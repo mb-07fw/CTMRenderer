@@ -4,7 +4,7 @@ workspace "RendererTest"
 	language "C++"
 	cppdialect "C++20"
 
-	outputdir = ("%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}")
+	local outputdir = ("%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}")
 
 	targetdir ("bin/out/" .. outputdir ..  "/%{prj.name}")
 	objdir ("bin/intermediates/" .. outputdir .. "/%{prj.name}")
@@ -14,9 +14,9 @@ workspace "RendererTest"
 			symbols "On"
 		filter{} -- clear filters
 
-		filter "configurations:Release"
-			optimize "On"
-		filter{} -- clear filters
+	filter "configurations:Release"
+		optimize "On"
+	filter{} -- clear filters
 
 	project "RendererApp"
 		location "RendererTest/RendererApp"

@@ -93,28 +93,87 @@ namespace Renderer::Window
 
         m_IsShown = true;
 
-        // TODO : Start the message loop thread.
-        //  Pseudo ---> m_MessageLoop = std::thread(MessageLoop);
+        // Start the message loop thread.
+        m_MessageLoop = std::thread(
+            [this]() { 
+                this->MessageLoop();
+            }
+        );
+    }
+
+    void Window::JoinMessageLoop()
+    {
+        if (!m_MessageLoop.joinable())
+        {
+            std::cerr << "[Window | JoinMessageLoop] Unable to join the message loop.\n";
+            return;
+        }
+
+        PostQuitMessage(0);  // Signal to exit the message loop
+        m_IsRunning = false; // Ensure the running flag is false
+
+        m_MessageLoop.join();
     }
     #pragma endregion
 
     #pragma region Private Implementations
+    void Window::MessageLoop()
+    {
+        DEBUG_PRINT("Message loop start.\n");
+
+        BOOL result;
+        MSG msg;
+
+        while ((result = GetMessage(&msg, nullptr, 0, 0)) > 0)
+        {
+            DEBUG_PRINT("GOT MESSAGE.\n");
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+
+        if (result == -1)
+            std::cerr << "GetMessage received an invalid parameter.\n";
+
+        else if (result == 0)
+            DEBUG_PRINT("Window exiting.\n");
+
+        DEBUG_PRINT("Message loop end.\n");
+    }
+
     LRESULT CALLBACK Window::WndProcSetup(HWND windowHandle, UINT msgCode, WPARAM wParam, LPARAM lParam) noexcept
     {
-        return DefWindowProc(windowHandle, msgCode, wParam, lParam);
+        // If we get a message before the WM_NCCREATE message, handle with default window procedure provided by the WinAPI.
+        //   (WM_NCCREATE contains the instance of Window that was passed to CrateWindowEx)
+        if (msgCode != WM_NCCREATE)
+            return DefWindowProc(windowHandle, msgCode, wParam, lParam);
 
-        // TODO : Implement the storing of the Window instance (this) in user data, and set the window procedure to WndProcThunk.
+        // Retrieve create parameter passed into CreateWindowEx that stores an instance of Window.
+        const CREATESTRUCTW* const pCreateStruct = reinterpret_cast<CREATESTRUCTW*>(lParam);
+        Window* const pWindow = static_cast<Window*>(pCreateStruct->lpCreateParams);
+
+        // Set WinAPI-managed user data to store the instance to Window.
+        SetWindowLongPtr(windowHandle, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWindow));
+
+        // Set message procedure that WndProcThunk now that the instance of Window is stored.
+        SetWindowLongPtr(windowHandle, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(Window::WndProcThunk));
+
+        // Forward message to the instance WndProc.
+        return pWindow->WndProc(windowHandle, msgCode, wParam, lParam);
     }
 
     LRESULT CALLBACK Window::WndProcThunk(HWND windowHandle, UINT msgCode, WPARAM wParam, LPARAM lParam) noexcept
     {
-        return DefWindowProc(windowHandle, msgCode, wParam, lParam);
+        // Retrieve pointer to instance of Window from WinAPI user data.
+        Window* const pWindow = reinterpret_cast<Window*>(GetWindowLongPtr(windowHandle, GWLP_USERDATA));
 
-        // TODO : Implement the retrieval of the Window instance from user data and the calling of the instance's WndProc.
+        // Forward message to the instance handler.
+        return pWindow->WndProc(windowHandle, msgCode, wParam, lParam);
     }
 
     LRESULT CALLBACK Window::WndProc(HWND windowHandle, UINT msgCode, WPARAM wParam, LPARAM lParam) noexcept
     {
+        DEBUG_PRINT("WNDPROC.\n");
+
         switch (msgCode)
         {
         case WM_CLOSE:

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Window.hpp"
+#include "Event/EventManager.hpp"
 
 namespace Renderer
 {
@@ -17,5 +18,6 @@ namespace Renderer
 		void JoinForShutdown();
 	private:
 		Window::Window m_Window;
+		Event::EventManager m_EventManager;
 	};
 }
