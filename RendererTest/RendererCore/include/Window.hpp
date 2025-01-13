@@ -22,10 +22,13 @@ namespace Renderer::Window
 		Window& operator=(Window&&) = delete;
 	public:
 		void StartMessageLoop();
+		void JoinMessageLoop();
 	public:
 		[[nodiscard]] inline bool IsInitialized() { return m_IsInitialized; }
 		[[nodiscard]] inline bool IsShown()		  { return m_IsShown; }
 		[[nodiscard]] inline bool IsRunning()	  { return m_IsRunning; }
+	private:
+		void MessageLoop();
 	private:
 		static LRESULT CALLBACK WndProcSetup(HWND windowHandle, UINT msgCode, WPARAM wParam, LPARAM lParam) noexcept;
 		static LRESULT CALLBACK WndProcThunk(HWND windowHandle, UINT msgCode, WPARAM wParam, LPARAM lParam) noexcept;
@@ -39,6 +42,6 @@ namespace Renderer::Window
 		bool m_IsInitialized = false;
 		bool m_IsShown = false;
 		bool m_IsRunning = false;
-		//std::thread m_MessageLoop;
+		std::thread m_MessageLoop;
 	};
 }

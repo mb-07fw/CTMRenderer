@@ -27,6 +27,12 @@
     <ClInclude Include="include\WindowsDefines.hpp">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\Event\Event.hpp" />
+    <ClInclude Include="include\Event\EventManager.hpp" />
+    <ClInclude Include="include\Event\Listener.hpp" />
+    <ClInclude Include="include\Event\EventListener.hpp" />
+    <ClInclude Include="include\Event\ListenerPool.hpp" />
+    <ClInclude Include="include\Utility.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CorePCH.cpp">
@@ -35,11 +41,11 @@
     <ClCompile Include="src\Renderer.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\RendererCore.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\Window.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Event\EventManager.cpp" />
+    <ClCompile Include="src\Event\EventListener.cpp" />
+    <ClCompile Include="src\Event\ListenerPool.cpp" />
   </ItemGroup>
 </Project>
