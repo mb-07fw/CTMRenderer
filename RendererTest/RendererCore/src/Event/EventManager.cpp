@@ -1,5 +1,5 @@
-#include "CorePCH.hpp"
-#include "RendererMacros.hpp"
+#include "Core/CorePCH.hpp"
+#include "Core/CoreMacros.hpp"
 #include "Event/EventManager.hpp"
 
 namespace Renderer::Event
@@ -9,21 +9,21 @@ namespace Renderer::Event
 		DEBUG_PRINT("[EventManager] Initialized EventManager.\n");
 	}
 
-	void EventManager::PushEvent(EventType eventType)
+	void EventManager::BroadcastEvent(EventType eventType) noexcept
 	{
-		m_ListenerPool.NotifyListeners(eventType);
+		m_ListenerPool.NotifyListenersOfEvent(eventType);
 	}
 
-	const EventListener* EventManager::GetActiveListener(ListenType listenType)
+	const std::weak_ptr<EventListener> EventManager::GetActiveListener(ListenType listenType) noexcept
 	{
+		// Return an empty weak_ptr if the listen type is invalid.
 		if (listenType == ListenType::INVALID)
-			return nullptr;
+			return std::weak_ptr<EventListener>();
+		
+		const std::weak_ptr<EventListener> listener = m_ListenerPool.GetInactiveListener(listenType);
 
-		EventListener* pListener = m_ListenerPool.GetInactiveListener(listenType);
+		m_ListenerPool.ActivateListener(listener);
 
-		if (!m_ListenerPool.ActivateListener(pListener))
-			DEBUG_PRINT_ERROR("[EventManager PUB.GetActiveListener] Failed to initialize listener : " + std::to_string(pListener->ID()) + '\n');
-
-		return pListener;
+		return listener;
 	}
 }

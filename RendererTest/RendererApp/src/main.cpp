@@ -1,4 +1,5 @@
-#include "RendererCore.hpp"
+#include "Core/RendererCore.hpp"
+#include <iostream>
 
 int main()
 {
@@ -7,4 +8,6 @@ int main()
 	renderer.Start();
 
 	renderer.JoinForShutdown();
+
+	std::cout << "Main end.\n";
 }

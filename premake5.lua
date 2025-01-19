@@ -40,5 +40,5 @@ workspace "RendererTest"
 		files { locationdir .. "src/**.cpp", locationdir .. "include/**.hpp" }
 		includedirs { locationdir .. "include/" }
 
-		pchheader "CorePCH.hpp"	-- Define how the header is included.
-		pchsource (locationdir .. "src/CorePCH.cpp") -- Define the path of the pch source file.
+		pchheader "Core/CorePCH.hpp"	-- Define how the header is included.
+		pchsource (locationdir .. "src/Core/CorePCH.cpp") -- Define the path of the pch source file.

@@ -1,7 +1,13 @@
 #pragma once
 
+#include <thread> // std::thread
+#include <atomic> // std::atomic_bool
+#include <mutex>  // std::mutex
+#include <condition_variable> // std::condition_variable
+
 #include "Window.hpp"
 #include "Event/EventManager.hpp"
+#include "Event/EventManagerInterface.hpp"
 
 namespace Renderer
 {
@@ -17,7 +23,19 @@ namespace Renderer
 		void Start();
 		void JoinForShutdown();
 	private:
-		Window::Window m_Window;
+		void OnStart();
+		void OnEnd();
+		void OnEvent();
+		void EventLoop();
+	private:
 		Event::EventManager m_EventManager;
+		Event::EventManagerInterface m_EventManagerInterface;
+		Window::Window m_Window;
+		std::thread m_EventThread;
+		std::atomic_bool m_ShouldRun;
+		std::atomic_bool m_EventLoopStarted;
+		std::atomic_bool m_RendererStarted;
+		std::mutex m_RendererMutex;
+		std::condition_variable m_RendererCV;
 	};
 }

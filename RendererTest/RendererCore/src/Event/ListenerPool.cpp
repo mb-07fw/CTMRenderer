@@ -1,95 +1,103 @@
-#include "CorePCH.hpp"
-#include "RendererMacros.hpp"
+#include "Core/CorePCH.hpp"
+#include "Core/CoreMacros.hpp"
 #include "Event/ListenerPool.hpp"
 
 namespace Renderer::Event
 {
-	void ListenerPool::NotifyListeners(EventType eventType) noexcept
+	void ListenerPool::NotifyListenersOfEvent(EventType eventType) noexcept
 	{
-		const std::vector<std::unique_ptr<EventListener>>& listeners = m_ActiveListenerMap[ListenType::LISTEN_ALL];
+		ListenType listenType = GetListenTypeOfEventType(eventType);
 
-		const std::unique_ptr<Event>& pEvent = GetPooledEvent(eventType);
+		RUNTIME_ASSERT(listenType != ListenType::INVALID, "Listen type is invalid.\n");
 
-		for (const std::unique_ptr<EventListener>& listener : listeners)
-		{
-			listener->Notify(pEvent.get());
-			DEBUG_PRINT("[ListenerPool PUB.NotifyAll] Notified listener : " + std::to_string(listener->ID()) + '\n');
-		}
-
-		ListenType listenType = EventListener::GetListenTypeFromEvent(eventType);
-
-		const std::vector<std::unique_ptr<EventListener>>& listenAll = m_ActiveListenerMap[listenType];
-
-		for (const std::unique_ptr<EventListener>& listener : listenAll)
-		{
-			listener->Notify(pEvent.get());
-			DEBUG_PRINT("[ListenerPool PUB.NotifyAll] Notified listener : " + std::to_string(listener->ID()) + '\n');
-		}
+		// Notify listeners that listen to all events with the EventType.
+		NotifyListeners(m_ActiveListenerMap[ListenType::LISTEN_ALL], eventType);
+		
+		// Notify listeners that listen to the specific EventType.
+		NotifyListeners(m_ActiveListenerMap[listenType], eventType);
 	}
 
-	EventListener* ListenerPool::GetInactiveListener(ListenType listenType)
+	const std::weak_ptr<EventListener> ListenerPool::GetInactiveListener(ListenType listenType)
 	{
-		if (m_InactiveListenerMap.size() == 0)
+		// Get the vector of inactive listeners that's mapped to the listen type.
+		std::vector<std::shared_ptr<EventListener>>& inactiveListeners = m_InactiveListenerMap[listenType];
+
+		// Return an std::weak_ptr to a pooled listener if it's the vector isn't empty.
+		if (!inactiveListeners.empty())
 		{
-			++m_TotalListeners;
-
-			m_InactiveListenerMap[listenType].emplace_back(std::make_unique<EventListener>(listenType, m_TotalListeners));
-
-			return m_InactiveListenerMap[listenType].back().get();
+			std::shared_ptr<EventListener>& listener = inactiveListeners.back();
+			inactiveListeners.pop_back();
+			return std::weak_ptr(listener);
 		}
 
-		return nullptr;
+		// Construct a new listener with listener type.
+		++m_TotalListeners;
+		inactiveListeners.emplace_back(std::make_shared<EventListener>(listenType, m_TotalListeners));
+
+		// Return an std::weak_ptr to the constructed listener.
+		return std::weak_ptr(inactiveListeners.back());
 	}
 
-	bool ListenerPool::ActivateListener(EventListener*& pOutListener)
+	bool ListenerPool::ActivateListener(const std::weak_ptr<EventListener>& listener)
 	{
-		if (pOutListener == nullptr)
-			return false;
+		// Lock the std::weak_ptr to get it's data safely.
+		std::shared_ptr<EventListener> sharedListener = listener.lock();
 
-		ListenType iterateType = pOutListener->Type();
+		// Get listen type of the provided listener.
+		ListenType iterateType = sharedListener->Type();
 
-		if (iterateType == ListenType::INVALID)
-			return false;
+		// Get references to listener vectors.
+		std::vector<std::shared_ptr<EventListener>>& inactiveListeners = m_InactiveListenerMap[iterateType];
+		std::vector<std::shared_ptr<EventListener>>& activeListeners = m_ActiveListenerMap[iterateType];
 
-		std::vector<std::unique_ptr<EventListener>>& inactiveListeners = m_InactiveListenerMap[iterateType];
-		std::vector<std::unique_ptr<EventListener>>& activeListeners = m_ActiveListenerMap[iterateType];
+		// Get ID of the provided listener.
+		int listenerID = sharedListener->ID();
 
-		int pOutListenerID = pOutListener->ID();
-
-		// Iterate through inactiveListeners to find the provided listener's.
+		// Iterate through inactiveListeners to find the provided listener's ID.
 		for (size_t i = 0; i < inactiveListeners.size(); ++i)
 		{
 			// Get reference to the listener.
-			std::unique_ptr<EventListener>& listener = inactiveListeners.at(i);
+			std::shared_ptr<EventListener>& inactiveListener = inactiveListeners.at(i);
 
 			// Skip the listener if it doesn't match the provided listener's ID.
-			if (listener->ID() != pOutListenerID)
+			if (inactiveListener->ID() != listenerID)
 				continue;
 
 			// Move the listener from inactiveListeners into activeListeners.
-			activeListeners.emplace_back(std::move(listener));
+			activeListeners.emplace_back(std::move(inactiveListener));
 
 			// Erase the moved listener from inactiveListeners.
 			inactiveListeners.erase(inactiveListeners.begin() + i);
 
-			// Rewire the pointer to point to the moved listener.
-			pOutListener = activeListeners.at(activeListeners.size() - 1).get();
-
 			// Activate the listener.
-			pOutListener->ActivateListener();
+			sharedListener->ActivateListener();
 
-			// Return true for success.
+			// Return true for successful.
 			return true;
 		}
 
 		// Return false for unsuccessful.
 		return false;
 	}
-	
-	const std::unique_ptr<Event>& ListenerPool::GetPooledEvent(EventType eventType)
+
+	void ListenerPool::NotifyListeners(std::vector<std::shared_ptr<EventListener>>& activeListeners, EventType eventType) noexcept
 	{
-		// TODO : Store events in an event pool.
-		//		  This is returning a stack allocated object, idiot.
-		return std::make_unique<Event>(eventType);
+		// Get a pooled event with the event type.
+		const Event& event = m_EventPool.GetPooledEvent(eventType);
+
+		// Notify all listeners in the listener vector with a pointer to the provided event.
+		for (std::shared_ptr<EventListener>& listener : activeListeners)
+			listener->Notify(&event);
+	}
+
+	constexpr ListenType ListenerPool::GetListenTypeOfEventType(EventType eventType) noexcept
+	{
+		switch (eventType)
+		{
+		case EventType::RENDERER_START:
+		case EventType::RENDERER_END:   return ListenType::LISTEN_RENDERER_STATE;
+		case EventType::INVALID:
+		default:						return ListenType::INVALID;
+		}
 	}
 }

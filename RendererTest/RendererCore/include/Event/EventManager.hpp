@@ -1,7 +1,10 @@
 #pragma once
 
+#include <functional>
+
 #include "Event/Event.hpp"
 #include "ListenerPool.hpp"
+#include "EventPool.hpp"
 
 namespace Renderer::Event
 {
@@ -14,14 +17,10 @@ namespace Renderer::Event
 		EventManager& operator=(const EventManager&) = delete;
 		EventManager& operator=(EventManager&&) = delete;
 	public:
-		void PushEvent(EventType eventType);
+		void BroadcastEvent(EventType eventType) noexcept;
 		
-		/* Returns an pointer to a listener.
-		*  Return value may be nullptr if ListenType == INVALID.
-		*  The returned pointer must not be deleted, as it is already managed internally via std::unique_ptr.
-		*  Call DeactivateListener to deactivate the listener.
-		*/
-		[[nodiscard]] const EventListener* GetActiveListener(ListenType listenType);
+		// Returns a const std::weak_ptr to an an EventListener that listens for the provided ListenType.
+		[[nodiscard]] const std::weak_ptr<EventListener> GetActiveListener(ListenType listenType) noexcept;
 	private:
 		ListenerPool m_ListenerPool;
 	};

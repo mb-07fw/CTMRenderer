@@ -1,10 +1,10 @@
 #pragma once
 
 // Include Windows stuff.
-#include "WindowsDefines.hpp"
+#include "CoreDefines.hpp"
 #include <Windows.h>
 
-// Other C++ utilities.
+// Other C++ utilities used throughout RendererCore.
 #include <iostream>
 #include <vector>
 #include <memory>
@@ -12,5 +12,7 @@
 #include <atomic>
 #include <unordered_map>
 #include <thread>
-
-#include "Utility.hpp"
+#include <optional>
+#include <functional>
+#include <mutex>
+#include <condition_variable>

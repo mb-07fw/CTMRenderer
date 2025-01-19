@@ -1,7 +1,12 @@
 #pragma once
 
-#include "CorePCH.hpp" // std::
+#include <unordered_map> // std::unordered_map
+#include <vector>		 // std::vector
+#include <memory>		 // std::shared_ptr
+#include <cstdint>		 // uint32t
+
 #include "EventListener.hpp"
+#include "EventPool.hpp"
 
 namespace Renderer::Event
 {
@@ -14,20 +19,22 @@ namespace Renderer::Event
 		ListenerPool& operator=(const ListenerPool&) = delete;
 		ListenerPool& operator=(ListenerPool&&) = delete;
 	public:
-		void NotifyListeners(EventType eventType) noexcept;
-		[[nodiscard]] EventListener* GetInactiveListener(ListenType listenType);
+		void NotifyListenersOfEvent(EventType eventType) noexcept;
 
-		/* Rewires the provided pointer to point to the moved EventListener
-		*  from a map of inactive listeners to active listeners.
-		*
-		*  Returns true if the listener is active. Returns false if not.
-		*/
-		bool ActivateListener(EventListener*& pOutListener);
+		// Returns an inactive listener that's compatible with the provided ListenType.
+		[[nodiscard]] const std::weak_ptr<EventListener> GetInactiveListener(ListenType listenType);
+
+		/* Activates the provided listener to listen for events.
+		 * Returns true if the listener was activated. Returns false if not, or if the listener was already active. */
+		bool ActivateListener(const std::weak_ptr<EventListener>& listener);
 	private:
-		[[nodiscard]] const std::unique_ptr<Event>& GetPooledEvent(EventType eventType);
+		void NotifyListeners(std::vector<std::shared_ptr<EventListener>>& activeListeners, EventType eventType) noexcept;
 	private:
-		std::unordered_map<ListenType, std::vector<std::unique_ptr<EventListener>>> m_ActiveListenerMap;
-		std::unordered_map<ListenType, std::vector<std::unique_ptr<EventListener>>> m_InactiveListenerMap;
+		static constexpr ListenType GetListenTypeOfEventType(EventType eventType) noexcept;
+	private:
+		std::unordered_map<ListenType, std::vector<std::shared_ptr<EventListener>>> m_ActiveListenerMap;
+		std::unordered_map<ListenType, std::vector<std::shared_ptr<EventListener>>> m_InactiveListenerMap;
+		EventPool m_EventPool;
 		uint32_t m_TotalListeners = 0;
 	};
 }

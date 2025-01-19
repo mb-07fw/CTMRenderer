@@ -4,39 +4,76 @@
     <Filter Include="include">
       <UniqueIdentifier>{89AF369E-F58E-B539-FEA6-40106A051C9B}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\Core">
+      <UniqueIdentifier>{81F1C769-6D54-570E-16DA-8FC4021C2391}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Event">
+      <UniqueIdentifier>{9AF3EDA2-06B4-69D9-CFEE-B2563B6EAEB5}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src">
       <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Core">
+      <UniqueIdentifier>{A5D31CCF-91A0-77DA-BAB9-6582A6E5AC68}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Event">
+      <UniqueIdentifier>{3E1ADFB2-AA84-9329-F3C2-44CF5F6C717E}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\CorePCH.hpp">
-      <Filter>include</Filter>
+    <ClInclude Include="include\Core\CoreDefines.hpp">
+      <Filter>include\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\CoreMacros.hpp">
+      <Filter>include\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\CorePCH.hpp">
+      <Filter>include\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\RendererCore.hpp">
+      <Filter>include\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Event\Event.hpp">
+      <Filter>include\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Event\EventListener.hpp">
+      <Filter>include\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Event\EventManager.hpp">
+      <Filter>include\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Event\EventPool.hpp">
+      <Filter>include\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Event\ListenerPool.hpp">
+      <Filter>include\Event</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderer.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\RendererCore.hpp">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\RendererMacros.hpp">
+    <ClInclude Include="include\Utility.hpp">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\Window.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\WindowsDefines.hpp">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Event\Event.hpp" />
-    <ClInclude Include="include\Event\EventManager.hpp" />
-    <ClInclude Include="include\Event\Listener.hpp" />
-    <ClInclude Include="include\Event\EventListener.hpp" />
-    <ClInclude Include="include\Event\ListenerPool.hpp" />
-    <ClInclude Include="include\Utility.hpp" />
+    <ClInclude Include="include\Event\EventManagerInterface.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\CorePCH.cpp">
-      <Filter>src</Filter>
+    <ClCompile Include="src\Core\CorePCH.cpp">
+      <Filter>src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Event\EventListener.cpp">
+      <Filter>src\Event</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Event\EventManager.cpp">
+      <Filter>src\Event</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Event\EventPool.cpp">
+      <Filter>src\Event</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Event\ListenerPool.cpp">
+      <Filter>src\Event</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer.cpp">
       <Filter>src</Filter>
@@ -44,8 +81,6 @@
     <ClCompile Include="src\Window.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Event\EventManager.cpp" />
-    <ClCompile Include="src\Event\EventListener.cpp" />
-    <ClCompile Include="src\Event\ListenerPool.cpp" />
+    <ClCompile Include="src\Event\EventManagerInterface.cpp" />
   </ItemGroup>
 </Project>
