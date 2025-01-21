@@ -51,6 +51,7 @@ namespace Renderer::Event
 		int m_ID;
 		bool m_IsActive;
 		bool m_IsNotified;
+		// TODO : Use an std::array with a fixed size to prevent too many events being stored.
 		std::deque<const Event*> m_EventQueue; // NOTE: These pointers are non-owning, meaning they're only used as references to current events.
 	};
 }

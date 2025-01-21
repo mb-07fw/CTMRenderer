@@ -1,7 +1,7 @@
 #include "Core/CorePCH.hpp"
 #include "Core/CoreMacros.hpp"
+#include "Core/CoreUtility.hpp"
 #include "Renderer.hpp"
-#include "Utility.hpp"
 
 namespace Renderer
 {
@@ -27,9 +27,6 @@ namespace Renderer
 
 		m_EventManager.BroadcastEvent(Event::EventType::RENDERER_START);
 		DEBUG_PRINT("Broadcasted start.\n");
-
-		/*m_EventManager.BroadcastEvent(Event::EventType::RENDERER_END);
-		DEBUG_PRINT("Broadcasted end.\n");*/
 	}
 
 	void Renderer::EventLoop()
@@ -53,25 +50,31 @@ namespace Renderer
 
 		while (m_ShouldRun.load(std::memory_order_acquire))
 		{
-			while (!sharedListener->IsEventQueueEmpty())
+			if (sharedListener->IsNotified())
 			{
-				DEBUG_PRINT("Event listener is notified.\n");
+				while (!sharedListener->IsEventQueueEmpty())
+				{
+					DEBUG_PRINT("Event listener is notified.\n");
 
-				const Event::Event* event = sharedListener->PopOldest();
-				
-				RUNTIME_ASSERT(event != nullptr, "Event received is nullptr.\n");
+					const Event::Event* event = sharedListener->PopOldest();
 
-				Event::EventType eventType = event->Type();
+					RUNTIME_ASSERT(event != nullptr, "Event received is nullptr.\n");
 
-				RUNTIME_ASSERT(eventType != Event::EventType::INVALID, "Received event is invalid.\n");
+					Event::EventType eventType = event->Type();
 
-				if (eventType == Event::EventType::RENDERER_START)
-					OnStart();
-				else if (eventType == Event::EventType::RENDERER_END)
-					OnEnd();
+					RUNTIME_ASSERT(eventType != Event::EventType::INVALID, "Received event is invalid.\n");
+
+					if (eventType == Event::EventType::RENDERER_START)
+						OnStart();
+					else if (eventType == Event::EventType::RENDERER_END)
+						OnEnd();
+				}
+
+				sharedListener->ClearNotification();
 			}
 
-			sharedListener->ClearNotification();
+			if (m_Window.IsInitialized())
+				m_Window.DoFrame();
 
 			Sleep(100);
 		}

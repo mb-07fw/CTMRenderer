@@ -5,14 +5,19 @@ workspace "RendererTest"
 	cppdialect "C++20"
 
 	local outputdir = ("%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}")
+	local target_dir = "bin/out/" .. outputdir ..  "/%{prj.name}"
 
-	targetdir ("bin/out/" .. outputdir ..  "/%{prj.name}")
+	targetdir (target_dir)
 	objdir ("bin/intermediates/" .. outputdir .. "/%{prj.name}")
+
+	defines {
+		'OUTPUT_DIR="out/' .. outputdir .. '/%{prj.name}/"'
+	}
 
 	filter "configurations:Debug"
 			defines { "DEBUG_MODE" }
 			symbols "On"
-		filter{} -- clear filters
+	filter{} -- clear filters
 
 	filter "configurations:Release"
 		optimize "On"
@@ -26,19 +31,42 @@ workspace "RendererTest"
 
 		files { locationdir .. "src/**.cpp", locationdir .. "include/**.hpp" }
 		includedirs { locationdir .. "include/" }
-		links { "RendererCore" }
+
+		links { "RendererCore.lib" }
 		libdirs { "bin/out/" .. outputdir .. "/RendererCore/" }
+
 		dependson { "RendererCore" }
 		includedirs { "RendererTest/RendererCore/include" }
 
 	project "RendererCore"
 		locationdir = "RendererTest/RendererCore/"
+		shaderdir = locationdir .. "resources/shaders/"
 		
 		location (locationdir)
-		kind "StaticLib"
+		kind "StaticLib" -- Compile as a static library.
 
-		files { locationdir .. "src/**.cpp", locationdir .. "include/**.hpp" }
+		files { 
+			locationdir .. "src/**.cpp", 
+			locationdir .. "include/**.hpp",
+			shaderdir .. "/**.hlsl"
+		}
+
+		filter { "files:**VS.hlsl" }
+			shadertype "Vertex"
+			shadermodel "4.0"
+			entrypoint "main"
+		filter{} -- clear filters.
+
+		filter { "files:**PS.hlsl" }
+			shadertype "Pixel"
+			shadermodel "4.0"
+			entrypoint "main"
+		filter{} -- clear filters.
+
 		includedirs { locationdir .. "include/" }
+
+		-- These are included via #pragma comment's
+		-- links { "d3d11.lib", "d3dcompiler.lib" }
 
 		pchheader "Core/CorePCH.hpp"	-- Define how the header is included.
 		pchsource (locationdir .. "src/Core/CorePCH.cpp") -- Define the path of the pch source file.

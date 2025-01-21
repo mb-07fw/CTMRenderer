@@ -1,8 +1,9 @@
 #pragma once
 
-#include "Core/CoreDefines.hpp"
 #include "Windows.h"
 #include "Event/EventManagerInterface.hpp"
+#include "Geometry.hpp"
+#include "Graphics.hpp"
 
 #include <thread> // std::thread
 #include <atomic> // std::atomic
@@ -11,14 +12,6 @@
 
 namespace Renderer::Window
 {
-	struct WindowArea
-	{
-		WindowArea(unsigned int width, unsigned int height)
-			: width(width), height(height) {}
-
-		unsigned int width, height;
-	};
-
 	class Window
 	{
 	public:
@@ -28,10 +21,11 @@ namespace Renderer::Window
 		Window& operator=(const Window&&) = delete;
 		Window& operator=(Window&&) = delete;
 	public:
-		void Start();
-		void Join();
+		void Start() noexcept;
+		void Join() noexcept;
+		void DoFrame() noexcept;
 	public:
-		[[nodiscard]] inline bool IsInitialized() { return m_IsInitialized; }
+		[[nodiscard]] inline bool IsInitialized() { return m_IsInitialized.load(std::memory_order_relaxed); }
 		[[nodiscard]] inline bool IsShown()		  { return m_IsShown; }
 		[[nodiscard]] inline bool IsRunning()	  { return m_IsRunning; }
 	private:
@@ -46,7 +40,8 @@ namespace Renderer::Window
 		static constexpr const wchar_t* SMP_WINDOW_TITLE = L"Test Window";
 	private:
 		Event::EventManagerInterface& m_EventManagerInterface;
-		WindowArea m_WindowArea;
+		Geometry::WindowArea m_WindowArea;
+		Graphics::Graphics m_Graphics;
 		HWND m_WindowHandle;
 		std::atomic_bool m_IsInitialized;
 		std::atomic_bool m_IsShown;

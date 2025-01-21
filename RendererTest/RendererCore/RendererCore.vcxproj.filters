@@ -10,6 +10,12 @@
     <Filter Include="include\Event">
       <UniqueIdentifier>{9AF3EDA2-06B4-69D9-CFEE-B2563B6EAEB5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="resources">
+      <UniqueIdentifier>{202B5BA7-8C95-0F1E-D5D3-C0C3417DED72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resources\shaders">
+      <UniqueIdentifier>{19081037-851E-0ECD-CE95-99EE3AEBDE54}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src">
       <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
     </Filter>
@@ -30,6 +36,9 @@
     <ClInclude Include="include\Core\CorePCH.hpp">
       <Filter>include\Core</Filter>
     </ClInclude>
+    <ClInclude Include="include\Core\CoreUtility.hpp">
+      <Filter>include\Core</Filter>
+    </ClInclude>
     <ClInclude Include="include\Core\RendererCore.hpp">
       <Filter>include\Core</Filter>
     </ClInclude>
@@ -42,22 +51,29 @@
     <ClInclude Include="include\Event\EventManager.hpp">
       <Filter>include\Event</Filter>
     </ClInclude>
+    <ClInclude Include="include\Event\EventManagerInterface.hpp">
+      <Filter>include\Event</Filter>
+    </ClInclude>
     <ClInclude Include="include\Event\EventPool.hpp">
       <Filter>include\Event</Filter>
     </ClInclude>
     <ClInclude Include="include\Event\ListenerPool.hpp">
       <Filter>include\Event</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer.hpp">
+    <ClInclude Include="include\Graphics.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\Utility.hpp">
+    <ClInclude Include="include\Renderer.hpp">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\Window.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\Event\EventManagerInterface.hpp" />
+    <ClInclude Include="include\Geometry.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\InfoQueue.hpp" />
+    <ClInclude Include="include\Color.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\CorePCH.cpp">
@@ -69,11 +85,17 @@
     <ClCompile Include="src\Event\EventManager.cpp">
       <Filter>src\Event</Filter>
     </ClCompile>
+    <ClCompile Include="src\Event\EventManagerInterface.cpp">
+      <Filter>src\Event</Filter>
+    </ClCompile>
     <ClCompile Include="src\Event\EventPool.cpp">
       <Filter>src\Event</Filter>
     </ClCompile>
     <ClCompile Include="src\Event\ListenerPool.cpp">
       <Filter>src\Event</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics.cpp">
+      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer.cpp">
       <Filter>src</Filter>
@@ -81,6 +103,14 @@
     <ClCompile Include="src\Window.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Event\EventManagerInterface.cpp" />
+    <ClCompile Include="src\InfoQueue.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="resources\shaders\DefaultPS.hlsl">
+      <Filter>resources\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\DefaultVS.hlsl">
+      <Filter>resources\shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

@@ -1,12 +1,13 @@
 #include "Core/CorePCH.hpp"
 #include "Core/CoreMacros.hpp"
 #include "Window.hpp"
+#include "Color.hpp"
 
 namespace Renderer::Window
 {
     #pragma region Constructors
     Window::Window(Event::EventManagerInterface& eventManagerInterface, unsigned int width, unsigned int height)
-        : m_EventManagerInterface(eventManagerInterface), m_WindowArea(width, height), m_WindowHandle(nullptr), 
+        : m_EventManagerInterface(eventManagerInterface), m_WindowArea(width, height), m_Graphics(m_WindowArea), m_WindowHandle(nullptr),
           m_IsInitialized(false), m_IsShown(false), m_IsRunning(false), m_MessageLoop(), m_Mutex(), m_CV()
     {
         // Start the message loop thread.
@@ -15,13 +16,13 @@ namespace Renderer::Window
     #pragma endregion
 
     #pragma region Public API
-    void Window::Start()
+    void Window::Start() noexcept
     {
         m_IsRunning.store(true, std::memory_order_release);
         m_CV.notify_one();
     }
 
-    void Window::Join()
+    void Window::Join() noexcept
     {
         if (!m_MessageLoop.joinable())
         {
@@ -32,6 +33,15 @@ namespace Renderer::Window
         m_IsRunning.store(false, std::memory_order_release);
 
         m_MessageLoop.join();
+    }
+
+    void Window::DoFrame() noexcept
+    {
+        RUNTIME_ASSERT(m_IsRunning.load(std::memory_order_acquire), "Window is not running.\n");
+        
+        m_Graphics.StartFrame();
+        m_Graphics.Draw();
+        m_Graphics.EndFrame();
     }
     #pragma endregion
 
@@ -66,7 +76,7 @@ namespace Renderer::Window
         constexpr int windowSizePadding = 100;
         RECT windowClientAreaRect;
 
-        // Calculate window size to account for the actual client size.
+        // Calculate window size to account for the actual client size. (640 x 480 client area with 100 pixel padding)
         windowClientAreaRect.left = windowSizePadding;
         windowClientAreaRect.right = m_WindowArea.width + windowSizePadding;
         windowClientAreaRect.top = windowSizePadding;
@@ -93,6 +103,8 @@ namespace Renderer::Window
         );
 
         RUNTIME_ASSERT(m_WindowHandle != nullptr, "Failed to create the window.\n");
+
+        m_Graphics.Init(m_WindowHandle);
 
         m_IsInitialized = true;
     }

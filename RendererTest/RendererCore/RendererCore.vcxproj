@@ -56,7 +56,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Core/CorePCH.hpp</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>DEBUG_MODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>OUTPUT_DIR="out/Debug-windows-x86_64/RendererCore/";DEBUG_MODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
@@ -73,6 +73,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Core/CorePCH.hpp</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>OUTPUT_DIR="out/Release-windows-x86_64/RendererCore/";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -89,9 +90,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\Color.hpp" />
     <ClInclude Include="include\Core\CoreDefines.hpp" />
     <ClInclude Include="include\Core\CoreMacros.hpp" />
     <ClInclude Include="include\Core\CorePCH.hpp" />
+    <ClInclude Include="include\Core\CoreUtility.hpp" />
     <ClInclude Include="include\Core\RendererCore.hpp" />
     <ClInclude Include="include\Event\Event.hpp" />
     <ClInclude Include="include\Event\EventListener.hpp" />
@@ -99,9 +102,11 @@
     <ClInclude Include="include\Event\EventManagerInterface.hpp" />
     <ClInclude Include="include\Event\EventPool.hpp" />
     <ClInclude Include="include\Event\ListenerPool.hpp" />
+    <ClInclude Include="include\Graphics.hpp" />
+    <ClInclude Include="include\InfoQueue.hpp" />
     <ClInclude Include="include\Renderer.hpp" />
-    <ClInclude Include="include\Utility.hpp" />
     <ClInclude Include="include\Window.hpp" />
+    <ClInclude Include="include\Geometry.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\CorePCH.cpp">
@@ -112,8 +117,20 @@
     <ClCompile Include="src\Event\EventManagerInterface.cpp" />
     <ClCompile Include="src\Event\EventPool.cpp" />
     <ClCompile Include="src\Event\ListenerPool.cpp" />
+    <ClCompile Include="src\Graphics.cpp" />
+    <ClCompile Include="src\InfoQueue.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\Window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="resources\shaders\DefaultPS.hlsl">
+      <ShaderType>Pixel</ShaderType>
+      <ShaderModel>4.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\DefaultVS.hlsl">
+      <ShaderType>Vertex</ShaderType>
+      <ShaderModel>4.0</ShaderModel>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
