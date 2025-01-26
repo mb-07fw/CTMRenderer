@@ -19,7 +19,7 @@ namespace Renderer::Event
 		ListenerPool& operator=(const ListenerPool&) = delete;
 		ListenerPool& operator=(ListenerPool&&) = delete;
 	public:
-		void NotifyListenersOfEvent(EventType eventType) noexcept;
+		void NotifyListenersOfEvent(const Event* pEvent) noexcept;
 
 		// Returns an inactive listener that's compatible with the provided ListenType.
 		[[nodiscard]] const std::weak_ptr<EventListener> GetInactiveListener(ListenType listenType);
@@ -28,9 +28,9 @@ namespace Renderer::Event
 		 * Returns true if the listener was activated. Returns false if not, or if the listener was already active. */
 		bool ActivateListener(const std::weak_ptr<EventListener>& listener);
 	private:
-		void NotifyListeners(std::vector<std::shared_ptr<EventListener>>& activeListeners, EventType eventType) noexcept;
+		void NotifyListeners(std::vector<std::shared_ptr<EventListener>>& activeListeners, const Event* pEvent) noexcept;
 	private:
-		static constexpr ListenType GetListenTypeOfEventType(EventType eventType) noexcept;
+		static constexpr ListenType ListenTypeOfAbstractType(AbstractEventType absType) noexcept;
 	private:
 		std::unordered_map<ListenType, std::vector<std::shared_ptr<EventListener>>> m_ActiveListenerMap;
 		std::unordered_map<ListenType, std::vector<std::shared_ptr<EventListener>>> m_InactiveListenerMap;

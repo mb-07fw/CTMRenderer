@@ -35,6 +35,6 @@
 #define NOPROXYSTUB
 #define NOIMAGE
 #define NOTAPE
-#define STRICT
+//#define STRICT (Macro redefinitions?)
 
 #include <sdkddkver.h> // Defines a bunch of windows related macros that correspond to the current Windows system settings. Include this before windows.h.

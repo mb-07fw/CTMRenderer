@@ -4,17 +4,17 @@
 
 namespace Renderer::Event
 {
-	void ListenerPool::NotifyListenersOfEvent(EventType eventType) noexcept
+	void ListenerPool::NotifyListenersOfEvent(const Event* pEvent) noexcept
 	{
-		ListenType listenType = GetListenTypeOfEventType(eventType);
+		ListenType listenType = ListenTypeOfAbstractType(pEvent->AbsType());
 
-		RUNTIME_ASSERT(listenType != ListenType::INVALID, "Listen type is invalid.\n");
+		RUNTIME_ASSERT(listenType != ListenType::INVALID, "Correspondin listen type is invalid.\n");
 
 		// Notify listeners that listen to all events with the EventType.
-		NotifyListeners(m_ActiveListenerMap[ListenType::LISTEN_ALL], eventType);
+		NotifyListeners(m_ActiveListenerMap[ListenType::LISTEN_ALL], pEvent);
 		
 		// Notify listeners that listen to the specific EventType.
-		NotifyListeners(m_ActiveListenerMap[listenType], eventType);
+		NotifyListeners(m_ActiveListenerMap[listenType], pEvent);
 	}
 
 	const std::weak_ptr<EventListener> ListenerPool::GetInactiveListener(ListenType listenType)
@@ -44,11 +44,11 @@ namespace Renderer::Event
 		std::shared_ptr<EventListener> sharedListener = listener.lock();
 
 		// Get listen type of the provided listener.
-		ListenType iterateType = sharedListener->Type();
+		ListenType listenType = sharedListener->Type();
 
 		// Get references to listener vectors.
-		std::vector<std::shared_ptr<EventListener>>& inactiveListeners = m_InactiveListenerMap[iterateType];
-		std::vector<std::shared_ptr<EventListener>>& activeListeners = m_ActiveListenerMap[iterateType];
+		std::vector<std::shared_ptr<EventListener>>& inactiveListeners = m_InactiveListenerMap[listenType];
+		std::vector<std::shared_ptr<EventListener>>& activeListeners = m_ActiveListenerMap[listenType];
 
 		// Get ID of the provided listener.
 		int listenerID = sharedListener->ID();
@@ -69,7 +69,7 @@ namespace Renderer::Event
 			// Erase the moved listener from inactiveListeners.
 			inactiveListeners.erase(inactiveListeners.begin() + i);
 
-			// Activate the listener.
+			// Activate the provided listener now that it's "owning" shared_ptr has been moved into activeListeners.
 			sharedListener->ActivateListener();
 
 			// Return true for successful.
@@ -80,24 +80,19 @@ namespace Renderer::Event
 		return false;
 	}
 
-	void ListenerPool::NotifyListeners(std::vector<std::shared_ptr<EventListener>>& activeListeners, EventType eventType) noexcept
+	void ListenerPool::NotifyListeners(std::vector<std::shared_ptr<EventListener>>& activeListeners, const Event* pEvent) noexcept
 	{
-		// Get a pooled event with the event type.
-		const Event& event = m_EventPool.GetPooledEvent(eventType);
-
 		// Notify all listeners in the listener vector with a pointer to the provided event.
 		for (std::shared_ptr<EventListener>& listener : activeListeners)
-			listener->Notify(&event);
+			listener->Notify(pEvent);
 	}
 
-	constexpr ListenType ListenerPool::GetListenTypeOfEventType(EventType eventType) noexcept
+	constexpr ListenType ListenerPool::ListenTypeOfAbstractType(AbstractEventType absType) noexcept
 	{
-		switch (eventType)
+		switch (absType)
 		{
-		case EventType::RENDERER_START:
-		case EventType::RENDERER_END:   return ListenType::LISTEN_RENDERER_STATE;
-		case EventType::INVALID:
-		default:						return ListenType::INVALID;
+		case AbstractEventType::RENDERER_STATE: return ListenType::LISTEN_RENDERER_STATE;
+		default:								return ListenType::INVALID;
 		}
 	}
 }

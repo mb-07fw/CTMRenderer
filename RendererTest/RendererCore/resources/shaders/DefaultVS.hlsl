@@ -1,16 +1,13 @@
-struct VSInput
-{
-    float2 pos : POSITION;
-};
-
 struct VSOutput
 {
-    float4 pos : SV_POSITION;
+    float4 color : Color;
+    float4 pos : SV_Position;
 };
 
-VSOutput main(VSInput input)
+VSOutput main(float4 color : Color, float2 pos : Position)
 {
     VSOutput output;
-    output.pos = float4(input.pos, 0.0f, 1.0f);
-    return output;
+    output.color = color;
+    output.pos = float4(pos, 0.0f, 1.0f);
+    return output; // Convert 2D coordinate to 4D homogenous space.
 }

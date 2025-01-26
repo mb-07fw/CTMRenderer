@@ -5,17 +5,16 @@
 namespace Renderer::Event
 {
 	EventManager::EventManager()
+		: m_ListenerPool(), m_EventPool(),
+		  m_ListenerPoolMutex(), m_EventPoolMutex()
 	{
 		DEBUG_PRINT("[EventManager] Initialized EventManager.\n");
 	}
 
-	void EventManager::BroadcastEvent(EventType eventType) noexcept
+	const std::weak_ptr<EventListener> EventManager::GetActiveListenerSafe(ListenType listenType) noexcept
 	{
-		m_ListenerPool.NotifyListenersOfEvent(eventType);
-	}
+		std::lock_guard<std::mutex> lock(m_ListenerPoolMutex);
 
-	const std::weak_ptr<EventListener> EventManager::GetActiveListener(ListenType listenType) noexcept
-	{
 		// Return an empty weak_ptr if the listen type is invalid.
 		if (listenType == ListenType::INVALID)
 			return std::weak_ptr<EventListener>();

@@ -5,22 +5,25 @@
 
 namespace Renderer::Window::Graphics
 {
-	Graphics::Graphics(const Geometry::WindowArea& windowArea) noexcept
+	Graphics::Graphics(const Geometry::WindowArea& windowArea, const unsigned int targetFPS) noexcept
 		: m_WindowHandle(nullptr), m_WindowArea(windowArea), m_InfoQueue(), m_InitializedScene(false),
-		mP_Device(nullptr), mP_SwapChain(nullptr), mP_DeviceContext(nullptr), mP_RTV(nullptr), m_ClearColor(0, 0, 0, 0)
+		  mP_Device(nullptr), mP_SwapChain(nullptr), mP_DeviceContext(nullptr), mP_RTV(nullptr), 
+		  m_ClearColor(0, 0, 0, 0), m_TargetFPS(targetFPS)
 	{
 	}
 
 	void Graphics::Init(const HWND windowHandle) noexcept
 	{
+		DEBUG_PRINT("(Graphics.Init) Target FPS : " + std::to_string(m_TargetFPS) + '\n');
+
 		m_WindowHandle = windowHandle;
 
 		DXGI_SWAP_CHAIN_DESC swapDesc = {};
 		swapDesc.BufferDesc.Width = m_WindowArea.width;
 		swapDesc.BufferDesc.Height = m_WindowArea.height;
 		swapDesc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-		swapDesc.BufferDesc.RefreshRate.Numerator = 0;	 // Use default.
-		swapDesc.BufferDesc.RefreshRate.Denominator = 0; // Use default.
+		swapDesc.BufferDesc.RefreshRate.Numerator = m_TargetFPS;
+		swapDesc.BufferDesc.RefreshRate.Denominator = 1;
 		swapDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 		swapDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 		swapDesc.SampleDesc.Count = 1;
@@ -47,14 +50,12 @@ namespace Renderer::Window::Graphics
 			nullptr,
 			&mP_DeviceContext
 		);
-
 		RUNTIME_ASSERT(hResult == S_OK, Utility::TranslateHResult(hResult));
 
 		m_InfoQueue.Init(mP_Device);
 
-		Microsoft::WRL::ComPtr<ID3D11Resource> pBackBuffer = nullptr;
-
 		// Get the back buffer.
+		Microsoft::WRL::ComPtr<ID3D11Resource> pBackBuffer = nullptr;
 		hResult = mP_SwapChain->GetBuffer(0, __uuidof(ID3D11Resource), &pBackBuffer);
 		RUNTIME_ASSERT(hResult == S_OK, Utility::TranslateHResult(hResult));
 
@@ -62,20 +63,32 @@ namespace Renderer::Window::Graphics
 		hResult = mP_Device->CreateRenderTargetView(pBackBuffer.Get(), nullptr, mP_RTV.GetAddressOf());
 		RUNTIME_ASSERT(hResult == S_OK, Utility::TranslateHResult(hResult));
 
-		//BindRTV();
-
 		InitTestScene();
 	}
 
 	void Graphics::InitTestScene() noexcept
 	{
-		const Geometry::BareVertex2D vertices[] = {
-			{  { 0.0f,  0.5f } },
-			{  { 0.5f, -0.5f } },
-			{  {-0.5f, -0.5f } }
+		struct Vertex {
+			struct {
+				float x, y;
+			} pos;
+
+			struct {
+				float r, g, b, a;
+			} color;
 		};
 
-		const unsigned int vBufferStride = Geometry::BareVertex2D::Stride();
+		const Vertex vertices[] = {
+			{ -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 1.0f },
+			{  0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f },
+			{ -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f },
+
+			//{ -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 1.0f },
+			//{  0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 1.0f },
+			//{  0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f }
+		};
+
+		const unsigned int vBufferStride = sizeof(Vertex);
 		const unsigned int vBufferOffset = 0;
 
 		Microsoft::WRL::ComPtr<ID3D11Buffer> pVBuffer = nullptr;
@@ -85,7 +98,7 @@ namespace Renderer::Window::Graphics
 		vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 		vBufferDesc.CPUAccessFlags = 0;
 		vBufferDesc.MiscFlags = 0;
-		vBufferDesc.StructureByteStride = 0; // not a structured buffer.
+		vBufferDesc.StructureByteStride = vBufferStride; // not a structured buffer.
 
 		D3D11_SUBRESOURCE_DATA vBufferSubData = {};
 		vBufferSubData.pSysMem = vertices;
@@ -122,8 +135,8 @@ namespace Renderer::Window::Graphics
 
 		Microsoft::WRL::ComPtr<ID3D11InputLayout> pInputLayout = nullptr;
 		D3D11_INPUT_ELEMENT_DESC inputDescs[] = {
-			{ "POSITION", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, 0u, D3D11_INPUT_PER_VERTEX_DATA, 0u },
-			//{ "COLOR", 0u, DXGI_FORMAT_R32G32B32A32_FLOAT, 0u, sizeof(Geometry::Pos2D), D3D11_INPUT_PER_VERTEX_DATA, 0u}
+			{ "Position", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, 0u, D3D11_INPUT_PER_VERTEX_DATA, 0u },
+			{ "Color", 0u, DXGI_FORMAT_R32G32B32A32_FLOAT, 0u, sizeof(float) * 2, D3D11_INPUT_PER_VERTEX_DATA, 0u}
 		};
 
 		mP_Device->CreateInputLayout(inputDescs, std::size(inputDescs), pBlob->GetBufferPointer(), pBlob->GetBufferSize(), pInputLayout.GetAddressOf());
@@ -152,7 +165,6 @@ namespace Renderer::Window::Graphics
 
 	void Graphics::Draw() noexcept
 	{
-		// Issue a draw call to render 3 vertices. (The output is sent to the bound RTV)
 		mP_DeviceContext->Draw(3, 0);
 		RUNTIME_ASSERT(m_InfoQueue.IsQueueEmpty() == true, m_InfoQueue.GetMessagesAsStr());
 	}

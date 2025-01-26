@@ -5,15 +5,27 @@
 #include <wrl.h>
 
 #include "Geometry.hpp"
-#include "Color.hpp"
 #include "InfoQueue.hpp"
 
 namespace Renderer::Window::Graphics
 {
+	struct Color
+	{
+		inline Color(float r = 0, float g = 0, float b = 0, float a = 0)
+		{
+			rgba[0] = r;
+			rgba[1] = g;
+			rgba[2] = b;
+			rgba[3] = a;
+		}
+
+		float rgba[4];
+	};
+
 	class Graphics
 	{
 	public:
-		Graphics(const Geometry::WindowArea& windowArea) noexcept;
+		Graphics(const Geometry::WindowArea & windowArea, const unsigned int targetFPS) noexcept;
 		Graphics(const Graphics&) = delete;
 		Graphics(Graphics&&) = delete;
 		Graphics& operator=(const Graphics&) = delete;
@@ -27,7 +39,7 @@ namespace Renderer::Window::Graphics
 	private:
 		void BindRTV() const noexcept;
 	private:
-		static constexpr unsigned int SYNC_INTERVAL = 1u;
+		static constexpr unsigned char SYNC_INTERVAL = 1u;
 	private:
 		HWND m_WindowHandle;
 		const Geometry::WindowArea& m_WindowArea;
@@ -38,5 +50,6 @@ namespace Renderer::Window::Graphics
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> mP_DeviceContext;
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> mP_RTV;
 		Color m_ClearColor;
+		const unsigned int m_TargetFPS;
 	};
 }

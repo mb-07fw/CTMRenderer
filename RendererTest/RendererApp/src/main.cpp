@@ -3,10 +3,9 @@
 
 int main()
 {
-	Renderer::Renderer renderer;
+	Renderer::Renderer renderer(60u);
 
 	renderer.Start();
-
 	renderer.JoinForShutdown();
 
 	std::cout << "Main end.\n";

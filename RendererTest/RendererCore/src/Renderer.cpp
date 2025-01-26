@@ -5,39 +5,68 @@
 
 namespace Renderer
 {
-	Renderer::Renderer()
-		: m_EventManager(), m_EventManagerInterface(m_EventManager), m_Window(m_EventManagerInterface), 
+	Renderer::Renderer(const unsigned int targetFPS)
+		: m_EventManager(), m_Window(m_EventManager, targetFPS), m_Timer(),
 		  m_EventThread(), m_ShouldRun(true), m_EventLoopStarted(false),
-		  m_RendererStarted(false), m_RendererMutex(), m_RendererCV()
+		  m_RendererStarted(false), m_RendererMutex(), m_RendererCV(), m_TargetFPS(targetFPS)
 	{
-		DEBUG_PRINT("Initialized renderer.\n");
 	}
 
+	#pragma region Public API
 	void Renderer::Start()
 	{
 		m_EventThread = std::thread(&Renderer::EventLoop, this);
-
-		DEBUG_PRINT("Waiting for event loop start.\n");
 
 		// Wait for the event loop to start.
 		std::unique_lock<std::mutex> lock(m_RendererMutex);
 		m_RendererCV.wait(lock, [this] { return m_EventLoopStarted.load(std::memory_order_acquire); });
 
-		DEBUG_PRINT("Done waiting for event loop start.\n");
-
-		m_EventManager.BroadcastEvent(Event::EventType::RENDERER_START);
+		m_EventManager.BroadcastEventSafe<Event::RendererStartEvent, Event::ConcreteEventType::RENDERER_START>(69u);
 		DEBUG_PRINT("Broadcasted start.\n");
+
+		DEBUG_PRINT("Initialized renderer.\n");
 	}
 
-	void Renderer::EventLoop()
+	void Renderer::JoinForShutdown()
 	{
-		const std::weak_ptr<Event::EventListener> listener = m_EventManager.GetActiveListener(Event::ListenType::LISTEN_RENDERER_STATE);
+		m_EventThread.join();
+	}
+	#pragma endregion
 
-		RUNTIME_ASSERT(listener.expired() == false, "Retrieved weak ptr to listener is expired.\n");
+	#pragma region Private Functions
+	void Renderer::OnStart(const Event::RendererStartEvent* pStartEvent) noexcept
+	{
+		RUNTIME_ASSERT(m_RendererStarted.load(std::memory_order_acquire) == false, "Renderer has already started.\n");
 
-		std::shared_ptr<Event::EventListener> sharedListener = listener.lock();
+		DEBUG_PRINT("Start args : " << pStartEvent->Value() << '\n');
 
-		RUNTIME_ASSERT(sharedListener->IsActive() == true, "State listener isn't active.\n");
+		m_Window.Start();
+
+		m_RendererStarted.store(true, std::memory_order_release);
+
+		DEBUG_PRINT("Renderer started.\n");
+	}
+
+	void Renderer::OnEnd(const Event::RendererEndEvent* pEndEvent) noexcept
+	{
+		RUNTIME_ASSERT(m_EventLoopStarted.load(std::memory_order_acquire) == true, "Event loop hasn't started.\n");
+		RUNTIME_ASSERT(m_RendererStarted.load(std::memory_order_acquire) == true, "Renderer hasn't started.\n");
+		RUNTIME_ASSERT(m_ShouldRun.load(std::memory_order_acquire) == true, "Renderer has already shutdown.\n");
+
+		DEBUG_PRINT("End args : " << pEndEvent->Value() << '\n');
+
+		m_ShouldRun.store(false, std::memory_order_release);
+
+		DEBUG_PRINT("Renderer ended.\n");
+	}
+
+	void Renderer::EventLoop() noexcept
+	{
+		const std::weak_ptr<Event::EventListener> weakEventListener = m_EventManager.GetActiveListenerSafe(Event::ListenType::LISTEN_RENDERER_STATE);
+		RUNTIME_ASSERT(weakEventListener.expired() == false, "Retrieved weak ptr to listener is expired.\n");
+
+		std::shared_ptr<Event::EventListener> eventListener = weakEventListener.lock();
+		RUNTIME_ASSERT(eventListener->IsActive() == true, "State listener isn't active.\n");
 
 		{
 			std::lock_guard<std::mutex> lock(m_RendererMutex);
@@ -48,72 +77,74 @@ namespace Renderer
 
 		DEBUG_PRINT("Renderer event loop started.\n");
 
+		const double targetFrameDuration = 1000.0 / m_TargetFPS;
+		double actualFrameDuration = 0.0;
+		double frameStartTime = 0.0;
+		double remainingFrameTime = 0.0;
+
+		BOOL result;
+		MSG msg;
 		while (m_ShouldRun.load(std::memory_order_acquire))
 		{
-			if (sharedListener->IsNotified())
+			frameStartTime = m_Timer.ElapsedMillis();
+
+			if (m_RendererStarted.load(std::memory_order_acquire))
+				m_Window.HandleMessages(result, msg);
+
+			if (eventListener->IsNotified())
 			{
-				while (!sharedListener->IsEventQueueEmpty())
-				{
-					DEBUG_PRINT("Event listener is notified.\n");
+				while (!eventListener->IsEventQueueEmpty())
+					HandleEvent(eventListener->PopOldest());
 
-					const Event::Event* event = sharedListener->PopOldest();
-
-					RUNTIME_ASSERT(event != nullptr, "Event received is nullptr.\n");
-
-					Event::EventType eventType = event->Type();
-
-					RUNTIME_ASSERT(eventType != Event::EventType::INVALID, "Received event is invalid.\n");
-
-					if (eventType == Event::EventType::RENDERER_START)
-						OnStart();
-					else if (eventType == Event::EventType::RENDERER_END)
-						OnEnd();
-				}
-
-				sharedListener->ClearNotification();
+				eventListener->ClearNotification();
 			}
 
 			if (m_Window.IsInitialized())
 				m_Window.DoFrame();
 
-			Sleep(100);
+			actualFrameDuration = m_Timer.ElapsedMillis() - frameStartTime;
+			remainingFrameTime = Utility::MinDB(targetFrameDuration - actualFrameDuration, 0);
+			RUNTIME_ASSERT(actualFrameDuration >= 0, "YOU DID SOMETHING WRONG YOU IDIOT!!!\n");
+			RUNTIME_ASSERT(remainingFrameTime >= 0, "YOU DID SOMETHING WRONG YOU IDIOT!!!\n");
+
+			Sleep(static_cast<DWORD>(remainingFrameTime));
 		}
 
 		DEBUG_PRINT("Event loop end.\n");
 	}
 
-	void Renderer::JoinForShutdown()
+	void Renderer::HandleEvent(const Event::Event* pEvent) noexcept
 	{
-		m_EventThread.join();
-		m_Window.Join();
+		using namespace Event;
+		
+		RUNTIME_ASSERT(pEvent != nullptr, "Event received is nullptr.\n");
+
+		AbstractEventType absType = pEvent->AbsType();
+
+		switch (absType)
+		{
+		case AbstractEventType::RENDERER_STATE:
+			RUNTIME_ASSERT(dynamic_cast<const RendererStateEvent*>(pEvent) != nullptr, "Types do not match.\n");
+			HandleStateEvent(static_cast<const RendererStateEvent*>(pEvent));
+			break;
+		}
 	}
 
-	#pragma region Private
-	void Renderer::OnStart()
+	void Renderer::HandleStateEvent(const Event::RendererStateEvent* pStateEvent) noexcept
 	{
-		RUNTIME_ASSERT(m_RendererStarted.load(std::memory_order_acquire) == false, "Renderer has already started.\n");
+		using namespace Event;
 
-		m_Window.Start();
-
-		m_RendererStarted.store(true, std::memory_order_release);
-
-		DEBUG_PRINT("Renderer started.\n");
-	}
-
-	void Renderer::OnEnd()
-	{
-		RUNTIME_ASSERT(m_EventLoopStarted.load(std::memory_order_acquire) == true, "Event loop hasn't started.\n");
-		RUNTIME_ASSERT(m_RendererStarted.load(std::memory_order_acquire) == true, "Renderer hasn't started.\n");
-		RUNTIME_ASSERT(m_ShouldRun.load(std::memory_order_acquire) == true, "Renderer has already shutdown.\n");
-
-		m_ShouldRun.store(false, std::memory_order_release);
-
-		DEBUG_PRINT("Renderer ended.\n");
-	}
-
-	void Renderer::OnEvent()
-	{
-
+		switch (pStateEvent->StateType())
+		{
+		case RendererStateEventType::START:
+			RUNTIME_ASSERT(dynamic_cast<const RendererStartEvent*>(pStateEvent) != nullptr, "Types do not match.\n");
+			OnStart(static_cast<const RendererStartEvent*>(pStateEvent));
+			break;
+		case RendererStateEventType::END:
+			RUNTIME_ASSERT(dynamic_cast<const RendererEndEvent*>(pStateEvent) != nullptr, "Types do not match.\n");
+			OnEnd(static_cast<const RendererEndEvent*>(pStateEvent));
+			break;
+		}
 	}
 	#pragma endregion
 }

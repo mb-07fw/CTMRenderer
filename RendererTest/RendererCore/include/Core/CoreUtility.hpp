@@ -61,4 +61,9 @@ namespace Renderer::Utility
     {
         return std::filesystem::path(OUTPUT_DIR);
     }
+
+    inline double MinDB(double value, double min)
+    {
+        return value < min ? min : value;
+    }
 }

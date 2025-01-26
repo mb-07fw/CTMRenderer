@@ -1,38 +1,48 @@
 #include "Core/CorePCH.hpp"
 #include "Core/CoreMacros.hpp"
 #include "Window.hpp"
-#include "Color.hpp"
 
 namespace Renderer::Window
 {
     #pragma region Constructors
-    Window::Window(Event::EventManagerInterface& eventManagerInterface, unsigned int width, unsigned int height)
-        : m_EventManagerInterface(eventManagerInterface), m_WindowArea(width, height), m_Graphics(m_WindowArea), m_WindowHandle(nullptr),
-          m_IsInitialized(false), m_IsShown(false), m_IsRunning(false), m_MessageLoop(), m_Mutex(), m_CV()
+    Window::Window(Event::EventManager& eventManagerRef, const unsigned int targetFPS, unsigned int width, unsigned int height)
+        : m_EventManagerRef(eventManagerRef), m_TargetFPS(targetFPS), m_WindowArea(width, height),
+          m_Graphics(m_WindowArea, targetFPS), m_WindowHandle(nullptr), m_IsInitialized(false),
+          m_IsShown(false), m_IsRunning(false), m_Mutex(), m_CV()
     {
-        // Start the message loop thread.
-        m_MessageLoop = std::thread(&Window::MessageLoop, this);
+        // Wait until Start is called to initialize the window, due to how Renderer doesn't use RAII.
 	}
     #pragma endregion
 
     #pragma region Public API
     void Window::Start() noexcept
     {
+        Init();
+
         m_IsRunning.store(true, std::memory_order_release);
-        m_CV.notify_one();
     }
 
-    void Window::Join() noexcept
+    void Window::HandleMessages(BOOL& result, MSG& msg) noexcept
     {
-        if (!m_MessageLoop.joinable())
+        RUNTIME_ASSERT(m_IsInitialized.load(std::memory_order_acquire), "The window isn't initialized.\n");
+
+        // Handle all queued messages.
+        // (If there are messages, the return value is nonzero, otherwise the return value is zero)
+        while ((result = PeekMessageW(&msg, nullptr, 0u, 0u, PM_REMOVE)) > 0)
         {
-            DEBUG_PRINT_ERROR("Unable to join Window's message loop.\n");
-            return;
+            if (msg.message == WM_QUIT)
+            {
+                DEBUG_PRINT("Broadcasting end event.\n");
+                m_EventManagerRef.BroadcastEventSafe<Event::RendererEndEvent, Event::ConcreteEventType::RENDERER_END>(1.738f); // ayy
+                return;
+            }
+
+            // Translate any raw virtual-key messages in character messages. (e.g., 'w', 'a', 's', 'd', etc)
+            TranslateMessage(&msg);
+
+            // Forward the message to the current window procedure.
+            DispatchMessageW(&msg);
         }
-
-        m_IsRunning.store(false, std::memory_order_release);
-
-        m_MessageLoop.join();
     }
 
     void Window::DoFrame() noexcept
@@ -42,6 +52,11 @@ namespace Renderer::Window
         m_Graphics.StartFrame();
         m_Graphics.Draw();
         m_Graphics.EndFrame();
+    }
+
+    void Window::SetTitle(std::wstring title) noexcept
+    {
+        SetWindowTextW(m_WindowHandle, title.c_str());
     }
     #pragma endregion
 
@@ -64,11 +79,10 @@ namespace Renderer::Window
                                                  *  the introduction of global state.
                                                  */
 
-                                                 // Get handle of the file that created the .exe process.
-        wndClass.hInstance = GetModuleHandle(NULL);
+        wndClass.hInstance = GetModuleHandleW(nullptr);
         RUNTIME_ASSERT(wndClass.hInstance != nullptr, "Failed to get the HINSTANCE.\n");
 
-        wndClass.lpszClassName = SMP_WINDOW_CLASS_NAME;
+        wndClass.lpszClassName = SP_WINDOW_CLASS_NAME;
 
         bool registeredClass = RegisterClassEx(&wndClass);
         RUNTIME_ASSERT(registeredClass != false, "Failed to register window class.\n");
@@ -85,8 +99,8 @@ namespace Renderer::Window
         // Create the window.
         m_WindowHandle = CreateWindowEx(
             0,                                        // 0 for no optional window styles.
-            SMP_WINDOW_CLASS_NAME,
-            SMP_WINDOW_TITLE,
+            SP_WINDOW_CLASS_NAME,
+            SP_WINDOW_TITLE,
             WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, // Window styles
             CW_USEDEFAULT, CW_USEDEFAULT,             // X,Y position.
             m_WindowArea.width, m_WindowArea.height,  // Window size.
@@ -96,50 +110,18 @@ namespace Renderer::Window
             this                                      // Other optional program data. (LPVOID)
 
             /* NOTE : We pass in this to be able to encapsulate the window procedure
-             *         as a instance member function so we have access to Window and Renderer state.
+             *        as a instance member function so we have access to Window and Renderer state.
              *
-             *        For more info on why or how, see comments on line 29.
+             *        For more info on why or how, see comments on line 73.
              */
         );
-
         RUNTIME_ASSERT(m_WindowHandle != nullptr, "Failed to create the window.\n");
 
         m_Graphics.Init(m_WindowHandle);
-
-        m_IsInitialized = true;
-    }
-
-    void Window::MessageLoop()
-    {
-        DEBUG_PRINT("Message loop start.\n");
-
-        // Create the window on the message loop thread to be able to read it's messages.
-        // (You have to create the window on the same thread you read it's messages on)
-        Init();
-
-        // Wait until Start is called.
-        std::unique_lock<std::mutex> lock(m_Mutex);
-        m_CV.wait(lock, [this] { return m_IsRunning.load(std::memory_order_acquire); });
+        m_IsInitialized.store(true, std::memory_order_release);
 
         ShowWindow(m_WindowHandle, SW_SHOW);
-
-        m_IsShown.store(true, std::memory_order_relaxed);
-
-        BOOL result;
-        MSG msg;
-
-        while ((result = GetMessage(&msg, nullptr, 0, 0)) > 0)
-        {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
-
-        RUNTIME_ASSERT(result != -1, "GetMessage received an invalid parameter, or another error occurred.\n");
-
-        DEBUG_PRINT("Broadcasting end event.\n");
-        m_EventManagerInterface.BroadcastEventSafe(Event::EventType::RENDERER_END);
-
-        DEBUG_PRINT("Message loop end.\n");
+        m_IsShown.store(true, std::memory_order_release);
     }
 
     LRESULT CALLBACK Window::WndProcSetup(HWND windowHandle, UINT msgCode, WPARAM wParam, LPARAM lParam) noexcept
@@ -178,7 +160,11 @@ namespace Renderer::Window
         {
         case WM_CLOSE:
             PostQuitMessage(0);
-            return 0;
+            return S_OK;
+        case WM_LBUTTONDOWN:
+            //m_EventManagerRef.BroadcastEventSafe(Event::EventType::MOUSE_LDOWN);
+            //m_EventManagerRef.BroadcastMouseEventSafe(Event::EventType::MOUSE_LDOWN, )
+            return S_OK;
         }
 
         return DefWindowProc(windowHandle, msgCode, wParam, lParam);

@@ -25,3 +25,4 @@
 #include <mutex>
 #include <condition_variable>
 #include <filesystem>
+#include <type_traits>
