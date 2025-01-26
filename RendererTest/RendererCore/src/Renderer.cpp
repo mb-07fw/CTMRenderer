@@ -36,6 +36,7 @@ namespace Renderer
 	#pragma region Private Functions
 	void Renderer::OnStart(const Event::RendererStartEvent* pStartEvent) noexcept
 	{
+		RUNTIME_ASSERT(pStartEvent != nullptr, "Start event is nullptr. How TF did this happen?\n");
 		RUNTIME_ASSERT(m_RendererStarted.load(std::memory_order_acquire) == false, "Renderer has already started.\n");
 
 		DEBUG_PRINT("Start args : " << pStartEvent->Value() << '\n');
@@ -49,6 +50,7 @@ namespace Renderer
 
 	void Renderer::OnEnd(const Event::RendererEndEvent* pEndEvent) noexcept
 	{
+		RUNTIME_ASSERT(pEndEvent != nullptr, "End event is nullptr. How TF did this happen?\n");
 		RUNTIME_ASSERT(m_EventLoopStarted.load(std::memory_order_acquire) == true, "Event loop hasn't started.\n");
 		RUNTIME_ASSERT(m_RendererStarted.load(std::memory_order_acquire) == true, "Renderer hasn't started.\n");
 		RUNTIME_ASSERT(m_ShouldRun.load(std::memory_order_acquire) == true, "Renderer has already shutdown.\n");
