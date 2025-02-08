@@ -24,7 +24,7 @@ namespace CTMRenderer::Window
 		void Start() noexcept;
 		void HandleMessages(BOOL& result, MSG& msg) noexcept;
 		void DoFrame() noexcept;
-		void SetTitle(std::wstring title) noexcept;
+		void SetTitle(const std::wstring& title) noexcept;
 	public:
 		[[nodiscard]] inline bool IsInitialized() { return m_IsInitialized.load(std::memory_order_acquire); }
 		[[nodiscard]] inline bool IsShown()		  { return m_IsShown.load(std::memory_order_acquire); }

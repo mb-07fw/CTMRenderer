@@ -29,6 +29,7 @@ namespace CTMRenderer
 		void EventLoop() noexcept;
 		void HandleEvent(Event::IEvent* pEvent) noexcept;
 		void HandleStateEvent(Event::IEvent* pEvent) noexcept;
+		void HandleMouseEvent(Event::IEvent* pEvent) noexcept;
 	private:
 		Event::EventSystem m_EventSystem;
 		Window::Window m_Window;

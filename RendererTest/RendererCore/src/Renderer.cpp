@@ -23,7 +23,7 @@ namespace CTMRenderer
 
 		// TODO: Figure out way to have events be dispatched on the Renderer's thread
 		//		 to prevent creation of the window on the main thread. (Dispatching queue)
-		m_EventSystem.Dispatcher().Dispatch<Event::StartEvent>(1738u);
+		m_EventSystem.Dispatcher().QueueEvent<Event::StartEvent>(1738u);
 
 		//DEBUG_PRINT("Initialized renderer.\n");
 	}
@@ -70,7 +70,8 @@ namespace CTMRenderer
 			std::bind(&CTMRenderer::HandleEvent, this, std::placeholders::_1)
 		);
 
-		m_EventSystem.Dispatcher().Subscribe(&eventListenerAny);
+		Event::EventDispatcher& eventDispatcher = m_EventSystem.Dispatcher();
+		eventDispatcher.Subscribe(&eventListenerAny);
 
 		{
 			std::lock_guard<std::mutex> lock(m_RendererMutex);
@@ -94,6 +95,9 @@ namespace CTMRenderer
 
 			if (m_RendererStarted.load(std::memory_order_acquire))
 				m_Window.HandleMessages(result, msg);
+
+			if (eventDispatcher.IsEventQueued())
+				eventDispatcher.DispatchQueued();
 
 			if (m_Window.IsRunning())
 				m_Window.DoFrame();
@@ -124,6 +128,7 @@ namespace CTMRenderer
 			HandleStateEvent(pEvent);
 			break;
 		case Event::GenericEventType::CTM_MOUSE_EVENT:
+			HandleMouseEvent(pEvent);
 			break;
 		default: break;
 		}
@@ -143,6 +148,21 @@ namespace CTMRenderer
 			break;
 		default:
 			RUNTIME_ASSERT(false, "Event wasn't handled.\n");
+		}
+	}
+
+	void CTMRenderer::HandleMouseEvent(Event::IEvent* pEvent) noexcept
+	{
+		RUNTIME_ASSERT(pEvent->GenericType() == Event::GenericEventType::CTM_MOUSE_EVENT, "The provided event wasn't a CTM_STATE_EVENT.\n");
+
+		switch (pEvent->ConcreteType())
+		{
+		case Event::ConcreteEventType::CTM_MOUSE_MOVE_EVENT:
+		{
+			Event::MouseMoveEvent* pMMoveEvent = Event::MouseMoveEvent::Cast(pEvent);
+			m_Window.SetTitle(std::wstring(L'(' + std::to_wstring(pMMoveEvent->PosX()) + L", " + std::to_wstring(pMMoveEvent->PosY()) + L')'));
+			break;
+		}
 		}
 	}
 	#pragma endregion

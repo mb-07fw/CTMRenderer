@@ -34,7 +34,7 @@ namespace CTMRenderer::Window
             {
                 DEBUG_PRINT("Broadcasting end event.\n");
                 
-                m_EventDispatcherRef.Dispatch<Event::EndEvent>(1738u); // ayyy
+                m_EventDispatcherRef.QueueEvent<Event::EndEvent>(1738u); // ayyy
                 return;
             }
 
@@ -55,7 +55,7 @@ namespace CTMRenderer::Window
         m_Graphics.EndFrame();
     }
 
-    void Window::SetTitle(std::wstring title) noexcept
+    void Window::SetTitle(const std::wstring& title) noexcept
     {
         SetWindowTextW(m_WindowHandle, title.c_str());
     }
@@ -165,7 +165,7 @@ namespace CTMRenderer::Window
             PostQuitMessage(0);
             return S_OK;
         case WM_MOUSEMOVE:
-            m_EventDispatcherRef.Dispatch<Event::MouseMoveEvent>(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+            m_EventDispatcherRef.QueueEvent<Event::MouseMoveEvent>(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
             return S_OK;
         default:
             return DefWindowProc(windowHandle, msgCode, wParam, lParam);

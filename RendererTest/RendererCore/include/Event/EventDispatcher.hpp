@@ -1,8 +1,8 @@
 #pragma once
 
-#include <memory>
-#include <functional>
 #include <vector>
+#include <deque>
+#include <atomic>
 
 #include "Event/EventListener.hpp"
 #include "Event/EventPool.hpp"
@@ -22,31 +22,19 @@ namespace CTMRenderer::Event
 		void Unsubscribe(IGenericListener* genericListener) noexcept;
 		void Unsubscribe(IConcreteListener* concreteListener) noexcept;
 
-		// Dispatches a concrete event type to all registered listeners that listen for it.
+		void DispatchQueued() noexcept;
+		inline [[nodiscard]] bool IsEventQueued() const noexcept { return m_IsEventQueued.load(std::memory_order_acquire); }
+
+		// Creates a queues a concrete event for dispatching. Queued events must be dispatched via `DispatchQueued()`
 		// Requires ConcreteEventTy to be a concrete event type, like MouseMoveEvent.
 		template <typename ConcreteEventTy, typename... Args>
 		requires IsConcreteEventType<ConcreteEventTy>::Value // Ensure the passed type (ConcreteEventTy) is a concrete event type like MouseMoveEvent.
-		inline void Dispatch(Args&&... args) noexcept
+		inline void QueueEvent(Args&&... args) noexcept
 		{
 			ConcreteEventTy* pEvent = m_EventPool.PoolNew<ConcreteEventTy::EnumConcreteTy, ConcreteEventTy>(std::forward<Args>(args)...);
+			m_EventQueues[ConcreteEventTy::EnumConcreteTy].emplace_back(pEvent);
 			
-			DispatchToGeneric(pEvent);
-			DispatchToConcrete(pEvent);
-		}
-
-		// Dispatches the newest event of the provided ConcreteEventTy that was previously pooled.
-		// Requires ConcreteEventTy to be a concrete event type, like MouseMoveEvent.
-		template <ConcreteEventType EnumConcreteTy, typename ConcreteEventTy>
-		requires IsConcreteEventType<ConcreteEventTy>::Value&& IsMatchingConcreteEventType<EnumConcreteTy, ConcreteEventTy>::Value
-		inline void DispatchExisting() const noexcept
-		{
-			ConcreteEventTy* pEvent = m_EventPool.GetNewest<EnumConcreteTy, ConcreteEventTy>();
-
-			if (pEvent == nullptr)
-				return;
-
-			DispatchToGeneric(pEvent);
-			DispatchToConcrete(pEvent);
+			m_IsEventQueued.store(true, std::memory_order_release);
 		}
 
 		// Returns a non-owning pointer to the oldest event of EnumConcreteTy.
@@ -69,7 +57,7 @@ namespace CTMRenderer::Event
 			// Get corresponding GenericEventType of the provided type.
 			constexpr GenericEventType EnunGenericType = EnumGenericEventTypeOf<ConcreteEventTy>::Type;
 
-			// TODO : Use .find to avoid duplicate loop-ups per event dispatch.
+			// TODO : Use .find to avoid duplicate loop-ups per GenericEventType.
 			if (m_GenericListeners.contains(EnunGenericType))
 			{
 				const std::vector<IGenericListener*>& genericListeners = m_GenericListeners.at(EnunGenericType);
@@ -105,6 +93,8 @@ namespace CTMRenderer::Event
 		}
 	private:
 		EventPool m_EventPool;
+		std::unordered_map<ConcreteEventType, std::deque<IEvent*>> m_EventQueues;
+		std::atomic_bool m_IsEventQueued = false;
 		std::unordered_map<GenericEventType, std::vector<IGenericListener*>> m_GenericListeners;
 		std::unordered_map<ConcreteEventType, std::vector<IConcreteListener*>> m_ConcreteListeners;
 	};
