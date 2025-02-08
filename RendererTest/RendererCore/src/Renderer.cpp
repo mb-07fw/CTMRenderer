@@ -3,43 +3,44 @@
 #include "Core/CoreUtility.hpp"
 #include "Renderer.hpp"
 
-namespace Renderer
+namespace CTMRenderer
 {
-	Renderer::Renderer(const unsigned int targetFPS)
-		: m_EventManager(), m_Window(m_EventManager, targetFPS), m_Timer(),
+	CTMRenderer::CTMRenderer(const unsigned int targetFPS)
+		: m_EventSystem(), m_Window(m_EventSystem.Dispatcher(), targetFPS), m_Timer(),
 		  m_EventThread(), m_ShouldRun(true), m_EventLoopStarted(false),
 		  m_RendererStarted(false), m_RendererMutex(), m_RendererCV(), m_TargetFPS(targetFPS)
 	{
 	}
 
 	#pragma region Public API
-	void Renderer::Start()
+	void CTMRenderer::Start()
 	{
-		m_EventThread = std::thread(&Renderer::EventLoop, this);
+		m_EventThread = std::thread(&CTMRenderer::EventLoop, this);
 
 		// Wait for the event loop to start.
 		std::unique_lock<std::mutex> lock(m_RendererMutex);
 		m_RendererCV.wait(lock, [this] { return m_EventLoopStarted.load(std::memory_order_acquire); });
 
-		m_EventManager.BroadcastEventSafe<Event::RendererStartEvent, Event::ConcreteEventType::RENDERER_START>(69u);
-		DEBUG_PRINT("Broadcasted start.\n");
+		// TODO: Figure out way to have events be dispatched on the Renderer's thread
+		//		 to prevent creation of the window on the main thread. (Dispatching queue)
+		m_EventSystem.Dispatcher().Dispatch<Event::StartEvent>(1738u);
 
-		DEBUG_PRINT("Initialized renderer.\n");
+		//DEBUG_PRINT("Initialized renderer.\n");
 	}
 
-	void Renderer::JoinForShutdown()
+	void CTMRenderer::JoinForShutdown()
 	{
 		m_EventThread.join();
 	}
 	#pragma endregion
 
 	#pragma region Private Functions
-	void Renderer::OnStart(const Event::RendererStartEvent* pStartEvent) noexcept
+	void CTMRenderer::OnStart(const Event::StartEvent* pStartEvent) noexcept
 	{
 		RUNTIME_ASSERT(pStartEvent != nullptr, "Start event is nullptr. How TF did this happen?\n");
 		RUNTIME_ASSERT(m_RendererStarted.load(std::memory_order_acquire) == false, "Renderer has already started.\n");
 
-		DEBUG_PRINT("Start args : " << pStartEvent->Value() << '\n');
+		DEBUG_PRINT("Start args : " << pStartEvent->PlaceholderArgs() << '\n');
 
 		m_Window.Start();
 
@@ -48,27 +49,28 @@ namespace Renderer
 		DEBUG_PRINT("Renderer started.\n");
 	}
 
-	void Renderer::OnEnd(const Event::RendererEndEvent* pEndEvent) noexcept
+	void CTMRenderer::OnEnd(const Event::EndEvent* pEndEvent) noexcept
 	{
 		RUNTIME_ASSERT(pEndEvent != nullptr, "End event is nullptr. How TF did this happen?\n");
 		RUNTIME_ASSERT(m_EventLoopStarted.load(std::memory_order_acquire) == true, "Event loop hasn't started.\n");
 		RUNTIME_ASSERT(m_RendererStarted.load(std::memory_order_acquire) == true, "Renderer hasn't started.\n");
 		RUNTIME_ASSERT(m_ShouldRun.load(std::memory_order_acquire) == true, "Renderer has already shutdown.\n");
 
-		DEBUG_PRINT("End args : " << pEndEvent->Value() << '\n');
+		DEBUG_PRINT("End args : " << pEndEvent->PlaceholderArgs() << '\n');
 
 		m_ShouldRun.store(false, std::memory_order_release);
 
 		DEBUG_PRINT("Renderer ended.\n");
 	}
 
-	void Renderer::EventLoop() noexcept
+	void CTMRenderer::EventLoop() noexcept
 	{
-		const std::weak_ptr<Event::EventListener> weakEventListener = m_EventManager.GetActiveListenerSafe(Event::ListenType::LISTEN_RENDERER_STATE);
-		RUNTIME_ASSERT(weakEventListener.expired() == false, "Retrieved weak ptr to listener is expired.\n");
+		// The passed onNotifyFunc will be called when an event is dispatched.
+		Event::GenericListener<Event::GenericEventType::CTM_ANY> eventListenerAny(
+			std::bind(&CTMRenderer::HandleEvent, this, std::placeholders::_1)
+		);
 
-		std::shared_ptr<Event::EventListener> eventListener = weakEventListener.lock();
-		RUNTIME_ASSERT(eventListener->IsActive() == true, "State listener isn't active.\n");
+		m_EventSystem.Dispatcher().Subscribe(&eventListenerAny);
 
 		{
 			std::lock_guard<std::mutex> lock(m_RendererMutex);
@@ -93,15 +95,7 @@ namespace Renderer
 			if (m_RendererStarted.load(std::memory_order_acquire))
 				m_Window.HandleMessages(result, msg);
 
-			if (eventListener->IsNotified())
-			{
-				while (!eventListener->IsEventQueueEmpty())
-					HandleEvent(eventListener->PopOldest());
-
-				eventListener->ClearNotification();
-			}
-
-			if (m_Window.IsInitialized())
+			if (m_Window.IsRunning())
 				m_Window.DoFrame();
 
 			actualFrameDuration = m_Timer.ElapsedMillis() - frameStartTime;
@@ -115,37 +109,40 @@ namespace Renderer
 		DEBUG_PRINT("Event loop end.\n");
 	}
 
-	void Renderer::HandleEvent(const Event::Event* pEvent) noexcept
+	void CTMRenderer::HandleEvent(Event::IEvent* pEvent) noexcept
 	{
-		using namespace Event;
-		
 		RUNTIME_ASSERT(pEvent != nullptr, "Event received is nullptr.\n");
 
-		AbstractEventType absType = pEvent->AbsType();
+		Event::GenericEventType genericType = pEvent->GenericType();
 
-		switch (absType)
+		switch (genericType)
 		{
-		case AbstractEventType::RENDERER_STATE:
-			RUNTIME_ASSERT(dynamic_cast<const RendererStateEvent*>(pEvent) != nullptr, "Types do not match.\n");
-			HandleStateEvent(static_cast<const RendererStateEvent*>(pEvent));
+		case Event::GenericEventType::CTM_ANY:
+			RUNTIME_ASSERT(false, "No events should have CTM_ANY as their GenericEventType, as it is a marker type used for event listening.\n");
 			break;
+		case Event::GenericEventType::CTM_STATE_EVENT:
+			HandleStateEvent(pEvent);
+			break;
+		case Event::GenericEventType::CTM_MOUSE_EVENT:
+			break;
+		default: break;
 		}
 	}
 
-	void Renderer::HandleStateEvent(const Event::RendererStateEvent* pStateEvent) noexcept
+	void CTMRenderer::HandleStateEvent(Event::IEvent* pEvent) noexcept
 	{
-		using namespace Event;
+		RUNTIME_ASSERT(pEvent->GenericType() == Event::GenericEventType::CTM_STATE_EVENT, "The provided event wasn't a CTM_STATE_EVENT.\n");
 
-		switch (pStateEvent->StateType())
+		switch (pEvent->ConcreteType())
 		{
-		case RendererStateEventType::START:
-			RUNTIME_ASSERT(dynamic_cast<const RendererStartEvent*>(pStateEvent) != nullptr, "Types do not match.\n");
-			OnStart(static_cast<const RendererStartEvent*>(pStateEvent));
+		case Event::ConcreteEventType::CTM_STATE_START_EVENT:
+			OnStart(Event::StartEvent::Cast(pEvent));
 			break;
-		case RendererStateEventType::END:
-			RUNTIME_ASSERT(dynamic_cast<const RendererEndEvent*>(pStateEvent) != nullptr, "Types do not match.\n");
-			OnEnd(static_cast<const RendererEndEvent*>(pStateEvent));
+		case Event::ConcreteEventType::CTM_STATE_END_EVENT:
+			OnEnd(Event::EndEvent::Cast(pEvent));
 			break;
+		default:
+			RUNTIME_ASSERT(false, "Event wasn't handled.\n");
 		}
 	}
 	#pragma endregion

@@ -1,57 +1,95 @@
 #pragma once
 
-#include <deque>
+#include <functional>
 
-#include "Event.hpp"
+#include "Event/Event.hpp"
+#include "Core/CoreMacros.hpp"
 
-namespace Renderer::Event
+namespace CTMRenderer::Event
 {
-	enum class ListenType
+	class IListener
 	{
-		INVALID = -1,			// A marker for any Listener's in invalid states.
-		LISTEN_ALL,				// Listen to all events across Renderer. (Graphics events, window events, etc)
-		LISTEN_RENDERER_STATE	// Listen to all events involving Renderer state. (Start, shutdown, etc)
+		friend class EventDispatcher;
+	public:
+		virtual ~IListener() = default;
+		virtual [[nodiscard]] bool ListensAbstract() const noexcept = 0;
+		virtual [[nodiscard]] bool ListensConcrete() const noexcept = 0;
+	protected:
+		inline void Register() noexcept { m_IsRegistered = true; }
+		inline void Unegister() noexcept { m_IsRegistered = false; }
+		inline constexpr [[nodiscard]] bool IsRegistered() const noexcept { return m_IsRegistered; }
+	protected:
+		bool m_IsRegistered = false;
 	};
 
-	class EventListener
+	class IGenericListener : public IListener
 	{
 	public:
-		EventListener(ListenType listenType = ListenType::INVALID, int id = -1);
-		EventListener(const EventListener&) = delete;
-		EventListener(EventListener&&) = delete;
-		EventListener& operator=(const EventListener&) = delete;
-		EventListener& operator=(EventListener&&) = delete;
+		virtual ~IGenericListener() = default;
+		virtual [[nodiscard]] GenericEventType ListenType() const noexcept = 0;
+	};
+
+	class IConcreteListener : public IListener
+	{
 	public:
-		// Sets the activated status to true.
-		void ActivateListener() noexcept;
+		virtual ~IConcreteListener() = default;
+		virtual [[nodiscard]] ConcreteEventType ListenType() const noexcept = 0;
+	};
 
-		// Sets the current event to the event provided, and sets the notified status to true.
-		void Notify(const Event* event) noexcept;
-
-		// Resets the notified status of the listener.
-		void ClearNotification() noexcept;
-
-		void ClearQueue() noexcept;
-
-		// Uses std::to_string() to convert the ID to a string.
-		[[nodiscard]] std::string IDToStr() const noexcept;
-
-		[[nodiscard]] const Event* PopLatest() noexcept;
-		[[nodiscard]] const Event* PopOldest() noexcept;
-
-		[[nodiscard]] bool IsEventQueueEmpty() const noexcept;
+	// TODO: Use a template-based callable.
+	template <typename NotifyFuncArgs, typename EventNotifyArgs>
+	class Listener : public virtual IListener // Inherit IListener virtually, as both IGenericListener and IConcreteListener already construct IListener implicitly.
+	{
 	public:
-		[[nodiscard]] inline ListenType Type() const noexcept { return m_Type; }
-		[[nodiscard]] inline int ID() const noexcept { return m_ID; }
-		[[nodiscard]] inline bool IsActive() const noexcept { return m_IsActive; }
-		[[nodiscard]] inline bool IsNotified() const noexcept { return m_IsNotified; }
-		[[nodiscard]] inline const std::deque<const Event*>& EventQueue() const noexcept { return m_EventQueue; }
+		inline Listener(std::function<NotifyFuncArgs>& onNotifyFunc) noexcept
+			: m_OnNotifyFunc(onNotifyFunc) {}
+
+		virtual ~Listener() = default;
+	public:
+		inline void Notify(EventNotifyArgs pEvent) noexcept
+		{
+			RUNTIME_ASSERT(pEvent != nullptr, "Recieved event is nullptr.\n");
+
+			m_OnNotifyFunc(pEvent);
+		}
 	private:
-		ListenType m_Type;
-		int m_ID;
-		bool m_IsActive;
-		bool m_IsNotified;
-		// TODO : Use an std::array with a fixed size to prevent too many events being stored.
-		std::deque<const Event*> m_EventQueue; // NOTE: These pointers are non-owning, meaning they're only used as references to current events.
+		std::function<NotifyFuncArgs> m_OnNotifyFunc;
+	};
+
+	template <GenericEventType EnumGenericTy>
+	class GenericListener : public Listener<void(IEvent*), IEvent*>, public IGenericListener
+	{
+	public:
+		inline GenericListener(std::function<void(IEvent*)>& onNotifyFunc) noexcept
+			: Listener<void(IEvent*), IEvent*>(onNotifyFunc) {}
+		
+		// Secondary value constructor for lambda's.
+		inline GenericListener(std::function<void(IEvent*)> onNotifyFunc) noexcept
+			: Listener<void(IEvent*), IEvent*>(onNotifyFunc) {}
+
+		~GenericListener() = default;
+	public:
+		inline virtual constexpr [[nodiscard]] bool ListensAbstract() const noexcept override { return true; }
+		inline virtual constexpr [[nodiscard]] bool ListensConcrete() const noexcept override { return false; }
+		inline virtual constexpr GenericEventType ListenType() const noexcept override { return EnumGenericTy; }
+	};
+
+	template <ConcreteEventType EnumConcreteTy, typename ConcreteEventTy>
+	requires IsMatchingConcreteEventType<EnumConcreteTy, ConcreteEventTy>::Value // Ensure the passed ConcreteEventType (EnumConcreteTy) and ConcreteEventTy match.
+	class ConcreteListener : public Listener<void(ConcreteEventTy*), ConcreteEventTy*>, public IConcreteListener
+	{
+	public:
+		inline ConcreteListener(std::function<void(ConcreteEventTy*)>& onNotifyFunc) noexcept
+			: Listener(onNotifyFunc) {}
+
+		// Secondary value constructor for lambda's.
+		inline ConcreteListener(std::function<void(ConcreteEventTy*)> onNotifyFunc) noexcept
+			: Listener<void(ConcreteEventTy*), ConcreteEventTy*>(onNotifyFunc) {}
+
+		~ConcreteListener() = default;
+	public:
+		inline virtual constexpr [[nodiscard]] bool ListensAbstract() const noexcept override { return false; }
+		inline virtual constexpr [[nodiscard]] bool ListensConcrete() const noexcept override { return true; }
+		inline virtual constexpr ConcreteEventType ListenType() const noexcept override { return EnumConcreteTy; }
 	};
 }

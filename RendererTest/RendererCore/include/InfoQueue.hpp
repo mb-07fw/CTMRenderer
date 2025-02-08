@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Renderer::Window::Graphics::Debug
+namespace CTMRenderer::Window::Graphics::Debug
 {
 	class InfoQueue
 	{

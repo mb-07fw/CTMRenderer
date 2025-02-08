@@ -7,7 +7,7 @@
 #include "Geometry.hpp"
 #include "InfoQueue.hpp"
 
-namespace Renderer::Window::Graphics
+namespace CTMRenderer::Window::Graphics
 {
 	struct Color
 	{

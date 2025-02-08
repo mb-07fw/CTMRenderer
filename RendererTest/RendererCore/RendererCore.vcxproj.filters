@@ -48,13 +48,7 @@
     <ClInclude Include="include\Event\EventListener.hpp">
       <Filter>include\Event</Filter>
     </ClInclude>
-    <ClInclude Include="include\Event\EventManager.hpp">
-      <Filter>include\Event</Filter>
-    </ClInclude>
     <ClInclude Include="include\Event\EventPool.hpp">
-      <Filter>include\Event</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Event\ListenerPool.hpp">
       <Filter>include\Event</Filter>
     </ClInclude>
     <ClInclude Include="include\Graphics.hpp">
@@ -69,19 +63,12 @@
     <ClInclude Include="include\InfoQueue.hpp" />
     <ClInclude Include="include\Timer.hpp" />
     <ClInclude Include="include\Geometry.hpp" />
+    <ClInclude Include="include\Event\EventDispatcher.hpp" />
+    <ClInclude Include="include\Event\EventSystem.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\CorePCH.cpp">
       <Filter>src\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Event\EventListener.cpp">
-      <Filter>src\Event</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Event\EventManager.cpp">
-      <Filter>src\Event</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Event\ListenerPool.cpp">
-      <Filter>src\Event</Filter>
     </ClCompile>
     <ClCompile Include="src\Graphics.cpp">
       <Filter>src</Filter>
@@ -94,7 +81,8 @@
     </ClCompile>
     <ClCompile Include="src\InfoQueue.cpp" />
     <ClCompile Include="src\Timer.cpp" />
-    <ClCompile Include="src\Event\Event.cpp" />
+    <ClCompile Include="src\Event\EventDispatcher.cpp" />
+    <ClCompile Include="src\Event\EventSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\DefaultPS.hlsl">

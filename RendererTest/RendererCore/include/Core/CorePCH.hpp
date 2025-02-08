@@ -3,6 +3,7 @@
 // Include Windows stuff.
 #include "CoreDefines.hpp"
 #include <Windows.h>
+#include <windowsx.h>
 #include <stringapiset.h> // WideCharToMultiByte in CoreUtility.hpp's TranslateHResult(hResult).
 #include <WinNls.h> // CP_UTF8 for WideCharToMultiByte in CoreUtility.hpp's TranslateHResult(hResult).
 
@@ -17,10 +18,10 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <atomic>
 #include <unordered_map>
 #include <thread>
-#include <optional>
 #include <functional>
 #include <mutex>
 #include <condition_variable>

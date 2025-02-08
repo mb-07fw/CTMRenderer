@@ -3,7 +3,7 @@
 
 int main()
 {
-	Renderer::Renderer renderer(60u);
+	CTMRenderer::CTMRenderer renderer(60u);
 
 	renderer.Start();
 	renderer.JoinForShutdown();

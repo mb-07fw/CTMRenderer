@@ -10,7 +10,7 @@
 
 #include <filesystem>
 
-namespace Renderer::Utility
+namespace CTMRenderer::Utility
 {
 	/* Converts a boolean state to an std::string.
 	 * Returns "true", "false", or "NON-BOOLEAN" for non boolean values. */

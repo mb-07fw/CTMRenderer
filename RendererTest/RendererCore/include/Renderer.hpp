@@ -6,31 +6,31 @@
 #include <condition_variable> // std::condition_variable
 
 #include "Window.hpp"
-#include "Event/EventManager.hpp"
+#include "Event/EventSystem.hpp"
 #include "Timer.hpp"
 
-namespace Renderer
+namespace CTMRenderer
 {
-	class Renderer
+	class CTMRenderer
 	{
 	public:
-		Renderer(const unsigned int targetFPS);
-		Renderer(const Renderer&) = delete;
-		Renderer(Renderer&&) = delete;
-		Renderer& operator=(const Renderer&) = delete;
-		Renderer& operator=(Renderer&&) = delete;
-		~Renderer() = default;
+		CTMRenderer(const unsigned int targetFPS);
+		CTMRenderer(const CTMRenderer&) = delete;
+		CTMRenderer(CTMRenderer&&) = delete;
+		CTMRenderer& operator=(const CTMRenderer&) = delete;
+		CTMRenderer& operator=(CTMRenderer&&) = delete;
+		~CTMRenderer() = default;
 	public:
 		void Start();
 		void JoinForShutdown();
 	private:
-		void OnStart(const Event::RendererStartEvent* pStartEvent) noexcept;
-		void OnEnd(const Event::RendererEndEvent* pEndEvent) noexcept;
+		void OnStart(const Event::StartEvent* pEvent) noexcept;
+		void OnEnd(const Event::EndEvent* pEvent) noexcept;
 		void EventLoop() noexcept;
-		void HandleEvent(const Event::Event* pEvent) noexcept;
-		void HandleStateEvent(const Event::RendererStateEvent* pStateEvent) noexcept;
+		void HandleEvent(Event::IEvent* pEvent) noexcept;
+		void HandleStateEvent(Event::IEvent* pEvent) noexcept;
 	private:
-		Event::EventManager m_EventManager;
+		Event::EventSystem m_EventSystem;
 		Window::Window m_Window;
 		Timer::Timer m_Timer;
 		std::thread m_EventThread;

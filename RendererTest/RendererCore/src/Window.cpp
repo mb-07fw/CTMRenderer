@@ -2,11 +2,11 @@
 #include "Core/CoreMacros.hpp"
 #include "Window.hpp"
 
-namespace Renderer::Window
+namespace CTMRenderer::Window
 {
     #pragma region Constructors
-    Window::Window(Event::EventManager& eventManagerRef, const unsigned int targetFPS, unsigned int width, unsigned int height)
-        : m_EventManagerRef(eventManagerRef), m_TargetFPS(targetFPS), m_WindowArea(width, height),
+    Window::Window(Event::EventDispatcher& eventDispatcherRef, const unsigned int targetFPS, unsigned int width, unsigned int height)
+        : m_EventDispatcherRef(eventDispatcherRef), m_TargetFPS(targetFPS), m_WindowArea(width, height),
           m_Graphics(m_WindowArea, targetFPS), m_WindowHandle(nullptr), m_IsInitialized(false),
           m_IsShown(false), m_IsRunning(false), m_Mutex(), m_CV()
     {
@@ -33,7 +33,8 @@ namespace Renderer::Window
             if (msg.message == WM_QUIT)
             {
                 DEBUG_PRINT("Broadcasting end event.\n");
-                m_EventManagerRef.BroadcastEventSafe<Event::RendererEndEvent, Event::ConcreteEventType::RENDERER_END>(1.738f); // ayy
+                
+                m_EventDispatcherRef.Dispatch<Event::EndEvent>(1738u); // ayyy
                 return;
             }
 
@@ -63,6 +64,8 @@ namespace Renderer::Window
     #pragma region Private Functions
     void Window::Init()
     {
+        RUNTIME_ASSERT(m_IsInitialized.load() == false, "The window is already initialized.\n");
+
         WNDCLASSEXW wndClass = {};
 
         wndClass.cbSize = sizeof(WNDCLASSEXW);
@@ -75,7 +78,7 @@ namespace Renderer::Window
                                                  *  For context, Instance functions implicitly take in an argument of this, which is incompatible with
                                                  *  the WinAPI window procedure standard, thus static functions are required as they omit the this argument.
                                                  *
-                                                 *  In conclusion, the indirection is required to be able to access Window state in the window procedure without
+                                                 *  In conclusion, the indirection is required to be able to access CTMRenderer::Window state in the window procedure without
                                                  *  the introduction of global state.
                                                  */
 
@@ -138,7 +141,7 @@ namespace Renderer::Window
         // Set WinAPI-managed user data to store the instance to Window.
         SetWindowLongPtr(windowHandle, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWindow));
 
-        // Set message procedure that WndProcThunk now that the instance of Window is stored.
+        // Set message procedure to WndProcThunk now that the instance of Window is stored.
         SetWindowLongPtr(windowHandle, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(Window::WndProcThunk));
 
         // Forward message to the instance WndProc.
@@ -161,13 +164,12 @@ namespace Renderer::Window
         case WM_CLOSE:
             PostQuitMessage(0);
             return S_OK;
-        case WM_LBUTTONDOWN:
-            //m_EventManagerRef.BroadcastEventSafe(Event::EventType::MOUSE_LDOWN);
-            //m_EventManagerRef.BroadcastMouseEventSafe(Event::EventType::MOUSE_LDOWN, )
+        case WM_MOUSEMOVE:
+            m_EventDispatcherRef.Dispatch<Event::MouseMoveEvent>(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
             return S_OK;
+        default:
+            return DefWindowProc(windowHandle, msgCode, wParam, lParam);
         }
-
-        return DefWindowProc(windowHandle, msgCode, wParam, lParam);
     }
     #pragma endregion
 }

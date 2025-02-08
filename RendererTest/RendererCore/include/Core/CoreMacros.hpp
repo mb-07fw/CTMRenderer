@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>	// std::to_string
-#include <iostream> // std::cout, std::cerr
+#include <string>
+#include <iostream>
 
 #ifdef DEBUG_MODE
 

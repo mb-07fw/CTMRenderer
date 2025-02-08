@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Renderer::Window::Geometry
+namespace CTMRenderer::Window::Geometry
 {
 	struct WindowArea
 	{

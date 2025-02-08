@@ -1,7 +1,7 @@
 #include "Core/CorePCH.hpp"
 #include "Timer.hpp"
 
-namespace Renderer::Timer
+namespace CTMRenderer::Timer
 {
 	Timer::Timer() noexcept
 	{

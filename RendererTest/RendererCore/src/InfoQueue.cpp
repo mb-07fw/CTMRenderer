@@ -2,7 +2,7 @@
 #include "Core/CoreUtility.hpp"
 #include "InfoQueue.hpp"
 
-namespace Renderer::Window::Graphics::Debug
+namespace CTMRenderer::Window::Graphics::Debug
 {
 	InfoQueue::InfoQueue() noexcept
 		: mP_InfoQueue(nullptr), m_Initialized(false)

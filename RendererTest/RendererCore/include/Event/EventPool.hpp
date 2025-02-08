@@ -4,72 +4,74 @@
 #include <vector>
 #include <memory>
 
-#include "Event.hpp"
-#include "Core/CoreMacros.hpp"
+#include "Event/Event.hpp"
 
-namespace Renderer::Event
+namespace CTMRenderer::Event
 {
 	class EventPool
 	{
 	public:
 		EventPool() = default;
-		EventPool(const EventPool&) = delete;
-		EventPool(EventPool&&) = delete;
-		EventPool& operator=(const EventPool&) = delete;
-		EventPool& operator=(EventPool&&) = delete;
+		~EventPool() = default;
 	public:
-		// Returns a pooled event via either construction, or updating of a previous event.
-		template <typename T, ConcreteEventType ConcreteType, typename... Args>
-		requires std::is_base_of_v<Event, T> && IsMatchingConcreteEventType<T, ConcreteType>::value
-		T* GetPooledEvent(Args&&... args) noexcept;
-	private:
-		template <ConcreteEventType ConcreteType, typename... Args>
-		void UpdateEvent(Event* pEvent, Args&&... args) const noexcept;
-	private:
-		std::unordered_map<ConcreteEventType, std::vector<std::unique_ptr<Event>>> m_PooledEvents;
-	};
-
-	template <typename T, ConcreteEventType ConcreteType, typename... Args>
-	requires std::is_base_of_v<Event, T> && IsMatchingConcreteEventType<T, ConcreteType>::value
-	T* EventPool::GetPooledEvent(Args&&... args) noexcept
-	{
-		static_assert(IsMatchingConcreteEventType<T, ConcreteType>::value, "T does not match the specified ConcreteEventType");
-
-		std::vector<std::unique_ptr<Event>>& pooledEvents = m_PooledEvents[ConcreteType];
-
-		// No previous events exist.
-		if (pooledEvents.empty())
-			pooledEvents.emplace_back(std::make_unique<T>(std::forward<Args>(args)...));
-
-		// Update the previous event.
-		else
+		template <ConcreteEventType EnumConcreteTy, typename ConcreteEventTy, typename... Args>
+		requires IsConcreteEventType<ConcreteEventTy>::Value && IsMatchingConcreteEventType<EnumConcreteTy, ConcreteEventTy>::Value
+		inline ConcreteEventTy* PoolNew(Args&&... args) noexcept
 		{
-			Event* pEvent = pooledEvents.back().get();
+			std::vector<std::unique_ptr<IEvent>>& events = m_Pool[EnumConcreteTy];
 
-			// Since the vectors are mapped by ConcreteEventType's, this is pretty much impossible to be unsafe unless I do 
-			// something incomprehensibly dumb like putting an event in the wrong container.
-			// Either way, better safe than seg-faulting.
-			RUNTIME_ASSERT(pEvent->ConcreteType() == ConcreteType, "Concrete types mismatch.\n");
+			if (events.empty())
+			{
+				events.emplace_back(std::make_unique<ConcreteEventTy>(std::forward<Args>(args)...));
+				return ConcreteEventTy::Cast(events.back().get());
+			}
 			
-			UpdateEvent<ConcreteType>(pEvent, std::forward<Args>(args)...);
+			ConcreteEventTy* pEvent = ConcreteEventTy::Cast(events.back().get());
+			RUNTIME_ASSERT(pEvent != nullptr, "Invalid cast.\n");
+			pEvent->Update(std::forward<Args>(args)...);
+			return pEvent;
+		}
 
-			return static_cast<T*>(pEvent);
+		// Returns a non-owning pointer to the oldest event of EnumConcreteTy.
+		// May return nullptr if no events are in the pool.
+		template <ConcreteEventType EnumConcreteTy, typename ConcreteEventTy>
+		requires IsConcreteEventType<ConcreteEventTy>::Value && IsMatchingConcreteEventType<EnumConcreteTy, ConcreteEventTy>::Value
+		inline ConcreteEventTy* GetOldest() const noexcept
+		{
+			if (!m_Pool.contains(EnumConcreteTy))
+				return nullptr;
+
+			const std::vector<std::unique_ptr<IEvent>>& events = m_Pool.at(EnumConcreteTy);
+
+			ConcreteEventTy* pEvent = ConcreteEventTy::Cast(events.back().get());
+			RUNTIME_ASSERT(pEvent != nullptr, "Invalid cast.\n");
+			return pEvent;
+		}
+
+		// Returns a non-owning pointer to the oldest event of EnumConcreteTy.
+		// May return nullptr if no events are in the pool.
+		template <ConcreteEventType EnumConcreteTy, typename ConcreteEventTy>
+		requires IsConcreteEventType<ConcreteEventTy>::Value&& IsMatchingConcreteEventType<EnumConcreteTy, ConcreteEventTy>::Value
+		inline ConcreteEventTy* GetNewest() const noexcept
+		{
+			if (!m_Pool.contains(EnumConcreteTy))
+				return nullptr;
+
+			const std::vector<std::unique_ptr<IEvent>>& events = m_Pool.at(EnumConcreteTy);
+
+			ConcreteEventTy* pEvent = ConcreteEventTy::Cast(events.front().get());
+			RUNTIME_ASSERT(pEvent != nullptr, "Invalid cast.\n");
+			return pEvent;
 		}
 		
-		return static_cast<T*>(pooledEvents.back().get());
-	}
-
-	template <ConcreteEventType ConcreteType, typename... Args>
-	void EventPool::UpdateEvent(Event* pEvent, Args&&... args) const noexcept
-	{
-		switch (ConcreteType)
+		inline size_t Count(ConcreteEventType type) const noexcept
 		{
-		case ConcreteEventType::RENDERER_START:
-			static_cast<RendererStartEvent*>(pEvent)->Update((unsigned int)std::forward<Args>(args)...);
-			break;
-		case ConcreteEventType::RENDERER_END:
-			static_cast<RendererEndEvent*>(pEvent)->Update((float)std::forward<Args>(args)...);
-			break;
+			if (!m_Pool.contains(type))
+				return 0;
+
+			return m_Pool.at(type).size();
 		}
-	}
+	private:
+		std::unordered_map<ConcreteEventType, std::vector<std::unique_ptr<IEvent>>> m_Pool;
+	};
 }

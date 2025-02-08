@@ -3,19 +3,19 @@
 #include "Windows.h"
 #include "Geometry.hpp"
 #include "Graphics.hpp"
-#include "Event/EventManager.hpp"
+#include "Event/EventSystem.hpp"
 
 #include <thread> // std::thread
 #include <atomic> // std::atomic
 #include <mutex>  // std::mutex
 #include <condition_variable> // std::condition_variable
 
-namespace Renderer::Window
+namespace CTMRenderer::Window
 {
 	class Window
 	{
 	public:
-		Window(Event::EventManager& eventManagerRef, const unsigned int targetFPS, unsigned int width = 800, unsigned int height = 600);
+		Window(Event::EventDispatcher& eventDispatcherRef, const unsigned int targetFPS, unsigned int width = 800, unsigned int height = 600);
 		Window(const Window&) = delete;
 		Window(Window&&) = delete;
 		Window& operator=(const Window&&) = delete;
@@ -39,7 +39,7 @@ namespace Renderer::Window
 		static constexpr const wchar_t* SP_WINDOW_CLASS_NAME = L"TestWindow"; // SMP = static member pointer.
 		static constexpr const wchar_t* SP_WINDOW_TITLE = L"Test Window";
 	private:
-		Event::EventManager& m_EventManagerRef;
+		Event::EventDispatcher& m_EventDispatcherRef;
 		const unsigned int m_TargetFPS;
 		Geometry::WindowArea m_WindowArea;
 		Graphics::Graphics m_Graphics;

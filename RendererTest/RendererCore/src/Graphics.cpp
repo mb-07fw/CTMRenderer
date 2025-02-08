@@ -3,7 +3,7 @@
 #include "Core/CoreUtility.hpp"
 #include "Graphics.hpp"
 
-namespace Renderer::Window::Graphics
+namespace CTMRenderer::Window::Graphics
 {
 	Graphics::Graphics(const Geometry::WindowArea& windowArea, const unsigned int targetFPS) noexcept
 		: m_WindowHandle(nullptr), m_WindowArea(windowArea), m_InfoQueue(), m_InitializedScene(false),

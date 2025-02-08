@@ -96,10 +96,10 @@
     <ClInclude Include="include\Core\CoreUtility.hpp" />
     <ClInclude Include="include\Core\RendererCore.hpp" />
     <ClInclude Include="include\Event\Event.hpp" />
+    <ClInclude Include="include\Event\EventDispatcher.hpp" />
     <ClInclude Include="include\Event\EventListener.hpp" />
-    <ClInclude Include="include\Event\EventManager.hpp" />
     <ClInclude Include="include\Event\EventPool.hpp" />
-    <ClInclude Include="include\Event\ListenerPool.hpp" />
+    <ClInclude Include="include\Event\EventSystem.hpp" />
     <ClInclude Include="include\Geometry.hpp" />
     <ClInclude Include="include\Graphics.hpp" />
     <ClInclude Include="include\InfoQueue.hpp" />
@@ -111,10 +111,8 @@
     <ClCompile Include="src\Core\CorePCH.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\Event\Event.cpp" />
-    <ClCompile Include="src\Event\EventListener.cpp" />
-    <ClCompile Include="src\Event\EventManager.cpp" />
-    <ClCompile Include="src\Event\ListenerPool.cpp" />
+    <ClCompile Include="src\Event\EventDispatcher.cpp" />
+    <ClCompile Include="src\Event\EventSystem.cpp" />
     <ClCompile Include="src\Graphics.cpp" />
     <ClCompile Include="src\InfoQueue.cpp" />
     <ClCompile Include="src\Renderer.cpp" />

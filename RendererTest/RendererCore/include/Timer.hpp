@@ -2,7 +2,7 @@
 
 #include "Core/CorePCH.hpp"
 
-namespace Renderer::Timer
+namespace CTMRenderer::Timer
 {
 	class Timer
 	{
