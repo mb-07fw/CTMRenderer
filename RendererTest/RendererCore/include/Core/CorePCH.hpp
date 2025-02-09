@@ -12,6 +12,7 @@
 #include <d3dcompiler.h>
 #include <wrl.h>
 #include <dxgidebug.h>
+#include <DirectXMath.h>
 
 // Other C++ utilities used throughout RendererCore.
 #include <iostream>

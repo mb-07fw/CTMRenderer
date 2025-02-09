@@ -1,14 +1,16 @@
 #pragma once
 
 #include "Windows.h"
+
 #include "Geometry.hpp"
 #include "Graphics.hpp"
 #include "Event/EventSystem.hpp"
+#include "Mouse.hpp"
 
-#include <thread> // std::thread
-#include <atomic> // std::atomic
-#include <mutex>  // std::mutex
-#include <condition_variable> // std::condition_variable
+#include <thread>
+#include <atomic>
+#include <mutex>
+#include <condition_variable>
 
 namespace CTMRenderer::Window
 {
@@ -26,9 +28,10 @@ namespace CTMRenderer::Window
 		void DoFrame() noexcept;
 		void SetTitle(const std::wstring& title) noexcept;
 	public:
-		[[nodiscard]] inline bool IsInitialized() { return m_IsInitialized.load(std::memory_order_acquire); }
-		[[nodiscard]] inline bool IsShown()		  { return m_IsShown.load(std::memory_order_acquire); }
-		[[nodiscard]] inline bool IsRunning()	  { return m_IsRunning.load(std::memory_order_acquire); }
+		inline [[nodiscard]] bool IsInitialized() { return m_IsInitialized.load(std::memory_order_acquire); }
+		inline [[nodiscard]] bool IsShown()		  { return m_IsShown.load(std::memory_order_acquire); }
+		inline [[nodiscard]] bool IsRunning()	  { return m_IsRunning.load(std::memory_order_acquire); }
+		inline [[nodiscard]] Control::Mouse& Mouse() noexcept { return m_Mouse; }
 	private:
 		void Init();
 	private:
@@ -40,6 +43,7 @@ namespace CTMRenderer::Window
 		static constexpr const wchar_t* SP_WINDOW_TITLE = L"Test Window";
 	private:
 		Event::EventDispatcher& m_EventDispatcherRef;
+		Control::Mouse m_Mouse;
 		const unsigned int m_TargetFPS;
 		Geometry::WindowArea m_WindowArea;
 		Graphics::Graphics m_Graphics;

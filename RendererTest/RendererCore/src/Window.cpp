@@ -6,11 +6,13 @@ namespace CTMRenderer::Window
 {
     #pragma region Constructors
     Window::Window(Event::EventDispatcher& eventDispatcherRef, const unsigned int targetFPS, unsigned int width, unsigned int height)
-        : m_EventDispatcherRef(eventDispatcherRef), m_TargetFPS(targetFPS), m_WindowArea(width, height),
-          m_Graphics(m_WindowArea, targetFPS), m_WindowHandle(nullptr), m_IsInitialized(false),
+        : m_EventDispatcherRef(eventDispatcherRef), m_Mouse(), m_TargetFPS(targetFPS), m_WindowArea(width, height),
+          m_Graphics(m_WindowArea, m_Mouse, targetFPS), m_WindowHandle(nullptr), m_IsInitialized(false),
           m_IsShown(false), m_IsRunning(false), m_Mutex(), m_CV()
     {
-        // Wait until Start is called to initialize the window, due to how Renderer doesn't use RAII.
+        // Wait until Start is called to initialize the window, due to how CTMRenderer doesn't use RAII,
+        // and runs on a separate thread, so the window must be created on the it's thread for CTMRenderer
+        // to be able to read messages.
 	}
     #pragma endregion
 
@@ -67,7 +69,6 @@ namespace CTMRenderer::Window
         RUNTIME_ASSERT(m_IsInitialized.load() == false, "The window is already initialized.\n");
 
         WNDCLASSEXW wndClass = {};
-
         wndClass.cbSize = sizeof(WNDCLASSEXW);
         wndClass.lpfnWndProc = WndProcSetup;    /*  Set the window procedure to the static setup function that will eventually thunk (redirect / forward)
                                                  *  Window's messages to an instance function that has access to Window and Renderer state.
@@ -91,9 +92,9 @@ namespace CTMRenderer::Window
         RUNTIME_ASSERT(registeredClass != false, "Failed to register window class.\n");
 
         constexpr int windowSizePadding = 100;
-        RECT windowClientAreaRect;
+        RECT windowClientAreaRect = {};
 
-        // Calculate window size to account for the actual client size. (640 x 480 client area with 100 pixel padding)
+        // Calculate window size to account for the actual client size. (client area with 100 pixel padding)
         windowClientAreaRect.left = windowSizePadding;
         windowClientAreaRect.right = m_WindowArea.width + windowSizePadding;
         windowClientAreaRect.top = windowSizePadding;
@@ -109,13 +110,11 @@ namespace CTMRenderer::Window
             m_WindowArea.width, m_WindowArea.height,  // Window size.
             nullptr,                                  // Parent window.
             nullptr,                                  // Menu.
-            GetModuleHandle(NULL),                    // Handle to the window instance. (HINSTANCE)
+            GetModuleHandle(NULL),                    // Handle to the instance of the application. (HINSTANCE)
             this                                      // Other optional program data. (LPVOID)
 
             /* NOTE : We pass in this to be able to encapsulate the window procedure
              *        as a instance member function so we have access to Window and Renderer state.
-             *
-             *        For more info on why or how, see comments on line 73.
              */
         );
         RUNTIME_ASSERT(m_WindowHandle != nullptr, "Failed to create the window.\n");
@@ -130,7 +129,7 @@ namespace CTMRenderer::Window
     LRESULT CALLBACK Window::WndProcSetup(HWND windowHandle, UINT msgCode, WPARAM wParam, LPARAM lParam) noexcept
     {
         // If we get a message before the WM_NCCREATE message, handle with default window procedure provided by the WinAPI.
-        //   (WM_NCCREATE contains the instance of Window that was passed to CrateWindowEx)
+        // (WM_NCCREATE contains the instance of Window that was passed to CrateWindowEx)
         if (msgCode != WM_NCCREATE)
             return DefWindowProc(windowHandle, msgCode, wParam, lParam);
 

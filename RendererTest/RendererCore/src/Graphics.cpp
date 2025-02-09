@@ -5,10 +5,10 @@
 
 namespace CTMRenderer::Window::Graphics
 {
-	Graphics::Graphics(const Geometry::WindowArea& windowArea, const unsigned int targetFPS) noexcept
-		: m_WindowHandle(nullptr), m_WindowArea(windowArea), m_InfoQueue(), m_InitializedScene(false),
-		  mP_Device(nullptr), mP_SwapChain(nullptr), mP_DeviceContext(nullptr), mP_RTV(nullptr), 
-		  m_ClearColor(0, 0, 0, 0), m_TargetFPS(targetFPS)
+	Graphics::Graphics(const Geometry::WindowArea& windowAreaRef, const Control::Mouse& mouseRef, const unsigned int targetFPS) noexcept
+		: m_WindowHandle(nullptr), m_WindowAreaRef(windowAreaRef), m_InfoQueue(), m_InitializedScene(false),
+		  mP_Device(nullptr), mP_SwapChain(nullptr), mP_DeviceContext(nullptr), mP_RTV(nullptr), mP_ConstantBuffer(),
+		  m_ClearColor(0, 0, 0, 0), m_TargetFPS(targetFPS), m_MouseRef(mouseRef)
 	{
 	}
 
@@ -19,8 +19,8 @@ namespace CTMRenderer::Window::Graphics
 		m_WindowHandle = windowHandle;
 
 		DXGI_SWAP_CHAIN_DESC swapDesc = {};
-		swapDesc.BufferDesc.Width = m_WindowArea.width;
-		swapDesc.BufferDesc.Height = m_WindowArea.height;
+		swapDesc.BufferDesc.Width = m_WindowAreaRef.width;
+		swapDesc.BufferDesc.Height = m_WindowAreaRef.height;
 		swapDesc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 		swapDesc.BufferDesc.RefreshRate.Numerator = m_TargetFPS;
 		swapDesc.BufferDesc.RefreshRate.Denominator = 1;
@@ -80,12 +80,14 @@ namespace CTMRenderer::Window::Graphics
 
 		const Vertex vertices[] = {
 			{ -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 1.0f },
-			{  0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f },
+			{  0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 1.0f },
+			{  0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f },
 			{ -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f },
+		};
 
-			//{ -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 1.0f },
-			//{  0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 1.0f },
-			//{  0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f }
+		const short indices[] = {
+			0, 1, 2,
+			0, 2, 3
 		};
 
 		const unsigned int vBufferStride = sizeof(Vertex);
@@ -98,13 +100,40 @@ namespace CTMRenderer::Window::Graphics
 		vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 		vBufferDesc.CPUAccessFlags = 0;
 		vBufferDesc.MiscFlags = 0;
-		vBufferDesc.StructureByteStride = vBufferStride; // not a structured buffer.
 
 		D3D11_SUBRESOURCE_DATA vBufferSubData = {};
 		vBufferSubData.pSysMem = vertices;
 
 		mP_Device->CreateBuffer(&vBufferDesc, &vBufferSubData, pVBuffer.GetAddressOf());
 		mP_DeviceContext->IASetVertexBuffers(0, 1, pVBuffer.GetAddressOf(), &vBufferStride, &vBufferOffset);
+
+		Microsoft::WRL::ComPtr<ID3D11Buffer> pIBuffer = nullptr;
+		D3D11_BUFFER_DESC iBufferDesc = {};
+		iBufferDesc.ByteWidth = sizeof(indices);
+		iBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+		iBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+		iBufferDesc.CPUAccessFlags = 0;
+		iBufferDesc.MiscFlags = 0;
+
+		D3D11_SUBRESOURCE_DATA iBufferSubData = {};
+		iBufferSubData.pSysMem = indices;
+
+		mP_Device->CreateBuffer(&iBufferDesc, &iBufferSubData, pIBuffer.GetAddressOf());
+		mP_DeviceContext->IASetIndexBuffer(pIBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
+
+		Transform transformData = { { 0.0f, 0.0f }, 0, 0 };
+		D3D11_BUFFER_DESC cBufferDesc = {};
+		cBufferDesc.ByteWidth = sizeof(transformData);
+		cBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+		cBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		cBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		cBufferDesc.MiscFlags = 0;
+		
+		D3D11_SUBRESOURCE_DATA cBufferData = {};
+		cBufferData.pSysMem = &transformData;
+
+		mP_Device->CreateBuffer(&cBufferDesc, &cBufferData, mP_ConstantBuffer.GetAddressOf());
+		mP_DeviceContext->VSSetConstantBuffers(0, 1, mP_ConstantBuffer.GetAddressOf());
 
 		// Target Path (for now) : C:\dev\projects\cpp\Direct3D\RendererTest\bin\out\Debug-windows-x86_64\RendererCore\ 
 		const std::filesystem::path shaderPath = Utility::GetBinDirectory().string() + Utility::GetOutDirectory().string();
@@ -145,8 +174,8 @@ namespace CTMRenderer::Window::Graphics
 		D3D11_VIEWPORT viewport = {};
 		viewport.TopLeftX = 0;
 		viewport.TopLeftY = 0;
-		viewport.Width = (FLOAT)m_WindowArea.width;
-		viewport.Height = (FLOAT)m_WindowArea.height;
+		viewport.Width = (FLOAT)m_WindowAreaRef.width;
+		viewport.Height = (FLOAT)m_WindowAreaRef.height;
 		viewport.MinDepth = 0;
 		viewport.MaxDepth = 1;
 
@@ -157,6 +186,20 @@ namespace CTMRenderer::Window::Graphics
 
 	void Graphics::StartFrame() noexcept
 	{
+		// Update transformation before rendering.
+		D3D11_MAPPED_SUBRESOURCE mappedResource = {};
+		mP_DeviceContext->Map(mP_ConstantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+
+		RUNTIME_ASSERT(mappedResource.pData != nullptr, "Data is nullptr.\n");
+
+		Transform* pData = reinterpret_cast<Transform*>(mappedResource.pData);
+		pData->translation = { 
+			Utility::ToClipSpaceX((float)m_MouseRef.PosX(), 0, (float)m_WindowAreaRef.width), 
+			Utility::ToClipSpaceY((float)m_MouseRef.PosY(), 0, (float)m_WindowAreaRef.height) 
+		};
+
+		mP_DeviceContext->Unmap(mP_ConstantBuffer.Get(), 0);
+	
 		// Rebind the RenderTargetView.
 		BindRTV();
 
@@ -165,7 +208,7 @@ namespace CTMRenderer::Window::Graphics
 
 	void Graphics::Draw() noexcept
 	{
-		mP_DeviceContext->Draw(3, 0);
+		mP_DeviceContext->DrawIndexed(6, 0, 0);
 		RUNTIME_ASSERT(m_InfoQueue.IsQueueEmpty() == true, m_InfoQueue.GetMessagesAsStr());
 	}
 

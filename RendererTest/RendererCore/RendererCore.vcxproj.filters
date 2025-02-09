@@ -65,6 +65,7 @@
     <ClInclude Include="include\Geometry.hpp" />
     <ClInclude Include="include\Event\EventDispatcher.hpp" />
     <ClInclude Include="include\Event\EventSystem.hpp" />
+    <ClInclude Include="include\Mouse.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\CorePCH.cpp">

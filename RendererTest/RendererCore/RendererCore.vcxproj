@@ -103,6 +103,7 @@
     <ClInclude Include="include\Geometry.hpp" />
     <ClInclude Include="include\Graphics.hpp" />
     <ClInclude Include="include\InfoQueue.hpp" />
+    <ClInclude Include="include\Mouse.hpp" />
     <ClInclude Include="include\Renderer.hpp" />
     <ClInclude Include="include\Timer.hpp" />
     <ClInclude Include="include\Window.hpp" />

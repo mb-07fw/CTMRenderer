@@ -147,7 +147,7 @@ namespace CTMRenderer
 			OnEnd(Event::EndEvent::Cast(pEvent));
 			break;
 		default:
-			RUNTIME_ASSERT(false, "Event wasn't handled.\n");
+			RUNTIME_ASSERT(false, "State event wasn't handled.\n");
 		}
 	}
 
@@ -160,9 +160,12 @@ namespace CTMRenderer
 		case Event::ConcreteEventType::CTM_MOUSE_MOVE_EVENT:
 		{
 			Event::MouseMoveEvent* pMMoveEvent = Event::MouseMoveEvent::Cast(pEvent);
+			m_Window.Mouse().SetPos(pMMoveEvent->PosX(), pMMoveEvent->PosY());
 			m_Window.SetTitle(std::wstring(L'(' + std::to_wstring(pMMoveEvent->PosX()) + L", " + std::to_wstring(pMMoveEvent->PosY()) + L')'));
 			break;
 		}
+		default:
+			RUNTIME_ASSERT(false, "Mouse event wasn't handled.\n")
 		}
 	}
 	#pragma endregion
