@@ -1,14 +1,14 @@
 #include "Core/CorePCH.hpp"
 #include "Core/CoreMacros.hpp"
 #include "Core/CoreUtility.hpp"
-#include "Graphics.hpp"
+#include "Graphics/Graphics.hpp"
 
 namespace CTMRenderer::Window::Graphics
 {
 	Graphics::Graphics(const Geometry::WindowArea& windowAreaRef, const Control::Mouse& mouseRef, const unsigned int targetFPS) noexcept
-		: m_WindowHandle(nullptr), m_WindowAreaRef(windowAreaRef), m_InfoQueue(), m_InitializedScene(false),
-		  mP_Device(nullptr), mP_SwapChain(nullptr), mP_DeviceContext(nullptr), mP_RTV(nullptr), mP_ConstantBuffer(),
-		  m_ClearColor(0, 0, 0, 0), m_TargetFPS(targetFPS), m_MouseRef(mouseRef)
+		: m_WindowHandle(nullptr), m_WindowAreaRef(windowAreaRef), m_InfoQueue(), mP_Device(nullptr),
+		  mP_SwapChain(nullptr), mP_DeviceContext(nullptr), mP_RTV(nullptr), mP_DSBuffer(nullptr), mP_DSView(nullptr),
+		  m_CBTransform(mP_Device, mP_DeviceContext), mP_CBRotation(nullptr), m_ClearColor(0, 0, 0, 0), m_TargetFPS(targetFPS), m_MouseRef(mouseRef)
 	{
 	}
 
@@ -63,77 +63,106 @@ namespace CTMRenderer::Window::Graphics
 		hResult = mP_Device->CreateRenderTargetView(pBackBuffer.Get(), nullptr, mP_RTV.GetAddressOf());
 		RUNTIME_ASSERT(hResult == S_OK, Utility::TranslateHResult(hResult));
 
+		// Initialize the depth-stencil buffer. (Depth buffer)
+		//D3D11_TEXTURE2D_DESC dsbDesc = {};
+		//dsbDesc.Width = swapDesc.BufferDesc.Width;
+		//dsbDesc.Height = swapDesc.BufferDesc.Height;
+		//dsbDesc.MipLevels = 1; // Base mip level. (full resolution)
+		//dsbDesc.ArraySize = 1; // Only 1 depth buffer.
+		//dsbDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; // 24-bit depth, 8-bit stencil.
+		//dsbDesc.SampleDesc.Count = 1;
+		//dsbDesc.SampleDesc.Quality = 0;
+		//dsbDesc.Usage = D3D11_USAGE_DEFAULT;
+		//dsbDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		//dsbDesc.CPUAccessFlags = 0;
+		//dsbDesc.MiscFlags = 0;
+
+		//// Create the depth stencil buffer.
+		//hResult = mP_Device->CreateTexture2D(&dsbDesc, nullptr, &mP_DSBuffer);
+		//RUNTIME_ASSERT(hResult == S_OK, Utility::TranslateHResult(hResult));
+
+		//// Initialize the depth-stencil view.
+		//D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+		//dsvDesc.Format = dsbDesc.Format;
+		//dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+		//dsvDesc.Texture2D.MipSlice = 0;
+
+		//// Create the depth stencil view.
+		//hResult = mP_Device->CreateDepthStencilView(mP_DSBuffer.Get(), &dsvDesc, &mP_DSView);
+		//RUNTIME_ASSERT(hResult == S_OK, Utility::TranslateHResult(hResult));
+
 		InitTestScene();
 	}
+
+	#define NUM_INDICES 36
 
 	void Graphics::InitTestScene() noexcept
 	{
 		struct Vertex {
 			struct {
-				float x, y;
+				float x, y, z;
 			} pos;
 
 			struct {
-				float r, g, b, a;
+				unsigned char r, g, b, a;
 			} color;
 		};
 
-		const Vertex vertices[] = {
-			{ -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 1.0f },
-			{  0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 1.0f },
-			{  0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f },
-			{ -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f },
-		};
+		CTMDirectX::VertexBuffer<Vertex, 8> vBuffer(
+			{
+				// Front face
+				{ -1.0f,  1.0f,  1.0f, 255, 255, 255, 255 }, // 0 - Top Left
+				{  1.0f,  1.0f,  1.0f, 255, 255, 255, 255 }, // 1 - Top Right
+				{  1.0f, -1.0f,  1.0f, 255, 255, 255, 255 }, // 2 - Bottom Right
+				{ -1.0f, -1.0f,  1.0f, 255, 255, 255, 255 }, // 3 - Bottom Left
 
-		const short indices[] = {
-			0, 1, 2,
-			0, 2, 3
-		};
+				// Back face
+				{ -1.0f,  1.0f, -1.0f, 255, 255, 255, 255 }, // 4 - Top Left
+				{  1.0f,  1.0f, -1.0f, 255, 255, 255, 255 }, // 5 - Top Right
+				{  1.0f, -1.0f, -1.0f, 255, 255, 255, 255 }, // 6 - Bottom Right
+				{ -1.0f, -1.0f, -1.0f, 255, 255, 255, 255 } // 7 - Bottom Left
+			},
+			mP_Device, mP_DeviceContext
+		);
 
-		const unsigned int vBufferStride = sizeof(Vertex);
-		const unsigned int vBufferOffset = 0;
+		RUNTIME_ASSERT(vBuffer.Create() == S_OK, "Failed to create buffer.\n");
+		vBuffer.Bind();
 
-		Microsoft::WRL::ComPtr<ID3D11Buffer> pVBuffer = nullptr;
-		D3D11_BUFFER_DESC vBufferDesc = {};
-		vBufferDesc.ByteWidth = sizeof(vertices);
-		vBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-		vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		vBufferDesc.CPUAccessFlags = 0;
-		vBufferDesc.MiscFlags = 0;
+		CTMDirectX::IndexBuffer<short, 36, DXGI_FORMAT_R16_UINT> iBuffer(
+			{
+				// Front face
+				0, 1, 2,
+				0, 2, 3,
 
-		D3D11_SUBRESOURCE_DATA vBufferSubData = {};
-		vBufferSubData.pSysMem = vertices;
+				// Back face
+				4, 6, 5,
+				4, 7, 6,
 
-		mP_Device->CreateBuffer(&vBufferDesc, &vBufferSubData, pVBuffer.GetAddressOf());
-		mP_DeviceContext->IASetVertexBuffers(0, 1, pVBuffer.GetAddressOf(), &vBufferStride, &vBufferOffset);
+				// Left face
+				4, 0, 3,
+				4, 3, 7,
 
-		Microsoft::WRL::ComPtr<ID3D11Buffer> pIBuffer = nullptr;
-		D3D11_BUFFER_DESC iBufferDesc = {};
-		iBufferDesc.ByteWidth = sizeof(indices);
-		iBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-		iBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-		iBufferDesc.CPUAccessFlags = 0;
-		iBufferDesc.MiscFlags = 0;
+				// Right face
+				1, 5, 6,
+				1, 6, 2,
 
-		D3D11_SUBRESOURCE_DATA iBufferSubData = {};
-		iBufferSubData.pSysMem = indices;
+				// Top face
+				4, 5, 1,
+				4, 1, 0,
 
-		mP_Device->CreateBuffer(&iBufferDesc, &iBufferSubData, pIBuffer.GetAddressOf());
-		mP_DeviceContext->IASetIndexBuffer(pIBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
+				// Bottom face
+				3, 2, 6,
+				3, 6, 7
+			},
+			mP_Device, mP_DeviceContext
+		);
 
-		Transform transformData = { { 0.0f, 0.0f }, 0, 0 };
-		D3D11_BUFFER_DESC cBufferDesc = {};
-		cBufferDesc.ByteWidth = sizeof(transformData);
-		cBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-		cBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		cBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		cBufferDesc.MiscFlags = 0;
-		
-		D3D11_SUBRESOURCE_DATA cBufferData = {};
-		cBufferData.pSysMem = &transformData;
+		RUNTIME_ASSERT(iBuffer.Create() == S_OK, "Failed to create buffer.\n");
+		iBuffer.Bind();
 
-		mP_Device->CreateBuffer(&cBufferDesc, &cBufferData, mP_ConstantBuffer.GetAddressOf());
-		mP_DeviceContext->VSSetConstantBuffers(0, 1, mP_ConstantBuffer.GetAddressOf());
+		m_CBTransform = { { /* Initialize with empty transform */} };
+		RUNTIME_ASSERT(m_CBTransform.Create() == S_OK, "Failed to create buffer.\n");
+		m_CBTransform.Bind();
 
 		// Target Path (for now) : C:\dev\projects\cpp\Direct3D\RendererTest\bin\out\Debug-windows-x86_64\RendererCore\ 
 		const std::filesystem::path shaderPath = Utility::GetBinDirectory().string() + Utility::GetOutDirectory().string();
@@ -164,8 +193,8 @@ namespace CTMRenderer::Window::Graphics
 
 		Microsoft::WRL::ComPtr<ID3D11InputLayout> pInputLayout = nullptr;
 		D3D11_INPUT_ELEMENT_DESC inputDescs[] = {
-			{ "Position", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, 0u, D3D11_INPUT_PER_VERTEX_DATA, 0u },
-			{ "Color", 0u, DXGI_FORMAT_R32G32B32A32_FLOAT, 0u, sizeof(float) * 2, D3D11_INPUT_PER_VERTEX_DATA, 0u}
+			{ "Position", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, 0u, D3D11_INPUT_PER_VERTEX_DATA, 0u },
+			{ "Color", 0u, DXGI_FORMAT_R8G8B8A8_UNORM, 0u, sizeof(Vertex::pos), D3D11_INPUT_PER_VERTEX_DATA, 0u}
 		};
 
 		mP_Device->CreateInputLayout(inputDescs, std::size(inputDescs), pBlob->GetBufferPointer(), pBlob->GetBufferSize(), pInputLayout.GetAddressOf());
@@ -182,24 +211,33 @@ namespace CTMRenderer::Window::Graphics
 		mP_DeviceContext->RSSetViewports(1, &viewport);
 
 		mP_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		DEBUG_PRINT("Aspect ratio : " << m_WindowAreaRef.aspectRatio << '\n');
+		DEBUG_PRINT("Aspect ratio reciprocal : " << m_WindowAreaRef.aspectRatioReciprocal << '\n');
 	}
 
-	void Graphics::StartFrame() noexcept
+	void Graphics::StartFrame(double elapsedMillis) noexcept
 	{
 		// Update transformation before rendering.
 		D3D11_MAPPED_SUBRESOURCE mappedResource = {};
-		mP_DeviceContext->Map(mP_ConstantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		mP_DeviceContext->Map(m_CBTransform.ComBuffer().Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 
 		RUNTIME_ASSERT(mappedResource.pData != nullptr, "Data is nullptr.\n");
 
 		Transform* pData = reinterpret_cast<Transform*>(mappedResource.pData);
-		pData->translation = { 
-			Utility::ToClipSpaceX((float)m_MouseRef.PosX(), 0, (float)m_WindowAreaRef.width), 
-			Utility::ToClipSpaceY((float)m_MouseRef.PosY(), 0, (float)m_WindowAreaRef.height) 
-		};
+		pData->transform = DirectX::XMMatrixTranspose(
+			DirectX::XMMatrixRotationX((float)elapsedMillis) *
+			DirectX::XMMatrixRotationZ((float)elapsedMillis) *
+			DirectX::XMMatrixTranslation(
+				Utility::ToClipSpaceX((float)m_MouseRef.PosX(), 0, (float)m_WindowAreaRef.width),
+				Utility::ToClipSpaceY((float)m_MouseRef.PosY(), 0, (float)m_WindowAreaRef.height),
+				4.0f
+			) *
+			DirectX::XMMatrixPerspectiveLH(1.0f, m_WindowAreaRef.aspectRatioReciprocal, 0.5f, 10.0f)
+		);
 
-		mP_DeviceContext->Unmap(mP_ConstantBuffer.Get(), 0);
-	
+		mP_DeviceContext->Unmap(m_CBTransform.ComBuffer().Get(), 0);
+
 		// Rebind the RenderTargetView.
 		BindRTV();
 
@@ -208,7 +246,7 @@ namespace CTMRenderer::Window::Graphics
 
 	void Graphics::Draw() noexcept
 	{
-		mP_DeviceContext->DrawIndexed(6, 0, 0);
+		mP_DeviceContext->DrawIndexed(NUM_INDICES, 0, 0);
 		RUNTIME_ASSERT(m_InfoQueue.IsQueueEmpty() == true, m_InfoQueue.GetMessagesAsStr());
 	}
 
@@ -221,7 +259,7 @@ namespace CTMRenderer::Window::Graphics
 
 	void Graphics::BindRTV() const noexcept
 	{
-		// Bind the RTV.
+		//mP_DeviceContext->OMSetRenderTargets(1, mP_RTV.GetAddressOf(), mP_DSView.Get());
 		mP_DeviceContext->OMSetRenderTargets(1, mP_RTV.GetAddressOf(), nullptr);
 	}
 }

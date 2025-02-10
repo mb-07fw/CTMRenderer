@@ -28,3 +28,5 @@
 #include <condition_variable>
 #include <filesystem>
 #include <type_traits>
+#include <initializer_list>
+#include <array>

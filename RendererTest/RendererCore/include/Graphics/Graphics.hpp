@@ -5,9 +5,10 @@
 #include <wrl.h>
 #include <DirectXMath.h>
 
-#include "Geometry.hpp"
-#include "InfoQueue.hpp"
-#include "Mouse.hpp"
+#include "Window/WindowGeometry.hpp"
+#include "Window/Mouse.hpp"
+#include "Graphics/DirectX/InfoQueue.hpp"
+#include "Graphics/DirectX/Buffer.hpp"
 
 namespace CTMRenderer::Window::Graphics
 {
@@ -24,6 +25,10 @@ namespace CTMRenderer::Window::Graphics
 		float rgba[4];
 	};
 
+	struct Transform {
+		DirectX::XMMATRIX transform;
+	};
+
 	class Graphics
 	{
 	public:
@@ -35,7 +40,7 @@ namespace CTMRenderer::Window::Graphics
 	public:
 		void Init(const HWND windowHandle) noexcept;
 		void InitTestScene() noexcept;
-		void StartFrame() noexcept;
+		void StartFrame(double elapsedMillis) noexcept;
 		void Draw() noexcept;
 		void EndFrame() noexcept;
 	private:
@@ -46,19 +51,17 @@ namespace CTMRenderer::Window::Graphics
 		HWND m_WindowHandle;
 		const Geometry::WindowArea& m_WindowAreaRef;
 		Debug::InfoQueue m_InfoQueue;
-		bool m_InitializedScene;
+		bool m_InitializedScene = false;
 		Microsoft::WRL::ComPtr<ID3D11Device> mP_Device;
 		Microsoft::WRL::ComPtr<IDXGISwapChain> mP_SwapChain;
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> mP_DeviceContext;
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> mP_RTV;
-		Microsoft::WRL::ComPtr<ID3D11Buffer> mP_ConstantBuffer;
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> mP_DSBuffer;
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> mP_DSView;
+		CTMDirectX::ConstantBuffer<Transform, 1u, D3D11_CPU_ACCESS_WRITE> m_CBTransform;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> mP_CBRotation;
 		Color m_ClearColor;
 		const unsigned int m_TargetFPS;
 		const Control::Mouse& m_MouseRef;
-	private:
-		struct Transform {
-			DirectX::XMFLOAT2 translation;
-			float padding[2];
-		};
 	};
 }

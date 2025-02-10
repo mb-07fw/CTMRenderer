@@ -51,36 +51,37 @@
     <ClInclude Include="include\Event\EventPool.hpp">
       <Filter>include\Event</Filter>
     </ClInclude>
-    <ClInclude Include="include\Graphics.hpp">
+    <ClInclude Include="include\Graphics\Graphics.hpp">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderer.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\Window.hpp">
+    <ClInclude Include="include\Window\Window.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\InfoQueue.hpp" />
+    <ClInclude Include="include\Graphics\DirectX\InfoQueue.hpp" />
     <ClInclude Include="include\Timer.hpp" />
-    <ClInclude Include="include\Geometry.hpp" />
+    <ClInclude Include="include\Window\WindowGeometry.hpp" />
     <ClInclude Include="include\Event\EventDispatcher.hpp" />
     <ClInclude Include="include\Event\EventSystem.hpp" />
-    <ClInclude Include="include\Mouse.hpp" />
+    <ClInclude Include="include\Window\Mouse.hpp" />
+    <ClInclude Include="include\Graphics\DirectX\Buffer.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\CorePCH.cpp">
       <Filter>src\Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\Graphics.cpp">
+    <ClCompile Include="src\Graphics\Graphics.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Window.cpp">
+    <ClCompile Include="src\Window\Window.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\InfoQueue.cpp" />
+    <ClCompile Include="src\Graphics\DirectX\InfoQueue.cpp" />
     <ClCompile Include="src\Timer.cpp" />
     <ClCompile Include="src\Event\EventDispatcher.cpp" />
     <ClCompile Include="src\Event\EventSystem.cpp" />

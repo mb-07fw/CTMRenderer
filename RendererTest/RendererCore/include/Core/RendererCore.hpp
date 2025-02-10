@@ -4,4 +4,3 @@
 #pragma comment(lib,"d3dcompiler.lib")
 
 #include "Renderer.hpp"
-#include "Window.hpp"

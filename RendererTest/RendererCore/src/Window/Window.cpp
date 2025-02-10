@@ -1,6 +1,6 @@
 #include "Core/CorePCH.hpp"
 #include "Core/CoreMacros.hpp"
-#include "Window.hpp"
+#include "Window/Window.hpp"
 
 namespace CTMRenderer::Window
 {
@@ -48,11 +48,11 @@ namespace CTMRenderer::Window
         }
     }
 
-    void Window::DoFrame() noexcept
+    void Window::DoFrame(double elapsedMillis) noexcept
     {
         RUNTIME_ASSERT(m_IsRunning.load(std::memory_order_acquire), "Window is not running.\n");
         
-        m_Graphics.StartFrame();
+        m_Graphics.StartFrame(elapsedMillis);
         m_Graphics.Draw();
         m_Graphics.EndFrame();
     }
@@ -160,6 +160,10 @@ namespace CTMRenderer::Window
     {
         switch (msgCode)
         {
+        case WM_KEYDOWN:
+            if (wParam != VK_ESCAPE)
+                return S_OK;
+            // Fall through if Esc was pressed.
         case WM_CLOSE:
             PostQuitMessage(0);
             return S_OK;

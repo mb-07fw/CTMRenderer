@@ -1,6 +1,6 @@
 #include "Core/CorePCH.hpp"
 #include "Core/CoreUtility.hpp"
-#include "InfoQueue.hpp"
+#include "Graphics/DirectX/InfoQueue.hpp"
 
 namespace CTMRenderer::Window::Graphics::Debug
 {

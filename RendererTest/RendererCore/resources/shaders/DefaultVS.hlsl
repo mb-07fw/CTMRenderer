@@ -1,22 +1,22 @@
-cbuffer TransformBuffer : register(b0)
+cbuffer TranslationBuffer : register(b0)
 {
-    float2 translation;
+    matrix rotation;
 }
 
 struct VSOutput
 {
-    float4 color : Color;
+    float4 color : Color; // Note to self : Keep color first or things will go wrong.
     float4 pos : SV_Position;
 };
 
-VSOutput main(float4 color : Color, float2 pos : Position)
+VSOutput main(float3 pos : Position, float4 color : Color)
 {
     VSOutput output;
+    
     output.color = color;
+    output.pos = float4(pos, 1.0f);
     
-    pos += translation;
-    
-    output.pos = float4(pos, 0.0f, 1.0f);
+    output.pos = mul(output.pos, rotation);
     
     return output; // Convert 2D coordinate to 4D homogenous space.
 }

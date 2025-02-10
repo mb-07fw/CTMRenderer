@@ -2,10 +2,10 @@
 
 #include "Windows.h"
 
-#include "Geometry.hpp"
-#include "Graphics.hpp"
+#include "Graphics/Graphics.hpp"
 #include "Event/EventSystem.hpp"
-#include "Mouse.hpp"
+#include "Window/WindowGeometry.hpp"
+#include "Window/Mouse.hpp"
 
 #include <thread>
 #include <atomic>
@@ -25,7 +25,7 @@ namespace CTMRenderer::Window
 	public:
 		void Start() noexcept;
 		void HandleMessages(BOOL& result, MSG& msg) noexcept;
-		void DoFrame() noexcept;
+		void DoFrame(double elapsedMillis) noexcept;
 		void SetTitle(const std::wstring& title) noexcept;
 	public:
 		inline [[nodiscard]] bool IsInitialized() { return m_IsInitialized.load(std::memory_order_acquire); }

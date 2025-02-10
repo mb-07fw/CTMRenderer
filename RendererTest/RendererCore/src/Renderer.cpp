@@ -100,7 +100,7 @@ namespace CTMRenderer
 				eventDispatcher.DispatchQueued();
 
 			if (m_Window.IsRunning())
-				m_Window.DoFrame();
+				m_Window.DoFrame(frameStartTime / 1000);
 
 			actualFrameDuration = m_Timer.ElapsedMillis() - frameStartTime;
 			remainingFrameTime = Utility::MinDB(targetFrameDuration - actualFrameDuration, 0);
@@ -165,7 +165,7 @@ namespace CTMRenderer
 			break;
 		}
 		default:
-			RUNTIME_ASSERT(false, "Mouse event wasn't handled.\n")
+			RUNTIME_ASSERT(false, "Mouse event wasn't handled.\n");
 		}
 	}
 	#pragma endregion

@@ -17,6 +17,6 @@ namespace CTMRenderer::Window::Control
 		inline [[nodiscard]] int PosX() const noexcept { return m_PosX; }
 		inline [[nodiscard]] int PosY() const noexcept { return m_PosY; }
 	private:
-		int m_PosX, m_PosY;
+		int m_PosX = 0, m_PosY = 0;
 	};
 }

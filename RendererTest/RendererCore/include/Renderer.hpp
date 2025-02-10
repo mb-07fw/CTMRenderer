@@ -5,7 +5,7 @@
 #include <mutex>  // std::mutex
 #include <condition_variable> // std::condition_variable
 
-#include "Window.hpp"
+#include "Window/Window.hpp"
 #include "Event/EventSystem.hpp"
 #include "Timer.hpp"
 
