@@ -67,6 +67,7 @@
     <ClInclude Include="include\Event\EventSystem.hpp" />
     <ClInclude Include="include\Window\Mouse.hpp" />
     <ClInclude Include="include\Graphics\DirectX\Buffer.hpp" />
+    <ClInclude Include="include\Graphics\DirectX\Shader.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\CorePCH.cpp">
@@ -87,11 +88,13 @@
     <ClCompile Include="src\Event\EventSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="resources\shaders\DefaultPS.hlsl">
+    <FxCompile Include="resources\shaders\DefaultCubePS.hlsl">
       <Filter>resources\shaders</Filter>
     </FxCompile>
-    <FxCompile Include="resources\shaders\DefaultVS.hlsl">
+    <FxCompile Include="resources\shaders\DefaultCubeVS.hlsl">
       <Filter>resources\shaders</Filter>
     </FxCompile>
+    <FxCompile Include="resources\shaders\DefaultRectVS.hlsl" />
+    <FxCompile Include="resources\shaders\DefaultRectPS.hlsl" />
   </ItemGroup>
 </Project>

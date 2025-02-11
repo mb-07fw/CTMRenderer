@@ -46,7 +46,7 @@ namespace CTMRenderer::Window::Graphics::CTMDirectX
 			return *this;
 		}
 
-		virtual ~Buffer() = default;
+		~Buffer() = default;
 	public:
 		inline [[nodiscard]] HRESULT Create() noexcept
 		{
@@ -65,8 +65,6 @@ namespace CTMRenderer::Window::Graphics::CTMDirectX
 			m_Created = true;
 			return mP_DeviceRef->CreateBuffer(&vBufferDesc, &vBufferSubData, mP_Buffer.GetAddressOf());
 		}
-
-		virtual void Bind(UINT startSlot = 0u) noexcept = 0;
 	public:
 		inline constexpr [[nodiscard]] const T* Data() const noexcept { return m_Data.data(); }
 		inline constexpr [[nodiscard]] UINT Elements() const noexcept { return Elems; }
@@ -108,7 +106,7 @@ namespace CTMRenderer::Window::Graphics::CTMDirectX
 
 		~VertexBuffer() = default;
 	public:
-		virtual void Bind(UINT startSlot = 0u) noexcept override
+		inline void Bind(UINT startSlot = 0u) noexcept
 		{
 			this->mP_DeviceContextRef->IASetVertexBuffers(startSlot, 1, this->mP_Buffer.GetAddressOf(), &this->m_Stride, &this->m_Offset);
 		}
@@ -138,7 +136,7 @@ namespace CTMRenderer::Window::Graphics::CTMDirectX
 
 		~IndexBuffer() = default;
 	public:
-		virtual void Bind(UINT startSlot = 0u) noexcept override
+		inline void Bind(UINT startSlot = 0u) noexcept
 		{
 			this->mP_DeviceContextRef->IASetIndexBuffer(this->mP_Buffer.Get(), DXGIFormat, 0);
 		}
@@ -168,7 +166,7 @@ namespace CTMRenderer::Window::Graphics::CTMDirectX
 
 		~ConstantBuffer() = default;
 	public:
-		virtual void Bind(UINT startSlot = 0u) noexcept override
+		inline void Bind(UINT startSlot = 0u) noexcept
 		{
 			this->mP_DeviceContextRef->VSSetConstantBuffers(startSlot, 1, this->mP_Buffer.GetAddressOf());
 		}

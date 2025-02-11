@@ -9,6 +9,7 @@
 #include "Window/Mouse.hpp"
 #include "Graphics/DirectX/InfoQueue.hpp"
 #include "Graphics/DirectX/Buffer.hpp"
+#include "Graphics/DirectX/Shader.hpp"
 
 namespace CTMRenderer::Window::Graphics
 {

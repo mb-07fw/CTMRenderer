@@ -101,6 +101,7 @@
     <ClInclude Include="include\Event\EventListener.hpp" />
     <ClInclude Include="include\Event\EventPool.hpp" />
     <ClInclude Include="include\Event\EventSystem.hpp" />
+    <ClInclude Include="include\Graphics\DirectX\Shader.hpp" />
     <ClInclude Include="include\Window\WindowGeometry.hpp" />
     <ClInclude Include="include\Graphics\Graphics.hpp" />
     <ClInclude Include="include\Graphics\DirectX\InfoQueue.hpp" />
@@ -122,13 +123,21 @@
     <ClCompile Include="src\Window\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="resources\shaders\DefaultPS.hlsl">
+    <FxCompile Include="resources\shaders\DefaultCubePS.hlsl">
       <ShaderType>Pixel</ShaderType>
       <ShaderModel>4.0</ShaderModel>
     </FxCompile>
-    <FxCompile Include="resources\shaders\DefaultVS.hlsl">
+    <FxCompile Include="resources\shaders\DefaultCubeVS.hlsl">
       <ShaderType>Vertex</ShaderType>
       <ShaderModel>4.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\DefaultRectPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\DefaultRectVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

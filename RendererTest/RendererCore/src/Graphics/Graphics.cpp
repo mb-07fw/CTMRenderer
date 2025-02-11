@@ -168,28 +168,17 @@ namespace CTMRenderer::Window::Graphics
 		const std::filesystem::path shaderPath = Utility::GetBinDirectory().string() + Utility::GetOutDirectory().string();
 		const std::string shaderPathStr = shaderPath.string();
 
-		const std::filesystem::path pixelShaderPath = shaderPathStr + "DefaultPS.cso";
-		const std::filesystem::path vertexShaderPath = shaderPathStr + "DefaultVS.cso";
+		const std::filesystem::path pixelShaderPath = shaderPathStr + "DefaultCubePS.cso";
+		const std::filesystem::path vertexShaderPath = shaderPathStr + "DefaultCubeVS.cso";
+		
+		Microsoft::WRL::ComPtr<ID3DBlob> pBlob;
+		CTMDirectX::PixelShader pixelShader(mP_Device, mP_DeviceContext);
+		pixelShader.Create(pixelShaderPath, pBlob);
+		pixelShader.Bind();
 
-		//const std::string pixelShaderPathStr = pixelShaderPath.string();
-		//const std::string vertexShaderPathStr = vertexShaderPath.string();
-
-		const std::wstring pixelShaderPathWStr = pixelShaderPath.wstring();
-		const std::wstring vertexShaderPathWStr = vertexShaderPath.wstring();
-
-		Microsoft::WRL::ComPtr<ID3DBlob> pBlob = nullptr;
-		Microsoft::WRL::ComPtr <ID3D11PixelShader> pPShader;
-		D3DReadFileToBlob(pixelShaderPathWStr.c_str(), &pBlob);
-
-		mP_Device->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, pPShader.GetAddressOf());
-		mP_DeviceContext->PSSetShader(pPShader.Get(), nullptr, 0u);
-
-		D3DReadFileToBlob(vertexShaderPathWStr.c_str(), &pBlob);
-
-		Microsoft::WRL::ComPtr<ID3D11VertexShader> pVShader = nullptr;
-
-		mP_Device->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, pVShader.GetAddressOf());
-		mP_DeviceContext->VSSetShader(pVShader.Get(), nullptr, 0);
+		CTMDirectX::VertexShader vertexShader(mP_Device, mP_DeviceContext);
+		vertexShader.Create(vertexShaderPath, pBlob);
+		vertexShader.Bind();
 
 		Microsoft::WRL::ComPtr<ID3D11InputLayout> pInputLayout = nullptr;
 		D3D11_INPUT_ELEMENT_DESC inputDescs[] = {
