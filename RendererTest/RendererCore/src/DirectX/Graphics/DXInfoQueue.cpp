@@ -1,8 +1,8 @@
 #include "Core/CorePCH.hpp"
 #include "Core/CoreUtility.hpp"
-#include "Graphics/DirectX/InfoQueue.hpp"
+#include "DirectX/Graphics/DXInfoQueue.hpp"
 
-namespace CTMRenderer::Window::Graphics::Debug
+namespace CTMRenderer::CTMDirectX::Window::Graphics::Debug
 {
 	InfoQueue::InfoQueue() noexcept
 		: mP_InfoQueue(nullptr), m_Initialized(false)

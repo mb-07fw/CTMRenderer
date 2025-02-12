@@ -2,7 +2,7 @@
 
 #include "Core/CoreMacros.hpp"
 
-namespace CTMRenderer::Window::Geometry
+namespace CTMRenderer::CTMDirectX::Window::Geometry
 {
 	struct WindowArea
 	{
@@ -12,11 +12,15 @@ namespace CTMRenderer::Window::Geometry
 			RUNTIME_ASSERT(width != 0, "Width cannot be zero.\n");
 			RUNTIME_ASSERT(height != 0, "Height cannot be zero.\n");
 
+			centerX = (float)width / 2;
+			centerY = (float)height / 2;
+
 			aspectRatio = (float)width / height;
 			aspectRatioReciprocal = (float)height / width;
 		}
 
 		unsigned int width, height;
+		float centerX, centerY;
 		float aspectRatio, aspectRatioReciprocal;
 	};
 }

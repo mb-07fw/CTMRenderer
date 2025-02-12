@@ -5,13 +5,13 @@
 #include <wrl.h>
 #include <DirectXMath.h>
 
-#include "Window/WindowGeometry.hpp"
-#include "Window/Mouse.hpp"
-#include "Graphics/DirectX/InfoQueue.hpp"
-#include "Graphics/DirectX/Buffer.hpp"
-#include "Graphics/DirectX/Shader.hpp"
+#include "DirectX/Window/DXWindowGeometry.hpp"
+#include "Control/Mouse.hpp"
+#include "DirectX/Graphics/DXInfoQueue.hpp"
+#include "DirectX/Graphics/DXBuffer.hpp"
+#include "DirectX/Graphics/DXShader.hpp"
 
-namespace CTMRenderer::Window::Graphics
+namespace CTMRenderer::CTMDirectX::Window::Graphics
 {
 	struct Color
 	{
@@ -59,7 +59,7 @@ namespace CTMRenderer::Window::Graphics
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> mP_RTV;
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> mP_DSBuffer;
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> mP_DSView;
-		CTMDirectX::ConstantBuffer<Transform, 1u, D3D11_CPU_ACCESS_WRITE> m_CBTransform;
+		ConstantBuffer<Transform, 1u, D3D11_CPU_ACCESS_WRITE> m_CBTransform;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> mP_CBRotation;
 		Color m_ClearColor;
 		const unsigned int m_TargetFPS;

@@ -2,22 +2,22 @@
 
 #include "Windows.h"
 
-#include "Graphics/Graphics.hpp"
 #include "Event/EventSystem.hpp"
-#include "Window/WindowGeometry.hpp"
-#include "Window/Mouse.hpp"
+#include "DirectX/Graphics/Graphics.hpp"
+#include "DirectX/Window/WindowGeometry.hpp"
+#include "DirectX/Window/Mouse.hpp"
 
 #include <thread>
 #include <atomic>
 #include <mutex>
 #include <condition_variable>
 
-namespace CTMRenderer::Window
+namespace CTMRenderer::CTMDirectX::Window
 {
 	class Window
 	{
 	public:
-		Window(Event::EventDispatcher& eventDispatcherRef, const unsigned int targetFPS, unsigned int width = 800, unsigned int height = 600);
+		Window(Event::EventDispatcher& eventDispatcherRef, const unsigned int targetFPS, UINT width = 800, UINT height = 600);
 		Window(const Window&) = delete;
 		Window(Window&&) = delete;
 		Window& operator=(const Window&&) = delete;

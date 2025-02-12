@@ -10,7 +10,7 @@
 
 #include "Core/CoreMacros.hpp"
 
-namespace CTMRenderer::Window::Graphics::CTMDirectX
+namespace CTMRenderer::CTMDirectX::Window::Graphics
 {
 	template <typename T, UINT Elems, D3D11_USAGE Usage, D3D11_BIND_FLAG BindFlags, D3D11_CPU_ACCESS_FLAG CPUFlags = (D3D11_CPU_ACCESS_FLAG)(0)>
 	class Buffer
@@ -31,7 +31,10 @@ namespace CTMRenderer::Window::Graphics::CTMDirectX
 			: m_Stride(sizeof(T)), m_Bytes(Elems * m_Stride), mP_DeviceRef(pDeviceRef),
 			  mP_DeviceContextRef(pDeviceContextRef), mP_Buffer()
 		{
-			RUNTIME_ASSERT(Elems == list.size(), "Buffer size and list size don't match.\n");
+			RUNTIME_ASSERT(
+				Elems == list.size(),
+				"Buffer size and list size don't match. | " << "Buffer size : " << Elems <<  " | " << "List size : " << list.size() << '\n'
+			);
 			std::copy(list.begin(), list.end(), m_Data.data());
 		}
 

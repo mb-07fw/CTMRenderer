@@ -1,9 +1,9 @@
 #include "Core/CorePCH.hpp"
 #include "Core/CoreMacros.hpp"
 #include "Core/CoreUtility.hpp"
-#include "Graphics/Graphics.hpp"
+#include "DirectX/Graphics/DXGraphics.hpp"
 
-namespace CTMRenderer::Window::Graphics
+namespace CTMRenderer::CTMDirectX::Window::Graphics
 {
 	Graphics::Graphics(const Geometry::WindowArea& windowAreaRef, const Control::Mouse& mouseRef, const unsigned int targetFPS) noexcept
 		: m_WindowHandle(nullptr), m_WindowAreaRef(windowAreaRef), m_InfoQueue(), mP_Device(nullptr),
@@ -94,13 +94,13 @@ namespace CTMRenderer::Window::Graphics
 		InitTestScene();
 	}
 
-	#define NUM_INDICES 36
+	static constexpr UINT NUM_INDICES = 6;
 
 	void Graphics::InitTestScene() noexcept
 	{
 		struct Vertex {
 			struct {
-				float x, y, z;
+				float x, y;
 			} pos;
 
 			struct {
@@ -108,19 +108,12 @@ namespace CTMRenderer::Window::Graphics
 			} color;
 		};
 
-		CTMDirectX::VertexBuffer<Vertex, 8> vBuffer(
+		VertexBuffer<Vertex, 4> vBuffer(
 			{
-				// Front face
-				{ -1.0f,  1.0f,  1.0f, 255, 255, 255, 255 }, // 0 - Top Left
-				{  1.0f,  1.0f,  1.0f, 255, 255, 255, 255 }, // 1 - Top Right
-				{  1.0f, -1.0f,  1.0f, 255, 255, 255, 255 }, // 2 - Bottom Right
-				{ -1.0f, -1.0f,  1.0f, 255, 255, 255, 255 }, // 3 - Bottom Left
-
-				// Back face
-				{ -1.0f,  1.0f, -1.0f, 255, 255, 255, 255 }, // 4 - Top Left
-				{  1.0f,  1.0f, -1.0f, 255, 255, 255, 255 }, // 5 - Top Right
-				{  1.0f, -1.0f, -1.0f, 255, 255, 255, 255 }, // 6 - Bottom Right
-				{ -1.0f, -1.0f, -1.0f, 255, 255, 255, 255 } // 7 - Bottom Left
+				{ -0.5f,  0.5, 255, 255, 255, 255 },
+				{  0.5f,  0.5, 255, 255, 255, 255 },
+				{  0.5f, -0.5, 255, 255, 255, 255 },
+				{ -0.5f, -0.5, 255, 255, 255, 255 }
 			},
 			mP_Device, mP_DeviceContext
 		);
@@ -128,31 +121,10 @@ namespace CTMRenderer::Window::Graphics
 		RUNTIME_ASSERT(vBuffer.Create() == S_OK, "Failed to create buffer.\n");
 		vBuffer.Bind();
 
-		CTMDirectX::IndexBuffer<short, 36, DXGI_FORMAT_R16_UINT> iBuffer(
+		IndexBuffer<short, 6, DXGI_FORMAT_R16_UINT> iBuffer(
 			{
-				// Front face
-				0, 1, 2,
 				0, 2, 3,
-
-				// Back face
-				4, 6, 5,
-				4, 7, 6,
-
-				// Left face
-				4, 0, 3,
-				4, 3, 7,
-
-				// Right face
-				1, 5, 6,
-				1, 6, 2,
-
-				// Top face
-				4, 5, 1,
-				4, 1, 0,
-
-				// Bottom face
-				3, 2, 6,
-				3, 6, 7
+				0, 1, 2
 			},
 			mP_Device, mP_DeviceContext
 		);
@@ -160,29 +132,25 @@ namespace CTMRenderer::Window::Graphics
 		RUNTIME_ASSERT(iBuffer.Create() == S_OK, "Failed to create buffer.\n");
 		iBuffer.Bind();
 
-		m_CBTransform = { { /* Initialize with empty transform */} };
-		RUNTIME_ASSERT(m_CBTransform.Create() == S_OK, "Failed to create buffer.\n");
-		m_CBTransform.Bind();
-
 		// Target Path (for now) : C:\dev\projects\cpp\Direct3D\RendererTest\bin\out\Debug-windows-x86_64\RendererCore\ 
 		const std::filesystem::path shaderPath = Utility::GetBinDirectory().string() + Utility::GetOutDirectory().string();
 		const std::string shaderPathStr = shaderPath.string();
 
-		const std::filesystem::path pixelShaderPath = shaderPathStr + "DefaultCubePS.cso";
-		const std::filesystem::path vertexShaderPath = shaderPathStr + "DefaultCubeVS.cso";
+		const std::filesystem::path pixelShaderPath = shaderPathStr + "DefaultRectPS.cso";
+		const std::filesystem::path vertexShaderPath = shaderPathStr + "DefaultRectVS.cso";
 		
 		Microsoft::WRL::ComPtr<ID3DBlob> pBlob;
-		CTMDirectX::PixelShader pixelShader(mP_Device, mP_DeviceContext);
-		pixelShader.Create(pixelShaderPath, pBlob);
+		PixelShader pixelShader(mP_Device, mP_DeviceContext);
+		RUNTIME_ASSERT(pixelShader.Create(pixelShaderPath, pBlob)  == S_OK, "Failed to create pixel shader.\n");
 		pixelShader.Bind();
 
-		CTMDirectX::VertexShader vertexShader(mP_Device, mP_DeviceContext);
-		vertexShader.Create(vertexShaderPath, pBlob);
+		VertexShader vertexShader(mP_Device, mP_DeviceContext);
+		RUNTIME_ASSERT(vertexShader.Create(vertexShaderPath, pBlob) == S_OK, "Failed to create vertex shader.\n");
 		vertexShader.Bind();
 
 		Microsoft::WRL::ComPtr<ID3D11InputLayout> pInputLayout = nullptr;
 		D3D11_INPUT_ELEMENT_DESC inputDescs[] = {
-			{ "Position", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, 0u, D3D11_INPUT_PER_VERTEX_DATA, 0u },
+			{ "Position", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, 0u, D3D11_INPUT_PER_VERTEX_DATA, 0u },
 			{ "Color", 0u, DXGI_FORMAT_R8G8B8A8_UNORM, 0u, sizeof(Vertex::pos), D3D11_INPUT_PER_VERTEX_DATA, 0u}
 		};
 
@@ -207,26 +175,6 @@ namespace CTMRenderer::Window::Graphics
 
 	void Graphics::StartFrame(double elapsedMillis) noexcept
 	{
-		// Update transformation before rendering.
-		D3D11_MAPPED_SUBRESOURCE mappedResource = {};
-		mP_DeviceContext->Map(m_CBTransform.ComBuffer().Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-
-		RUNTIME_ASSERT(mappedResource.pData != nullptr, "Data is nullptr.\n");
-
-		Transform* pData = reinterpret_cast<Transform*>(mappedResource.pData);
-		pData->transform = DirectX::XMMatrixTranspose(
-			DirectX::XMMatrixRotationX((float)elapsedMillis) *
-			DirectX::XMMatrixRotationZ((float)elapsedMillis) *
-			DirectX::XMMatrixTranslation(
-				Utility::ToClipSpaceX((float)m_MouseRef.PosX(), 0, (float)m_WindowAreaRef.width),
-				Utility::ToClipSpaceY((float)m_MouseRef.PosY(), 0, (float)m_WindowAreaRef.height),
-				4.0f
-			) *
-			DirectX::XMMatrixPerspectiveLH(1.0f, m_WindowAreaRef.aspectRatioReciprocal, 0.5f, 10.0f)
-		);
-
-		mP_DeviceContext->Unmap(m_CBTransform.ComBuffer().Get(), 0);
-
 		// Rebind the RenderTargetView.
 		BindRTV();
 

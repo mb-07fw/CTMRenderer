@@ -1,10 +1,10 @@
 #pragma once
 
-#include "CoreMacros.hpp"
+#include "Core/CoreMacros.hpp"
 
 #include <Windows.h>
 
-#include <string>
+#include <string_view>
 #include <stringapiset.h>
 #include <WinNls.h>
 
@@ -14,14 +14,14 @@ namespace CTMRenderer::Utility
 {
 	/* Converts a boolean state to an std::string.
 	 * Returns "true", "false", or "NON-BOOLEAN" for non boolean values. */
-	inline constexpr std::string BoolToString(bool state)
+	inline constexpr std::string_view BoolToString(bool state)
 	{
 		if (state == true)
-			return "true";
+			return std::string_view("true");
 		else if (state == false)
-			return "false";
+			return std::string_view("false");
 		else
-			return "NON-BOOLEAN";
+			return std::string_view("NON-BOOLEAN");
 	}
 
 	inline std::string TranslateHResult(const HRESULT hResult) noexcept
@@ -65,23 +65,5 @@ namespace CTMRenderer::Utility
     inline constexpr double MinDB(double value, double min)
     {
         return value < min ? min : value;
-    }
-
-    // Converts a screen space x-coordinate to clip space where xMin is
-    // the left of screen space, and height is the height of the screen.
-    inline constexpr float ToClipSpaceX(float x, float xMin, float width)
-    {
-        RUNTIME_ASSERT(width != 0, "A width of 0 will result in division by zero.\n");
-
-        return (2 * (x - xMin)) / width - 1;
-    }
-
-    // Converts a screen space y-coordinate to clip space where yMin is
-    // the top of screen space, and height is the height of the screen.
-    inline constexpr float ToClipSpaceY(float y, float yMin, float height)
-    {
-        RUNTIME_ASSERT(height != 0, "A height of 0 will result in division by zero.\n");
-
-        return 1 - (2 * (y - yMin) / height);
     }
 }

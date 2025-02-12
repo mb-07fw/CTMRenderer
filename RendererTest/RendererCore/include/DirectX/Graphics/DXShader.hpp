@@ -9,7 +9,7 @@
 
 #include "Core/CoreMacros.hpp"
 
-namespace CTMRenderer::Window::Graphics::CTMDirectX
+namespace CTMRenderer::CTMDirectX::Window::Graphics
 {
 	class PixelShader
 	{

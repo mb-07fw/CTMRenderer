@@ -1,11 +1,11 @@
 #include "Core/CorePCH.hpp"
 #include "Core/CoreMacros.hpp"
-#include "Window/Window.hpp"
+#include "DirectX/Window/DXWindow.hpp"
 
-namespace CTMRenderer::Window
+namespace CTMRenderer::CTMDirectX::Window
 {
     #pragma region Constructors
-    Window::Window(Event::EventDispatcher& eventDispatcherRef, const unsigned int targetFPS, unsigned int width, unsigned int height)
+    Window::Window(Event::EventDispatcher& eventDispatcherRef, const unsigned int targetFPS, UINT width, UINT height)
         : m_EventDispatcherRef(eventDispatcherRef), m_Mouse(), m_TargetFPS(targetFPS), m_WindowArea(width, height),
           m_Graphics(m_WindowArea, m_Mouse, targetFPS), m_WindowHandle(nullptr), m_IsInitialized(false),
           m_IsShown(false), m_IsRunning(false), m_Mutex(), m_CV()

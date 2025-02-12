@@ -1,5 +1,5 @@
 #include "Core/CorePCH.hpp"
-#include "Timer.hpp"
+#include "Core/Timer.hpp"
 
 namespace CTMRenderer::Timer
 {

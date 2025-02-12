@@ -90,25 +90,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\Graphics\DirectX\Buffer.hpp" />
+    <ClInclude Include="include\DirectX\Graphics\DXBuffer.hpp" />
     <ClInclude Include="include\Core\CoreDefines.hpp" />
     <ClInclude Include="include\Core\CoreMacros.hpp" />
     <ClInclude Include="include\Core\CorePCH.hpp" />
     <ClInclude Include="include\Core\CoreUtility.hpp" />
     <ClInclude Include="include\Core\RendererCore.hpp" />
+    <ClInclude Include="include\DirectX\Graphics\DXGraphicsUtility.hpp" />
     <ClInclude Include="include\Event\Event.hpp" />
     <ClInclude Include="include\Event\EventDispatcher.hpp" />
     <ClInclude Include="include\Event\EventListener.hpp" />
     <ClInclude Include="include\Event\EventPool.hpp" />
     <ClInclude Include="include\Event\EventSystem.hpp" />
-    <ClInclude Include="include\Graphics\DirectX\Shader.hpp" />
-    <ClInclude Include="include\Window\WindowGeometry.hpp" />
-    <ClInclude Include="include\Graphics\Graphics.hpp" />
-    <ClInclude Include="include\Graphics\DirectX\InfoQueue.hpp" />
-    <ClInclude Include="include\Window\Mouse.hpp" />
+    <ClInclude Include="include\DirectX\Graphics\DXShader.hpp" />
+    <ClInclude Include="include\DirectX\Graphics\DXShape.hpp" />
+    <ClInclude Include="include\DirectX\Window\DXWindowGeometry.hpp" />
+    <ClInclude Include="include\DirectX\Graphics\DXGraphics.hpp" />
+    <ClInclude Include="include\DirectX\Graphics\DXInfoQueue.hpp" />
+    <ClInclude Include="include\Control\Mouse.hpp" />
     <ClInclude Include="include\Renderer.hpp" />
-    <ClInclude Include="include\Timer.hpp" />
-    <ClInclude Include="include\Window\Window.hpp" />
+    <ClInclude Include="include\Core\Timer.hpp" />
+    <ClInclude Include="include\DirectX\Window\DXWindow.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\CorePCH.cpp">
@@ -116,11 +118,11 @@
     </ClCompile>
     <ClCompile Include="src\Event\EventDispatcher.cpp" />
     <ClCompile Include="src\Event\EventSystem.cpp" />
-    <ClCompile Include="src\Graphics\Graphics.cpp" />
-    <ClCompile Include="src\Graphics\DirectX\InfoQueue.cpp" />
+    <ClCompile Include="src\DirectX\Graphics\DXGraphics.cpp" />
+    <ClCompile Include="src\DirectX\Graphics\DXInfoQueue.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\Timer.cpp" />
-    <ClCompile Include="src\Window\Window.cpp" />
+    <ClCompile Include="src\DirectX\Window\DXWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\DefaultCubePS.hlsl">

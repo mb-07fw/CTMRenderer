@@ -1,6 +1,6 @@
 #pragma once
 
-namespace CTMRenderer::Window::Control
+namespace CTMRenderer::CTMDirectX::Window::Control
 {
 	class Mouse
 	{

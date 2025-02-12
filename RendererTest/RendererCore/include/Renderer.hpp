@@ -5,9 +5,9 @@
 #include <mutex>  // std::mutex
 #include <condition_variable> // std::condition_variable
 
-#include "Window/Window.hpp"
+#include "DirectX/Window/DXWindow.hpp"
 #include "Event/EventSystem.hpp"
-#include "Timer.hpp"
+#include "Core/Timer.hpp"
 
 namespace CTMRenderer
 {
@@ -32,7 +32,7 @@ namespace CTMRenderer
 		void HandleMouseEvent(Event::IEvent* pEvent) noexcept;
 	private:
 		Event::EventSystem m_EventSystem;
-		Window::Window m_Window;
+		CTMDirectX::Window::Window m_Window;
 		Timer::Timer m_Timer;
 		std::thread m_EventThread;
 		std::atomic_bool m_ShouldRun;

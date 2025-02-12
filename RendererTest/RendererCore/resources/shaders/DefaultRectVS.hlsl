@@ -4,7 +4,10 @@ struct VSOutput
     float4 pos : SV_Position;
 };
 
-float4 main( float2 pos : Position ) : SV_POSITION
+VSOutput main( float4 color : Color, float2 pos : Position )
 {
-    return float4(pos, 0.0f, 1.0f);
+    VSOutput output;
+    output.pos = float4(pos, 0.0f, 1.0f);
+    output.color = color;
+    return output;
 }
