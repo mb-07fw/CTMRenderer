@@ -1,6 +1,7 @@
 #pragma once
 
 #include <d3d11.h>
+#include <d3d11_1.h>
 #include <wrl/client.h> // ComPtr
 #include <d3dcompiler.h> // D3DReadFileToBlob
 #include <winnt.h> // HRESULT
@@ -14,7 +15,7 @@ namespace CTMRenderer::CTMDirectX::Window::Graphics
 	class PixelShader
 	{
 	public:
-		inline PixelShader(Microsoft::WRL::ComPtr<ID3D11Device>& pDeviceRef, Microsoft::WRL::ComPtr<ID3D11DeviceContext>& pDeviceContextRef)
+		inline PixelShader(Microsoft::WRL::ComPtr<ID3D11Device1>& pDeviceRef, Microsoft::WRL::ComPtr<ID3D11DeviceContext1>& pDeviceContextRef)
 			: mP_DeviceRef(pDeviceRef), mP_DeviceContext(pDeviceContextRef), mP_PixelShader() {}
 
 		~PixelShader() = default;
@@ -38,15 +39,15 @@ namespace CTMRenderer::CTMDirectX::Window::Graphics
 		}
 	private:
 		bool m_Created = false;
-		Microsoft::WRL::ComPtr<ID3D11Device>& mP_DeviceRef;
-		Microsoft::WRL::ComPtr<ID3D11DeviceContext>& mP_DeviceContext;
+		Microsoft::WRL::ComPtr<ID3D11Device1>& mP_DeviceRef;
+		Microsoft::WRL::ComPtr<ID3D11DeviceContext1>& mP_DeviceContext;
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> mP_PixelShader;
 	};
 
 	class VertexShader
 	{
 	public:
-		inline VertexShader(Microsoft::WRL::ComPtr<ID3D11Device>& pDeviceRef, Microsoft::WRL::ComPtr<ID3D11DeviceContext>& pDeviceContextRef)
+		inline VertexShader(Microsoft::WRL::ComPtr<ID3D11Device1>& pDeviceRef, Microsoft::WRL::ComPtr<ID3D11DeviceContext1>& pDeviceContextRef)
 			: mP_DeviceRef(pDeviceRef), mP_DeviceContext(pDeviceContextRef), mP_VertexShader() {
 		}
 
@@ -71,8 +72,8 @@ namespace CTMRenderer::CTMDirectX::Window::Graphics
 		}
 	private:
 		bool m_Created = false;
-		Microsoft::WRL::ComPtr<ID3D11Device>& mP_DeviceRef;
-		Microsoft::WRL::ComPtr<ID3D11DeviceContext>& mP_DeviceContext;
+		Microsoft::WRL::ComPtr<ID3D11Device1>& mP_DeviceRef;
+		Microsoft::WRL::ComPtr<ID3D11DeviceContext1>& mP_DeviceContext;
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> mP_VertexShader;
 	};
 }

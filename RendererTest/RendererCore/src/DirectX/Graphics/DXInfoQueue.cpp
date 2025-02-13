@@ -10,7 +10,7 @@ namespace CTMRenderer::CTMDirectX::Window::Graphics::Debug
 
 	}
 
-	void InfoQueue::Init(Microsoft::WRL::ComPtr<ID3D11Device>& pDeviceRef) noexcept
+	void InfoQueue::Init(Microsoft::WRL::ComPtr<ID3D11Device1>& pDeviceRef) noexcept
 	{
 		// Get the info queue interface.
 		HRESULT hResult = pDeviceRef->QueryInterface(__uuidof(ID3D11InfoQueue), &mP_InfoQueue);

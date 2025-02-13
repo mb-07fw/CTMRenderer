@@ -1,6 +1,7 @@
 #pragma once
 
 #include <d3d11.h>
+#include <d3d11_1.h>
 #include <wrl/client.h>
 #include <winnt.h> // HRESULT
 #include <minwindef.h> // UINT
@@ -18,16 +19,16 @@ namespace CTMRenderer::CTMDirectX::Window::Graphics
 		template<typename Ty>
 		using ComPtr = Microsoft::WRL::ComPtr<Ty>;
 	public:
-		inline Buffer(ComPtr<ID3D11Device>& pDeviceRef, ComPtr<ID3D11DeviceContext>& pDeviceContextRef) noexcept
+		inline Buffer(ComPtr<ID3D11Device1>& pDeviceRef, ComPtr<ID3D11DeviceContext1>& pDeviceContextRef) noexcept
 			: m_Data(), m_Stride(sizeof(T)), m_Bytes(Elems * m_Stride), mP_DeviceRef(pDeviceRef),
 			  mP_DeviceContextRef(pDeviceContextRef), mP_Buffer() {
 		}
 
-		inline Buffer(const std::array<T, Elems>& data, ComPtr<ID3D11Device>& pDeviceRef, ComPtr<ID3D11DeviceContext>& pDeviceContextRef) noexcept
+		inline Buffer(const std::array<T, Elems>& data, ComPtr<ID3D11Device1>& pDeviceRef, ComPtr<ID3D11DeviceContext1>& pDeviceContextRef) noexcept
 			: m_Data(data), m_Stride(sizeof(T)), m_Bytes(Elems * m_Stride), mP_DeviceRef(pDeviceRef),
 			  mP_DeviceContextRef(pDeviceContextRef), mP_Buffer() {}
 
-		inline Buffer(const std::initializer_list<T>& list, ComPtr<ID3D11Device>& pDeviceRef, ComPtr<ID3D11DeviceContext>& pDeviceContextRef) noexcept
+		inline Buffer(const std::initializer_list<T>& list, ComPtr<ID3D11Device1>& pDeviceRef, ComPtr<ID3D11DeviceContext1>& pDeviceContextRef) noexcept
 			: m_Stride(sizeof(T)), m_Bytes(Elems * m_Stride), mP_DeviceRef(pDeviceRef),
 			  mP_DeviceContextRef(pDeviceContextRef), mP_Buffer()
 		{
@@ -80,8 +81,8 @@ namespace CTMRenderer::CTMDirectX::Window::Graphics
 		UINT m_Bytes;
 		UINT m_Offset = 0;
 		ComPtr<ID3D11Buffer> mP_Buffer;
-		ComPtr<ID3D11Device>& mP_DeviceRef;
-		ComPtr<ID3D11DeviceContext>& mP_DeviceContextRef;
+		ComPtr<ID3D11Device1>& mP_DeviceRef;
+		ComPtr<ID3D11DeviceContext1>& mP_DeviceContextRef;
 		bool m_Created = false;
 	};
 
@@ -91,13 +92,13 @@ namespace CTMRenderer::CTMDirectX::Window::Graphics
 		template <typename Ty>
 		using ComPtr = Microsoft::WRL::ComPtr<Ty>;
 	public:
-		inline VertexBuffer(ComPtr<ID3D11Device>& pDeviceRef, ComPtr<ID3D11DeviceContext>& pDeviceContextRef) noexcept
+		inline VertexBuffer(ComPtr<ID3D11Device1>& pDeviceRef, ComPtr<ID3D11DeviceContext1>& pDeviceContextRef) noexcept
 			: Buffer<T, Elems, D3D11_USAGE_IMMUTABLE, D3D11_BIND_VERTEX_BUFFER>(pDeviceRef, pDeviceContextRef) {}
 
-		inline VertexBuffer(const std::array<T, Elems>& data, ComPtr<ID3D11Device>& pDeviceRef, ComPtr<ID3D11DeviceContext>& pDeviceContextRef) noexcept
+		inline VertexBuffer(const std::array<T, Elems>& data, ComPtr<ID3D11Device1>& pDeviceRef, ComPtr<ID3D11DeviceContext1>& pDeviceContextRef) noexcept
 			: Buffer<T, Elems, D3D11_USAGE_IMMUTABLE, D3D11_BIND_VERTEX_BUFFER>(data, pDeviceRef, pDeviceContextRef) {}
 
-		inline VertexBuffer(const std::initializer_list<T>& list, ComPtr<ID3D11Device>& pDeviceRef, ComPtr<ID3D11DeviceContext>& pDeviceContextRef) noexcept
+		inline VertexBuffer(const std::initializer_list<T>& list, ComPtr<ID3D11Device1>& pDeviceRef, ComPtr<ID3D11DeviceContext1>& pDeviceContextRef) noexcept
 			: Buffer<T, Elems, D3D11_USAGE_IMMUTABLE, D3D11_BIND_VERTEX_BUFFER>(list, pDeviceRef, pDeviceContextRef) {}
 
 		inline VertexBuffer& operator=(const std::initializer_list<T>& list) noexcept
@@ -121,13 +122,13 @@ namespace CTMRenderer::CTMDirectX::Window::Graphics
 		template <typename Ty>
 		using ComPtr = Microsoft::WRL::ComPtr<Ty>;
 	public:
-		inline IndexBuffer(ComPtr<ID3D11Device>& pDeviceRef, ComPtr<ID3D11DeviceContext>& pDeviceContextRef) noexcept
+		inline IndexBuffer(ComPtr<ID3D11Device1>& pDeviceRef, ComPtr<ID3D11DeviceContext1>& pDeviceContextRef) noexcept
 			: Buffer<T, Elems, D3D11_USAGE_IMMUTABLE, D3D11_BIND_INDEX_BUFFER>(pDeviceRef, pDeviceContextRef) {}
 
-		inline IndexBuffer(const std::array<T, Elems>& data, ComPtr<ID3D11Device>& pDeviceRef, ComPtr<ID3D11DeviceContext>& pDeviceContextRef) noexcept
+		inline IndexBuffer(const std::array<T, Elems>& data, ComPtr<ID3D11Device1>& pDeviceRef, ComPtr<ID3D11DeviceContext1>& pDeviceContextRef) noexcept
 			: Buffer<T, Elems, D3D11_USAGE_IMMUTABLE, D3D11_BIND_INDEX_BUFFER>(data, pDeviceRef, pDeviceContextRef) {}
 
-		inline IndexBuffer(const std::initializer_list<T>& list, ComPtr<ID3D11Device>& pDeviceRef, ComPtr<ID3D11DeviceContext>& pDeviceContextRef) noexcept
+		inline IndexBuffer(const std::initializer_list<T>& list, ComPtr<ID3D11Device1>& pDeviceRef, ComPtr<ID3D11DeviceContext1>& pDeviceContextRef) noexcept
 			: Buffer<T, Elems, D3D11_USAGE_IMMUTABLE, D3D11_BIND_INDEX_BUFFER>(list, pDeviceRef, pDeviceContextRef) {}
 
 		inline IndexBuffer& operator=(const std::initializer_list<T>& list) noexcept
@@ -151,13 +152,13 @@ namespace CTMRenderer::CTMDirectX::Window::Graphics
 		template <typename Ty>
 		using ComPtr = Microsoft::WRL::ComPtr<Ty>;
 	public:
-		inline ConstantBuffer(ComPtr<ID3D11Device>& pDeviceRef, ComPtr<ID3D11DeviceContext>& pDeviceContextRef) noexcept
+		inline ConstantBuffer(ComPtr<ID3D11Device1>& pDeviceRef, ComPtr<ID3D11DeviceContext1>& pDeviceContextRef) noexcept
 			: Buffer<T, Elems, D3D11_USAGE_DYNAMIC, D3D11_BIND_CONSTANT_BUFFER, CPUFlags>(pDeviceRef, pDeviceContextRef) {}
 
-		inline ConstantBuffer(const std::array<T, Elems>& data, ComPtr<ID3D11Device>& pDeviceRef, ComPtr<ID3D11DeviceContext>& pDeviceContextRef) noexcept
+		inline ConstantBuffer(const std::array<T, Elems>& data, ComPtr<ID3D11Device1>& pDeviceRef, ComPtr<ID3D11DeviceContext1>& pDeviceContextRef) noexcept
 			: Buffer<T, Elems, D3D11_USAGE_DYNAMIC, D3D11_BIND_CONSTANT_BUFFER, CPUFlags>(data, pDeviceRef, pDeviceContextRef) {}
 
-		inline ConstantBuffer(const std::initializer_list<T>& list, ComPtr<ID3D11Device>& pDeviceRef, ComPtr<ID3D11DeviceContext>& pDeviceContextRef) noexcept
+		inline ConstantBuffer(const std::initializer_list<T>& list, ComPtr<ID3D11Device1>& pDeviceRef, ComPtr<ID3D11DeviceContext1>& pDeviceContextRef) noexcept
 			: Buffer<T, Elems, D3D11_USAGE_DYNAMIC, D3D11_BIND_CONSTANT_BUFFER, CPUFlags>(list, pDeviceRef, pDeviceContextRef) {}
 
 		inline ConstantBuffer& operator=(const std::initializer_list<T>& list) noexcept

@@ -97,13 +97,14 @@
     <ClInclude Include="include\Core\CoreUtility.hpp" />
     <ClInclude Include="include\Core\RendererCore.hpp" />
     <ClInclude Include="include\DirectX\Graphics\DXGraphicsUtility.hpp" />
+    <ClInclude Include="include\DirectX\Graphics\DXShape.hpp" />
     <ClInclude Include="include\Event\Event.hpp" />
     <ClInclude Include="include\Event\EventDispatcher.hpp" />
     <ClInclude Include="include\Event\EventListener.hpp" />
     <ClInclude Include="include\Event\EventPool.hpp" />
     <ClInclude Include="include\Event\EventSystem.hpp" />
     <ClInclude Include="include\DirectX\Graphics\DXShader.hpp" />
-    <ClInclude Include="include\DirectX\Graphics\DXShape.hpp" />
+    <ClInclude Include="include\DirectX\Graphics\DXQuad.hpp" />
     <ClInclude Include="include\DirectX\Window\DXWindowGeometry.hpp" />
     <ClInclude Include="include\DirectX\Graphics\DXGraphics.hpp" />
     <ClInclude Include="include\DirectX\Graphics\DXInfoQueue.hpp" />

@@ -3,9 +3,9 @@
 #include "Windows.h"
 
 #include "Event/EventSystem.hpp"
-#include "DirectX/Graphics/Graphics.hpp"
-#include "DirectX/Window/WindowGeometry.hpp"
-#include "DirectX/Window/Mouse.hpp"
+#include "DirectX/Graphics/DXGraphics.hpp"
+#include "DirectX/Window/DXWindowGeometry.hpp"
+#include "Control/Mouse.hpp"
 
 #include <thread>
 #include <atomic>
@@ -46,6 +46,7 @@ namespace CTMRenderer::CTMDirectX::Window
 		Control::Mouse m_Mouse;
 		const unsigned int m_TargetFPS;
 		Geometry::WindowArea m_WindowArea;
+		RECT m_ClientRect;
 		Graphics::Graphics m_Graphics;
 		HWND m_WindowHandle;
 		std::atomic_bool m_IsInitialized;

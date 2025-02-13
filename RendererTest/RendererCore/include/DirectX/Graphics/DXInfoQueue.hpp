@@ -1,5 +1,7 @@
 #pragma once
 
+#include <d3d11_1.h>
+
 namespace CTMRenderer::CTMDirectX::Window::Graphics::Debug
 {
 	class InfoQueue
@@ -7,7 +9,7 @@ namespace CTMRenderer::CTMDirectX::Window::Graphics::Debug
 	public:
 		InfoQueue() noexcept;
 	public:
-		void Init(Microsoft::WRL::ComPtr<ID3D11Device>& pDeviceRef) noexcept;
+		void Init(Microsoft::WRL::ComPtr<ID3D11Device1>& pDeviceRef) noexcept;
 
 		[[nodiscard]] bool IsQueueEmpty() const noexcept;
 		[[nodiscard]] std::string GetMessagesAsStr() const noexcept;

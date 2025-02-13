@@ -9,15 +9,19 @@
 
 // Include Direct3D stuff.
 #include <d3d11.h>
+#include <d3d11_1.h>
+#include <d2d1_1.h>
 #include <d3dcompiler.h>
 #include <wrl.h>
 #include <dxgidebug.h>
 #include <DirectXMath.h>
 
+
 // Other C++ utilities used throughout RendererCore.
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <cstring>
 #include <string>
 #include <string_view>
 #include <atomic>

@@ -6,8 +6,8 @@ namespace CTMRenderer::CTMDirectX::Window
 {
     #pragma region Constructors
     Window::Window(Event::EventDispatcher& eventDispatcherRef, const unsigned int targetFPS, UINT width, UINT height)
-        : m_EventDispatcherRef(eventDispatcherRef), m_Mouse(), m_TargetFPS(targetFPS), m_WindowArea(width, height),
-          m_Graphics(m_WindowArea, m_Mouse, targetFPS), m_WindowHandle(nullptr), m_IsInitialized(false),
+        : m_EventDispatcherRef(eventDispatcherRef), m_Mouse(), m_TargetFPS(targetFPS), m_WindowArea(width, height), m_ClientRect(),
+          m_Graphics(m_WindowArea, m_Mouse, targetFPS, m_ClientRect), m_WindowHandle(nullptr), m_IsInitialized(false),
           m_IsShown(false), m_IsRunning(false), m_Mutex(), m_CV()
     {
         // Wait until Start is called to initialize the window, due to how CTMRenderer doesn't use RAII,
@@ -118,6 +118,8 @@ namespace CTMRenderer::CTMDirectX::Window
              */
         );
         RUNTIME_ASSERT(m_WindowHandle != nullptr, "Failed to create the window.\n");
+
+        GetClientRect(m_WindowHandle, &m_ClientRect);
 
         m_Graphics.Init(m_WindowHandle);
         m_IsInitialized.store(true, std::memory_order_release);
