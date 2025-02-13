@@ -65,8 +65,8 @@ workspace "RendererTest"
 
 		includedirs { locationdir .. "include/" }
 
-		-- These are included via #pragma comment's
-		-- links { "d3d11.lib", "d3dcompiler.lib" }
+		-- These are currently included via #pragma comment's. in RendererCore.hpp.
+		-- links { "d3d11.lib", "d3dcompiler.lib", "D2d1.lib", "dwrite.lib" }
 
 		pchheader "Core/CorePCH.hpp"	-- Define how the header is included.
 		pchsource (locationdir .. "src/Core/CorePCH.cpp") -- Define the path of the pch source file.
