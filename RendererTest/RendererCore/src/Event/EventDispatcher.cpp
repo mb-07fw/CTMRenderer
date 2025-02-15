@@ -46,33 +46,23 @@ namespace CTMRenderer::Event
 
 	void EventDispatcher::DispatchQueued() noexcept
 	{
+		// Iterate through each entry in the map.
 		for (auto& [key, value] : m_EventQueues)
 		{
+			// Iterate through each event in the ConcreteEventType's mapped event queue.
 			for (IEvent* pEvent : value)
 			{
 				switch (pEvent->ConcreteType())
 				{
 				case ConcreteEventType::CTM_STATE_START_EVENT:
-				{
-					StartEvent* pStartEvent = StartEvent::Cast(pEvent);
-					DispatchToGeneric(pStartEvent);
-					DispatchToConcrete(pStartEvent);
+					DispatchEvent(StartEvent::Cast(pEvent));
 					break;
-				}
 				case ConcreteEventType::CTM_STATE_END_EVENT:
-				{
-					EndEvent* pEndEvent = EndEvent::Cast(pEvent);
-					DispatchToGeneric(pEndEvent);
-					DispatchToConcrete(pEndEvent);
+					DispatchEvent(EndEvent::Cast(pEvent));
 					break;
-				}
 				case ConcreteEventType::CTM_MOUSE_MOVE_EVENT:
-				{
-					MouseMoveEvent* pMMoveEvent = MouseMoveEvent::Cast(pEvent);
-					DispatchToGeneric(pMMoveEvent);
-					DispatchToConcrete(pMMoveEvent);
+					DispatchEvent(MouseMoveEvent::Cast(pEvent));
 					break;
-				}
 				}
 			}
 

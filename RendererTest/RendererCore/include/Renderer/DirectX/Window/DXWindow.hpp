@@ -2,9 +2,9 @@
 
 #include "Windows.h"
 
+#include "Renderer/DirectX/DXRendererSettings.hpp"
+#include "Renderer/DirectX/Window/DXWindowGeometry.hpp"
 #include "Event/EventSystem.hpp"
-#include "DirectX/Graphics/DXGraphics.hpp"
-#include "DirectX/Window/DXWindowGeometry.hpp"
 #include "Control/Mouse.hpp"
 
 #include <thread>
@@ -14,24 +14,25 @@
 
 namespace CTMRenderer::CTMDirectX::Window
 {
-	class Window
+	class DXWindow
 	{
 	public:
-		Window(Event::EventDispatcher& eventDispatcherRef, const unsigned int targetFPS, UINT width = 800, UINT height = 600);
-		Window(const Window&) = delete;
-		Window(Window&&) = delete;
-		Window& operator=(const Window&&) = delete;
-		Window& operator=(Window&&) = delete;
+		DXWindow(const DXRendererSettings& settingsRef, Event::EventDispatcher& eventDispatcherRef, UINT width = 800, UINT height = 600);
+		DXWindow(const DXWindow&) = delete;
+		DXWindow(DXWindow&&) = delete;
+		DXWindow& operator=(const DXWindow&&) = delete;
+		DXWindow& operator=(DXWindow&&) = delete;
 	public:
 		void Start() noexcept;
 		void HandleMessages(BOOL& result, MSG& msg) noexcept;
-		void DoFrame(double elapsedMillis) noexcept;
 		void SetTitle(const std::wstring& title) noexcept;
 	public:
 		inline [[nodiscard]] bool IsInitialized() { return m_IsInitialized.load(std::memory_order_acquire); }
 		inline [[nodiscard]] bool IsShown()		  { return m_IsShown.load(std::memory_order_acquire); }
 		inline [[nodiscard]] bool IsRunning()	  { return m_IsRunning.load(std::memory_order_acquire); }
 		inline [[nodiscard]] Control::Mouse& Mouse() noexcept { return m_Mouse; }
+		inline [[nodiscard]] HWND Handle() const noexcept { return m_WindowHandle; }
+		inline [[nodiscard]] const Geometry::WindowArea& ClientArea() const noexcept { return m_ClientArea; }
 	private:
 		void Init();
 	private:
@@ -42,17 +43,13 @@ namespace CTMRenderer::CTMDirectX::Window
 		static constexpr const wchar_t* SP_WINDOW_CLASS_NAME = L"TestWindow"; // SMP = static member pointer.
 		static constexpr const wchar_t* SP_WINDOW_TITLE = L"Test Window";
 	private:
+		const DXRendererSettings& m_SettingsRef;
 		Event::EventDispatcher& m_EventDispatcherRef;
+		Geometry::WindowArea m_ClientArea;
 		Control::Mouse m_Mouse;
-		const unsigned int m_TargetFPS;
-		Geometry::WindowArea m_WindowArea;
-		RECT m_ClientRect;
-		Graphics::Graphics m_Graphics;
-		HWND m_WindowHandle;
-		std::atomic_bool m_IsInitialized;
-		std::atomic_bool m_IsShown;
-		std::atomic_bool m_IsRunning;
-		std::mutex m_Mutex;
-		std::condition_variable m_CV;
+		std::atomic_bool m_IsInitialized = false;
+		std::atomic_bool m_IsShown = false;
+		std::atomic_bool m_IsRunning = false;
+		HWND m_WindowHandle = nullptr;
 	};
 }

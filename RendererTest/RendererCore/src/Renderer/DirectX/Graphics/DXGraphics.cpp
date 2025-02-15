@@ -1,19 +1,19 @@
 #include "Core/CorePCH.hpp"
 #include "Core/CoreMacros.hpp"
 #include "Core/CoreUtility.hpp"
-#include "DirectX/Graphics/DXGraphics.hpp"
+#include "Renderer/DirectX/Graphics/DXGraphics.hpp"
 
-namespace CTMRenderer::CTMDirectX::Window::Graphics
+namespace CTMRenderer::CTMDirectX::Graphics
 {
-	Graphics::Graphics(const Geometry::WindowArea& windowAreaRef, const Control::Mouse& mouseRef, const unsigned int targetFPS, const RECT& clientAreaRef) noexcept
-		: m_WindowHandle(nullptr), m_WindowAreaRef(windowAreaRef), m_ClientAreaRef(clientAreaRef), m_InfoQueue(), mP_Device(), mP_SwapChain(),
-		  mP_DeviceContext(), mP_RTV(), m_2DRender(), m_TextRender(), m_ClearColor(0, 0, 0, 0), m_TargetFPS(targetFPS), m_MouseRef(mouseRef)
+	DXGraphics::DXGraphics(const DXRendererSettings& settingsRef, const Window::Geometry::WindowArea& windowAreaRef, const Control::Mouse& mouseRef) noexcept
+		: m_SettingsRef(settingsRef), m_WindowAreaRef(windowAreaRef), m_MouseRef(mouseRef),
+		  m_2DRender(), m_TextRender(), m_ClearColor(0, 0, 0, 0)
 	{
 	}
 
-	void Graphics::Init(const HWND windowHandle) noexcept
+	void DXGraphics::Init(const HWND windowHandle) noexcept
 	{
-		DEBUG_PRINT("(Graphics.Init) Target FPS : " + std::to_string(m_TargetFPS) + '\n');
+		DEBUG_PRINT("(Graphics.Init) Target FPS : " + std::to_string(m_SettingsRef.TargetFPS) + '\n');
 
 		m_WindowHandle = windowHandle;
 
@@ -21,7 +21,7 @@ namespace CTMRenderer::CTMDirectX::Window::Graphics
 		swapDesc.BufferDesc.Width = m_WindowAreaRef.width;
 		swapDesc.BufferDesc.Height = m_WindowAreaRef.height;
 		swapDesc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-		swapDesc.BufferDesc.RefreshRate.Numerator = m_TargetFPS;
+		swapDesc.BufferDesc.RefreshRate.Numerator = m_SettingsRef.TargetFPS;
 		swapDesc.BufferDesc.RefreshRate.Denominator = 1;
 		swapDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 		swapDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
@@ -78,7 +78,7 @@ namespace CTMRenderer::CTMDirectX::Window::Graphics
 		InitTestScene();
 	}
 
-	void Graphics::Init2D() noexcept
+	void DXGraphics::Init2D() noexcept
 	{
 		// Initialize the factory option's debug level.
 		D2D1_FACTORY_OPTIONS options = {};
@@ -124,7 +124,7 @@ namespace CTMRenderer::CTMDirectX::Window::Graphics
 		);
 	}
 
-	void Graphics::InitText() noexcept
+	void DXGraphics::InitText() noexcept
 	{
 		m_TextRender.text = L"Hello World!!!";
 		
@@ -160,16 +160,16 @@ namespace CTMRenderer::CTMDirectX::Window::Graphics
 		RUNTIME_ASSERT(hResult == S_OK, Utility::TranslateHResult(hResult));
 
 		m_TextRender.layoutRect = D2D1::RectF(
-			(FLOAT)m_ClientAreaRef.left,
-			(FLOAT)m_ClientAreaRef.top,
-			(FLOAT)m_ClientAreaRef.right,
-			(FLOAT)m_ClientAreaRef.bottom
+			0.0f,
+			0.0f,
+			(FLOAT)m_WindowAreaRef.width,
+			(FLOAT)m_WindowAreaRef.height
 		);
 	}
 
 	static constexpr UINT NUM_INDICES = 6;
 
-	void Graphics::InitTestScene() noexcept
+	void DXGraphics::InitTestScene() noexcept
 	{
 		struct Vertex {
 			struct {
@@ -186,11 +186,11 @@ namespace CTMRenderer::CTMDirectX::Window::Graphics
 		DEBUG_PRINT("Window center X : " << m_WindowAreaRef.centerX << '\n');
 		DEBUG_PRINT("Window center Y : " << m_WindowAreaRef.centerY << '\n');
 
-		Rect rect(
+		DXRect rect(
 			m_WindowAreaRef.centerX - 100, m_WindowAreaRef.centerY - 100, m_WindowAreaRef.centerX + 100, m_WindowAreaRef.centerY + 100
 		);
 
-		Quad rectQuad = rect.AsQuad((float)m_WindowAreaRef.width, (float)m_WindowAreaRef.height);
+		DXQuad rectQuad = rect.AsQuad((float)m_WindowAreaRef.width, (float)m_WindowAreaRef.height);
 
 		VertexBuffer<Vertex, 4> vBuffer(
 			{
@@ -224,11 +224,11 @@ namespace CTMRenderer::CTMDirectX::Window::Graphics
 		const std::filesystem::path vertexShaderPath = shaderPathStr + "DefaultRectVS.cso";
 		
 		Microsoft::WRL::ComPtr<ID3DBlob> pBlob;
-		PixelShader pixelShader(mP_Device, mP_DeviceContext);
+		DXPixelShader pixelShader(mP_Device, mP_DeviceContext);
 		RUNTIME_ASSERT(pixelShader.Create(pixelShaderPath, pBlob)  == S_OK, "Failed to create pixel shader.\n");
 		pixelShader.Bind();
 
-		VertexShader vertexShader(mP_Device, mP_DeviceContext);
+		DXVertexShader vertexShader(mP_Device, mP_DeviceContext);
 		RUNTIME_ASSERT(vertexShader.Create(vertexShaderPath, pBlob) == S_OK, "Failed to create vertex shader.\n");
 		vertexShader.Bind();
 
@@ -255,15 +255,9 @@ namespace CTMRenderer::CTMDirectX::Window::Graphics
 
 		DEBUG_PRINT("Aspect ratio : " << m_WindowAreaRef.aspectRatio << '\n');
 		DEBUG_PRINT("Aspect ratio reciprocal : " << m_WindowAreaRef.aspectRatioReciprocal << '\n');
-
-		DEBUG_PRINT("Client area left : " << m_ClientAreaRef.left << '\n');
-		DEBUG_PRINT("Client area top : " << m_ClientAreaRef.top << '\n');
-		DEBUG_PRINT("Client area right : " << m_ClientAreaRef.right << '\n');
-		DEBUG_PRINT("Client area bottom : " << m_ClientAreaRef.bottom << '\n');
-
 	}
 
-	void Graphics::StartFrame(double elapsedMillis) noexcept
+	void DXGraphics::StartFrame(double elapsedMillis) noexcept
 	{
 		// Rebind the RenderTargetView.
 		BindRTV();
@@ -271,10 +265,10 @@ namespace CTMRenderer::CTMDirectX::Window::Graphics
 		mP_DeviceContext->ClearRenderTargetView(mP_RTV.Get(), m_ClearColor.rgba);
 	}
 
-	void Graphics::Draw() noexcept
+	void DXGraphics::Draw() noexcept
 	{
 		mP_DeviceContext->DrawIndexed(NUM_INDICES, 0, 0);
-		RUNTIME_ASSERT(m_InfoQueue.IsQueueEmpty() == true, m_InfoQueue.GetMessagesAsStr());
+		RUNTIME_ASSERT(m_InfoQueue.IsQueueEmpty() == true, m_InfoQueue.GetMessages());
 
 		m_2DRender.pRTV->BeginDraw();
 		// Note to self : Clearing the D2D RTV when it references the same texture as the D3D RTV 
@@ -295,14 +289,14 @@ namespace CTMRenderer::CTMDirectX::Window::Graphics
 		RUNTIME_ASSERT(hResult == S_OK, Utility::TranslateHResult(hResult));
 	}
 
-	void Graphics::EndFrame() noexcept
+	void DXGraphics::EndFrame() noexcept
 	{
 		HRESULT hResult = mP_SwapChain->Present(SYNC_INTERVAL, 0u);
-		RUNTIME_ASSERT(m_InfoQueue.IsQueueEmpty() == true, m_InfoQueue.GetMessagesAsStr());
+		RUNTIME_ASSERT(m_InfoQueue.IsQueueEmpty() == true, m_InfoQueue.GetMessages());
 		RUNTIME_ASSERT(hResult == S_OK, Utility::TranslateHResult(hResult));
 	}
 
-	void Graphics::BindRTV() const noexcept
+	void DXGraphics::BindRTV() const noexcept
 	{
 		mP_DeviceContext->OMSetRenderTargets(1, mP_RTV.GetAddressOf(), nullptr);
 	}

@@ -46,6 +46,15 @@ namespace CTMRenderer::Event
 			return m_EventPool.GetOldest<ConcreteEventTy::EnumConcreteTy, ConcreteEventTy>();
 		}
 	private:
+		// Helper function to dispatch an event as a type.
+		template <typename ConcreteEventTy>
+		requires IsConcreteEventType<ConcreteEventTy>::Value
+		inline void DispatchEvent(ConcreteEventTy* pEvent)
+		{
+			DispatchToGeneric(pEvent);
+			DispatchToConcrete(pEvent);
+		}
+
 		// Dispatches an event to all registered IGenericListener's that listen for the event's GenericEventType, and any listeners that listen as CTM_ANY.
 		// Requires EventTy to be a concrete event type, like MouseMoveEvent.
 		template <typename ConcreteEventTy>
@@ -57,7 +66,7 @@ namespace CTMRenderer::Event
 			// Get corresponding GenericEventType of the provided type.
 			constexpr GenericEventType EnunGenericType = EnumGenericEventTypeOf<ConcreteEventTy>::Type;
 
-			// TODO : Use .find to avoid duplicate loop-ups per GenericEventType.
+			// TODO : Use .find to avoid duplicate loop-ups per GenericEventType. (contains() and at())
 			if (m_GenericListeners.contains(EnunGenericType))
 			{
 				const std::vector<IGenericListener*>& genericListeners = m_GenericListeners.at(EnunGenericType);
@@ -65,6 +74,7 @@ namespace CTMRenderer::Event
 					static_cast<GenericListener<EnunGenericType>*>(pGenericListener)->Notify(pEvent);
 			}
 
+			// TODO : Use .find to avoid duplicate loop-ups per GenericEventType. (contains() and at())
 			if (m_GenericListeners.contains(GenericEventType::CTM_ANY))
 			{
 				const std::vector<IGenericListener*>& ctmAnyListeners = m_GenericListeners.at(GenericEventType::CTM_ANY);

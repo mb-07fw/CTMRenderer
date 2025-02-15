@@ -6,20 +6,20 @@
 #include <d3d11_1.h>
 #include <d2d1_1.h>
 #include <dwrite_1.h>
-
 #include <wrl.h>
 #include <DirectXMath.h>
 
 #include <string_view>
 
-#include "DirectX/Window/DXWindowGeometry.hpp"
 #include "Control/Mouse.hpp"
-#include "DirectX/Graphics/DXInfoQueue.hpp"
-#include "DirectX/Graphics/DXBuffer.hpp"
-#include "DirectX/Graphics/DXShader.hpp"
-#include "DirectX/Graphics/DXShape.hpp"
+#include "Renderer/DirectX/DXRendererSettings.hpp"
+#include "Renderer/DirectX/Window/DXWindowGeometry.hpp"
+#include "Renderer/DirectX/Graphics/DXInfoQueue.hpp"
+#include "Renderer/DirectX/Graphics/DXBuffer.hpp"
+#include "Renderer/DirectX/Graphics/DXShader.hpp"
+#include "Renderer/DirectX/Graphics/DXShape.hpp"
 
-namespace CTMRenderer::CTMDirectX::Window::Graphics
+namespace CTMRenderer::CTMDirectX::Graphics
 {
 	struct Color
 	{
@@ -38,6 +38,7 @@ namespace CTMRenderer::CTMDirectX::Window::Graphics
 		DirectX::XMMATRIX transform;
 	};
 
+	// Temporary data containers for initial text rendering with DirectWrite implementation.
 	struct Rendering2D {
 		Microsoft::WRL::ComPtr<ID2D1Factory1> pFactory;
 		Microsoft::WRL::ComPtr<ID2D1Device> pDevice;
@@ -45,6 +46,7 @@ namespace CTMRenderer::CTMDirectX::Window::Graphics
 		Microsoft::WRL::ComPtr<ID2D1RenderTarget> pRTV;
 	};
 
+	// Temporary data containers for initial text rendering with DirectWrite implementation.
 	struct TextRender {
 		Microsoft::WRL::ComPtr<IDWriteFactory> pDWriteFactory;
 		Microsoft::WRL::ComPtr<IDWriteTextFormat> pTextFormat;
@@ -53,14 +55,14 @@ namespace CTMRenderer::CTMDirectX::Window::Graphics
 		std::wstring_view text;
 	};
 
-	class Graphics
+	class DXGraphics
 	{
 	public:
-		Graphics(const Geometry::WindowArea & windowArea, const Control::Mouse& mouseRef, const unsigned int targetFPS, const RECT& clientAreaRef) noexcept;
-		Graphics(const Graphics&) = delete;
-		Graphics(Graphics&&) = delete;
-		Graphics& operator=(const Graphics&) = delete;
-		Graphics& operator=(Graphics&&) = delete;
+		DXGraphics(const DXRendererSettings& settingsRef, const Window::Geometry::WindowArea& windowAreaRef, const Control::Mouse& mouseRef) noexcept;
+		DXGraphics(const DXGraphics&) = delete;
+		DXGraphics(DXGraphics&&) = delete;
+		DXGraphics& operator=(const DXGraphics&) = delete;
+		DXGraphics& operator=(DXGraphics&&) = delete;
 	public:
 		void Init(const HWND windowHandle) noexcept;
 		void Init2D() noexcept;
@@ -74,19 +76,18 @@ namespace CTMRenderer::CTMDirectX::Window::Graphics
 	private:
 		static constexpr unsigned char SYNC_INTERVAL = 1u;
 	private:
-		HWND m_WindowHandle;
-		const Geometry::WindowArea& m_WindowAreaRef;
-		const RECT& m_ClientAreaRef;
-		Debug::InfoQueue m_InfoQueue;
-		bool m_InitializedScene = false;
+		const DXRendererSettings& m_SettingsRef;
+		const Window::Geometry::WindowArea& m_WindowAreaRef;
+		const Control::Mouse& m_MouseRef;
+		Debug::DXInfoQueue m_InfoQueue;
 		Microsoft::WRL::ComPtr<ID3D11Device1> mP_Device;
 		Microsoft::WRL::ComPtr<IDXGISwapChain> mP_SwapChain;
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext1> mP_DeviceContext;
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> mP_RTV;
+		bool m_InitializedScene = false;
+		HWND m_WindowHandle = nullptr;
 		Rendering2D m_2DRender;
 		TextRender m_TextRender;
 		Color m_ClearColor;
-		const unsigned int m_TargetFPS;
-		const Control::Mouse& m_MouseRef;
 	};
 }

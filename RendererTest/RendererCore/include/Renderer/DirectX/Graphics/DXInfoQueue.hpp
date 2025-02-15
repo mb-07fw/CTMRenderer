@@ -2,21 +2,21 @@
 
 #include <d3d11_1.h>
 
-namespace CTMRenderer::CTMDirectX::Window::Graphics::Debug
+namespace CTMRenderer::CTMDirectX::Graphics::Debug
 {
-	class InfoQueue
+	class DXInfoQueue
 	{
 	public:
-		InfoQueue() noexcept;
+		DXInfoQueue() = default;
+		~DXInfoQueue() = default;
 	public:
 		void Init(Microsoft::WRL::ComPtr<ID3D11Device1>& pDeviceRef) noexcept;
-
 		[[nodiscard]] bool IsQueueEmpty() const noexcept;
-		[[nodiscard]] std::string GetMessagesAsStr() const noexcept;
+		[[nodiscard]] std::string GetMessages() const noexcept;
 	private:
 		void AssertInitialized() const noexcept;
 	private:
 		Microsoft::WRL::ComPtr<ID3D11InfoQueue> mP_InfoQueue;
-		bool m_Initialized;
+		bool m_Initialized = false;;
 	};
 }

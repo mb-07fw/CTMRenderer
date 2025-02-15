@@ -10,15 +10,15 @@
 
 #include "Core/CoreMacros.hpp"
 
-namespace CTMRenderer::CTMDirectX::Window::Graphics
+namespace CTMRenderer::CTMDirectX::Graphics
 {
-	class PixelShader
+	class DXPixelShader
 	{
 	public:
-		inline PixelShader(Microsoft::WRL::ComPtr<ID3D11Device1>& pDeviceRef, Microsoft::WRL::ComPtr<ID3D11DeviceContext1>& pDeviceContextRef)
+		inline DXPixelShader(Microsoft::WRL::ComPtr<ID3D11Device1>& pDeviceRef, Microsoft::WRL::ComPtr<ID3D11DeviceContext1>& pDeviceContextRef)
 			: mP_DeviceRef(pDeviceRef), mP_DeviceContext(pDeviceContextRef), mP_PixelShader() {}
 
-		~PixelShader() = default;
+		~DXPixelShader() = default;
 	public:
 		inline [[nodiscard]] HRESULT Create(const std::filesystem::path& shaderPath, Microsoft::WRL::ComPtr<ID3DBlob>& pReadBlob) noexcept
 		{
@@ -44,14 +44,14 @@ namespace CTMRenderer::CTMDirectX::Window::Graphics
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> mP_PixelShader;
 	};
 
-	class VertexShader
+	class DXVertexShader
 	{
 	public:
-		inline VertexShader(Microsoft::WRL::ComPtr<ID3D11Device1>& pDeviceRef, Microsoft::WRL::ComPtr<ID3D11DeviceContext1>& pDeviceContextRef)
+		inline DXVertexShader(Microsoft::WRL::ComPtr<ID3D11Device1>& pDeviceRef, Microsoft::WRL::ComPtr<ID3D11DeviceContext1>& pDeviceContextRef)
 			: mP_DeviceRef(pDeviceRef), mP_DeviceContext(pDeviceContextRef), mP_VertexShader() {
 		}
 
-		~VertexShader() = default;
+		~DXVertexShader() = default;
 	public:
 		inline [[nodiscard]] HRESULT Create(const std::filesystem::path& shaderPath, Microsoft::WRL::ComPtr<ID3DBlob>& pReadBlob) noexcept
 		{

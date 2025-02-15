@@ -1,9 +1,9 @@
 #pragma once
 
+#ifdef DEBUG_MODE
+
 #include <string>
 #include <iostream>
-
-#ifdef DEBUG_MODE
 
 #define DO_WRAP(x)              do { x } while(0)
 #define IF_DEBUG(x)				x

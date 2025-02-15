@@ -1,7 +1,7 @@
 #pragma once
 
 // Include Windows stuff.
-#include "CoreDefines.hpp"
+#include "Core/WindowsDefines.hpp"
 #include <Windows.h>
 #include <windowsx.h>
 #include <stringapiset.h> // WideCharToMultiByte in CoreUtility.hpp's TranslateHResult(hResult).
@@ -15,7 +15,6 @@
 #include <wrl.h>
 #include <dxgidebug.h>
 #include <DirectXMath.h>
-
 
 // Other C++ utilities used throughout RendererCore.
 #include <iostream>

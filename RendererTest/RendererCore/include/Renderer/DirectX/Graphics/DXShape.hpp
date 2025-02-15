@@ -1,14 +1,14 @@
 #pragma once
 
 #include "Core/CoreMacros.hpp"
-#include "DirectX/Graphics/DXQuad.hpp"
+#include "Renderer/DirectX/Graphics/DXQuad.hpp"
 
-namespace CTMRenderer::CTMDirectX::Window::Graphics
+namespace CTMRenderer::CTMDirectX::Graphics
 {
-	class Rect
+	class DXRect
 	{
 	public:
-		inline Rect(float left, float top, float right, float bottom) noexcept
+		inline DXRect(float left, float top, float right, float bottom) noexcept
 			: m_Left(left), m_Top(top), m_Right(right), m_Bottom(bottom),
 			m_Width(right - left), m_Height(bottom - top)
 		{
@@ -16,9 +16,9 @@ namespace CTMRenderer::CTMDirectX::Window::Graphics
 			RUNTIME_ASSERT(bottom > left, "Bottom Y position must be larger than top Y position.\n");
 		}
 	public:
-		inline Quad AsQuad(float relativeWidth, float relativeHeight) const noexcept
+		inline DXQuad AsQuad(float relativeWidth, float relativeHeight) const noexcept
 		{
-			return Quad(m_Left, m_Top, m_Right, m_Bottom, relativeWidth, relativeHeight);
+			return DXQuad(m_Left, m_Top, m_Right, m_Bottom, relativeWidth, relativeHeight);
 		}
 	public:
 		inline constexpr [[nodiscard]] float Left() const noexcept { return m_Left; }

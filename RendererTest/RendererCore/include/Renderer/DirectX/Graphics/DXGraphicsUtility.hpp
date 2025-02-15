@@ -1,9 +1,8 @@
 #pragma once
 
-#include "DirectX/Window/DXWindowGeometry.hpp"
 #include "Core/CoreMacros.hpp"
 
-namespace CTMRenderer::CTMDirectX::Window::Graphics
+namespace CTMRenderer::CTMDirectX::Graphics
 {
     // Converts a screen space x-coordinate to clip space where xMin is
     // the left of screen space, and relativeWeight is the height of the screen.

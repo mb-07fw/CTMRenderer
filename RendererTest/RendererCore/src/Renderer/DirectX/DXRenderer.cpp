@@ -1,21 +1,21 @@
 #include "Core/CorePCH.hpp"
 #include "Core/CoreMacros.hpp"
 #include "Core/CoreUtility.hpp"
-#include "Renderer.hpp"
+#include "Renderer/DirectX/DXRenderer.hpp"
 
-namespace CTMRenderer
+namespace CTMRenderer::CTMDirectX
 {
-	CTMRenderer::CTMRenderer(const unsigned int targetFPS)
-		: m_EventSystem(), m_Window(m_EventSystem.Dispatcher(), targetFPS), m_Timer(),
-		  m_EventThread(), m_ShouldRun(true), m_EventLoopStarted(false),
-		  m_RendererStarted(false), m_RendererMutex(), m_RendererCV(), m_TargetFPS(targetFPS)
+	DXRenderer::DXRenderer(const unsigned int targetFPS)
+		: IRenderer(), m_Settings(targetFPS), m_Window(m_Settings, m_EventSystem.Dispatcher()),
+		  m_Graphics(m_Settings, m_Window.ClientArea(), m_Window.Mouse())
 	{
 	}
 
 	#pragma region Public API
-	void CTMRenderer::Start()
+	void DXRenderer::Start() noexcept
 	{
-		m_EventThread = std::thread(&CTMRenderer::EventLoop, this);
+		m_ShouldRun.store(true, std::memory_order_release);
+		m_EventThread = std::thread(&DXRenderer::EventLoop, this);
 
 		// Wait for the event loop to start.
 		std::unique_lock<std::mutex> lock(m_RendererMutex);
@@ -23,19 +23,19 @@ namespace CTMRenderer
 
 		// TODO: Figure out way to have events be dispatched on the Renderer's thread
 		//		 to prevent creation of the window on the main thread. (Dispatching queue)
-		m_EventSystem.Dispatcher().QueueEvent<Event::StartEvent>(1738u);
+		m_EventSystem.Dispatcher().QueueEvent<Event::StartEvent>(1738u); // ayy
 
 		//DEBUG_PRINT("Initialized renderer.\n");
 	}
 
-	void CTMRenderer::JoinForShutdown()
+	void DXRenderer::JoinForShutdown() noexcept
 	{
 		m_EventThread.join();
 	}
 	#pragma endregion
 
 	#pragma region Private Functions
-	void CTMRenderer::OnStart(const Event::StartEvent* pStartEvent) noexcept
+	void DXRenderer::OnStart(const Event::StartEvent* pStartEvent) noexcept
 	{
 		RUNTIME_ASSERT(pStartEvent != nullptr, "Start event is nullptr. How TF did this happen?\n");
 		RUNTIME_ASSERT(m_RendererStarted.load(std::memory_order_acquire) == false, "Renderer has already started.\n");
@@ -43,13 +43,14 @@ namespace CTMRenderer
 		DEBUG_PRINT("Start args : " << pStartEvent->PlaceholderArgs() << '\n');
 
 		m_Window.Start();
+		m_Graphics.Init(m_Window.Handle());
 
 		m_RendererStarted.store(true, std::memory_order_release);
 
 		DEBUG_PRINT("Renderer started.\n");
 	}
 
-	void CTMRenderer::OnEnd(const Event::EndEvent* pEndEvent) noexcept
+	void DXRenderer::OnEnd(const Event::EndEvent* pEndEvent) noexcept
 	{
 		RUNTIME_ASSERT(pEndEvent != nullptr, "End event is nullptr. How TF did this happen?\n");
 		RUNTIME_ASSERT(m_EventLoopStarted.load(std::memory_order_acquire) == true, "Event loop hasn't started.\n");
@@ -63,11 +64,11 @@ namespace CTMRenderer
 		DEBUG_PRINT("Renderer ended.\n");
 	}
 
-	void CTMRenderer::EventLoop() noexcept
+	void DXRenderer::EventLoop() noexcept
 	{
 		// The passed onNotifyFunc will be called when an event is dispatched.
 		Event::GenericListener<Event::GenericEventType::CTM_ANY> eventListenerAny(
-			std::bind(&CTMRenderer::HandleEvent, this, std::placeholders::_1)
+			std::bind(&DXRenderer::HandleEvent, this, std::placeholders::_1)
 		);
 
 		Event::EventDispatcher& eventDispatcher = m_EventSystem.Dispatcher();
@@ -82,7 +83,7 @@ namespace CTMRenderer
 
 		DEBUG_PRINT("Renderer event loop started.\n");
 
-		const double targetFrameDuration = 1000.0 / m_TargetFPS;
+		const double targetFrameDuration = 1000.0 / m_Settings.TargetFPS;
 		double actualFrameDuration = 0.0;
 		double frameStartTime = 0.0;
 		double remainingFrameTime = 0.0;
@@ -94,13 +95,13 @@ namespace CTMRenderer
 			frameStartTime = m_Timer.ElapsedMillis();
 
 			if (m_RendererStarted.load(std::memory_order_acquire))
+			{
 				m_Window.HandleMessages(result, msg);
+				DoFrame(frameStartTime / 1000);
+			}
 
 			if (eventDispatcher.IsEventQueued())
 				eventDispatcher.DispatchQueued();
-
-			if (m_Window.IsRunning())
-				m_Window.DoFrame(frameStartTime / 1000);
 
 			actualFrameDuration = m_Timer.ElapsedMillis() - frameStartTime;
 			remainingFrameTime = Utility::MinDB(targetFrameDuration - actualFrameDuration, 0);
@@ -113,7 +114,14 @@ namespace CTMRenderer
 		DEBUG_PRINT("Event loop end.\n");
 	}
 
-	void CTMRenderer::HandleEvent(Event::IEvent* pEvent) noexcept
+	void DXRenderer::DoFrame(double elapsedMillis) noexcept
+	{
+		m_Graphics.StartFrame(elapsedMillis);
+		m_Graphics.Draw();
+		m_Graphics.EndFrame();
+	}
+
+	void DXRenderer::HandleEvent(Event::IEvent* pEvent) noexcept
 	{
 		RUNTIME_ASSERT(pEvent != nullptr, "Event received is nullptr.\n");
 
@@ -134,7 +142,7 @@ namespace CTMRenderer
 		}
 	}
 
-	void CTMRenderer::HandleStateEvent(Event::IEvent* pEvent) noexcept
+	void DXRenderer::HandleStateEvent(Event::IEvent* pEvent) noexcept
 	{
 		RUNTIME_ASSERT(pEvent->GenericType() == Event::GenericEventType::CTM_STATE_EVENT, "The provided event wasn't a CTM_STATE_EVENT.\n");
 
@@ -151,7 +159,7 @@ namespace CTMRenderer
 		}
 	}
 
-	void CTMRenderer::HandleMouseEvent(Event::IEvent* pEvent) noexcept
+	void DXRenderer::HandleMouseEvent(Event::IEvent* pEvent) noexcept
 	{
 		RUNTIME_ASSERT(pEvent->GenericType() == Event::GenericEventType::CTM_MOUSE_EVENT, "The provided event wasn't a CTM_STATE_EVENT.\n");
 

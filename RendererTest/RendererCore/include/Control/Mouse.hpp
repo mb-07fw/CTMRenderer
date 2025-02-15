@@ -1,7 +1,8 @@
 #pragma once
 
-namespace CTMRenderer::CTMDirectX::Window::Control
+namespace CTMRenderer::Control
 {
+	// A data representation of a mouse.
 	class Mouse
 	{
 	public:

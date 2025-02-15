@@ -1,16 +1,10 @@
 #include "Core/CorePCH.hpp"
 #include "Core/CoreUtility.hpp"
-#include "DirectX/Graphics/DXInfoQueue.hpp"
+#include "Renderer/DirectX/Graphics/DXInfoQueue.hpp"
 
-namespace CTMRenderer::CTMDirectX::Window::Graphics::Debug
+namespace CTMRenderer::CTMDirectX::Graphics::Debug
 {
-	InfoQueue::InfoQueue() noexcept
-		: mP_InfoQueue(nullptr), m_Initialized(false)
-	{
-
-	}
-
-	void InfoQueue::Init(Microsoft::WRL::ComPtr<ID3D11Device1>& pDeviceRef) noexcept
+	void DXInfoQueue::Init(Microsoft::WRL::ComPtr<ID3D11Device1>& pDeviceRef) noexcept
 	{
 		// Get the info queue interface.
 		HRESULT hResult = pDeviceRef->QueryInterface(__uuidof(ID3D11InfoQueue), &mP_InfoQueue);
@@ -19,14 +13,14 @@ namespace CTMRenderer::CTMDirectX::Window::Graphics::Debug
 		m_Initialized = true;
 	}
 
-	bool InfoQueue::IsQueueEmpty() const noexcept
+	bool DXInfoQueue::IsQueueEmpty() const noexcept
 	{
 		AssertInitialized();
 
 		return mP_InfoQueue->GetNumStoredMessages() == 0;
 	}
 
-	std::string InfoQueue::GetMessagesAsStr() const noexcept
+	std::string DXInfoQueue::GetMessages() const noexcept
 	{
 		AssertInitialized();
 
@@ -57,7 +51,7 @@ namespace CTMRenderer::CTMDirectX::Window::Graphics::Debug
 		return messageStr;
 	}
 
-	void InfoQueue::AssertInitialized() const noexcept
+	void DXInfoQueue::AssertInitialized() const noexcept
 	{
 		RUNTIME_ASSERT(m_Initialized == true, "InfoQueue hasn't been initialized yet.");
 	}

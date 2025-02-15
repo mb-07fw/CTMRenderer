@@ -1,14 +1,12 @@
 #include "Core/CorePCH.hpp"
 #include "Core/CoreMacros.hpp"
-#include "DirectX/Window/DXWindow.hpp"
+#include "Renderer/DirectX/Window/DXWindow.hpp"
 
 namespace CTMRenderer::CTMDirectX::Window
 {
     #pragma region Constructors
-    Window::Window(Event::EventDispatcher& eventDispatcherRef, const unsigned int targetFPS, UINT width, UINT height)
-        : m_EventDispatcherRef(eventDispatcherRef), m_Mouse(), m_TargetFPS(targetFPS), m_WindowArea(width, height), m_ClientRect(),
-          m_Graphics(m_WindowArea, m_Mouse, targetFPS, m_ClientRect), m_WindowHandle(nullptr), m_IsInitialized(false),
-          m_IsShown(false), m_IsRunning(false), m_Mutex(), m_CV()
+    DXWindow::DXWindow(const DXRendererSettings& settingsRef, Event::EventDispatcher& eventDispatcherRef, UINT width, UINT height)
+        : m_SettingsRef(settingsRef), m_EventDispatcherRef(eventDispatcherRef), m_ClientArea(width, height)
     {
         // Wait until Start is called to initialize the window, due to how CTMRenderer doesn't use RAII,
         // and runs on a separate thread, so the window must be created on the it's thread for CTMRenderer
@@ -17,14 +15,14 @@ namespace CTMRenderer::CTMDirectX::Window
     #pragma endregion
 
     #pragma region Public API
-    void Window::Start() noexcept
+    void DXWindow::Start() noexcept
     {
         Init();
 
         m_IsRunning.store(true, std::memory_order_release);
     }
 
-    void Window::HandleMessages(BOOL& result, MSG& msg) noexcept
+    void DXWindow::HandleMessages(BOOL& result, MSG& msg) noexcept
     {
         RUNTIME_ASSERT(m_IsInitialized.load(std::memory_order_acquire), "The window isn't initialized.\n");
 
@@ -48,23 +46,14 @@ namespace CTMRenderer::CTMDirectX::Window
         }
     }
 
-    void Window::DoFrame(double elapsedMillis) noexcept
-    {
-        RUNTIME_ASSERT(m_IsRunning.load(std::memory_order_acquire), "Window is not running.\n");
-        
-        m_Graphics.StartFrame(elapsedMillis);
-        m_Graphics.Draw();
-        m_Graphics.EndFrame();
-    }
-
-    void Window::SetTitle(const std::wstring& title) noexcept
+    void DXWindow::SetTitle(const std::wstring& title) noexcept
     {
         SetWindowTextW(m_WindowHandle, title.c_str());
     }
     #pragma endregion
 
     #pragma region Private Functions
-    void Window::Init()
+    void DXWindow::Init()
     {
         RUNTIME_ASSERT(m_IsInitialized.load() == false, "The window is already initialized.\n");
 
@@ -96,9 +85,9 @@ namespace CTMRenderer::CTMDirectX::Window
 
         // Calculate window size to account for the actual client size. (client area with 100 pixel padding)
         windowClientAreaRect.left = windowSizePadding;
-        windowClientAreaRect.right = m_WindowArea.width + windowSizePadding;
+        windowClientAreaRect.right = m_ClientArea.width + windowSizePadding;
         windowClientAreaRect.top = windowSizePadding;
-        windowClientAreaRect.bottom = m_WindowArea.height + windowSizePadding;
+        windowClientAreaRect.bottom = m_ClientArea.height + windowSizePadding;
 
         // Create the window.
         m_WindowHandle = CreateWindowEx(
@@ -107,7 +96,7 @@ namespace CTMRenderer::CTMDirectX::Window
             SP_WINDOW_TITLE,
             WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, // Window styles
             CW_USEDEFAULT, CW_USEDEFAULT,             // X,Y position.
-            m_WindowArea.width, m_WindowArea.height,  // Window size.
+            m_ClientArea.width, m_ClientArea.height,  // Window size.
             nullptr,                                  // Parent window.
             nullptr,                                  // Menu.
             GetModuleHandle(NULL),                    // Handle to the instance of the application. (HINSTANCE)
@@ -119,16 +108,13 @@ namespace CTMRenderer::CTMDirectX::Window
         );
         RUNTIME_ASSERT(m_WindowHandle != nullptr, "Failed to create the window.\n");
 
-        GetClientRect(m_WindowHandle, &m_ClientRect);
-
-        m_Graphics.Init(m_WindowHandle);
         m_IsInitialized.store(true, std::memory_order_release);
 
         ShowWindow(m_WindowHandle, SW_SHOW);
         m_IsShown.store(true, std::memory_order_release);
     }
 
-    LRESULT CALLBACK Window::WndProcSetup(HWND windowHandle, UINT msgCode, WPARAM wParam, LPARAM lParam) noexcept
+    LRESULT CALLBACK DXWindow::WndProcSetup(HWND windowHandle, UINT msgCode, WPARAM wParam, LPARAM lParam) noexcept
     {
         // If we get a message before the WM_NCCREATE message, handle with default window procedure provided by the WinAPI.
         // (WM_NCCREATE contains the instance of Window that was passed to CrateWindowEx)
@@ -137,28 +123,28 @@ namespace CTMRenderer::CTMDirectX::Window
 
         // Retrieve create parameter passed into CreateWindowEx that stores an instance of Window.
         const CREATESTRUCTW* const pCreateStruct = reinterpret_cast<CREATESTRUCTW*>(lParam);
-        Window* const pWindow = static_cast<Window*>(pCreateStruct->lpCreateParams);
+        DXWindow* const pWindow = static_cast<DXWindow*>(pCreateStruct->lpCreateParams);
 
         // Set WinAPI-managed user data to store the instance to Window.
         SetWindowLongPtr(windowHandle, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWindow));
 
         // Set message procedure to WndProcThunk now that the instance of Window is stored.
-        SetWindowLongPtr(windowHandle, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(Window::WndProcThunk));
+        SetWindowLongPtr(windowHandle, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(DXWindow::WndProcThunk));
 
         // Forward message to the instance WndProc.
         return pWindow->WndProc(windowHandle, msgCode, wParam, lParam);
     }
 
-    LRESULT CALLBACK Window::WndProcThunk(HWND windowHandle, UINT msgCode, WPARAM wParam, LPARAM lParam) noexcept
+    LRESULT CALLBACK DXWindow::WndProcThunk(HWND windowHandle, UINT msgCode, WPARAM wParam, LPARAM lParam) noexcept
     {
         // Retrieve pointer to instance of Window from WinAPI user data.
-        Window* const pWindow = reinterpret_cast<Window*>(GetWindowLongPtr(windowHandle, GWLP_USERDATA));
+        DXWindow* const pWindow = reinterpret_cast<DXWindow*>(GetWindowLongPtr(windowHandle, GWLP_USERDATA));
 
         // Forward message to the instance handler.
         return pWindow->WndProc(windowHandle, msgCode, wParam, lParam);
     }
 
-    LRESULT CALLBACK Window::WndProc(HWND windowHandle, UINT msgCode, WPARAM wParam, LPARAM lParam) noexcept
+    LRESULT CALLBACK DXWindow::WndProc(HWND windowHandle, UINT msgCode, WPARAM wParam, LPARAM lParam) noexcept
     {
         switch (msgCode)
         {

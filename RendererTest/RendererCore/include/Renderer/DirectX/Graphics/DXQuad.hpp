@@ -1,18 +1,18 @@
 #pragma once
 
 #include "Core/CoreMacros.hpp"
-#include "DirectX/Window/DXWindowGeometry.hpp"
-#include "DirectX/Graphics/DXGraphicsUtility.hpp"
+#include "Renderer/DirectX/Window/DXWindowGeometry.hpp"
+#include "Renderer/DirectX/Graphics/DXGraphicsUtility.hpp"
 
-namespace CTMRenderer::CTMDirectX::Window::Graphics
+namespace CTMRenderer::CTMDirectX::Graphics
 {
-	class Quad
+	class DXQuad
 	{
 	public:
-		Quad() = default;
-		~Quad() = default;
+		DXQuad() = default;
+		~DXQuad() = default;
 	public:
-		inline Quad(float left, float top, float right, float bottom, float relativeWidth, float relativeHeight) noexcept
+		inline DXQuad(float left, float top, float right, float bottom, float relativeWidth, float relativeHeight) noexcept
 		{
 			RUNTIME_ASSERT(right > left, "Right X position must be larger than left X position.\n");
 			RUNTIME_ASSERT(bottom > left, "Bottom Y position must be larger than top Y position.\n");
