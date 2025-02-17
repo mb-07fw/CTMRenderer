@@ -15,25 +15,11 @@
 #include "Renderer/DirectX/DXRendererSettings.hpp"
 #include "Renderer/DirectX/Window/DXWindowGeometry.hpp"
 #include "Renderer/DirectX/Graphics/DXInfoQueue.hpp"
-#include "Renderer/DirectX/Graphics/DXBuffer.hpp"
-#include "Renderer/DirectX/Graphics/DXShader.hpp"
-#include "Renderer/DirectX/Graphics/DXShape.hpp"
+#include "Renderer/DirectX/Graphics/DXColor.hpp"
+
 
 namespace CTMRenderer::CTMDirectX::Graphics
 {
-	struct Color
-	{
-		inline Color(float r = 0, float g = 0, float b = 0, float a = 0)
-		{
-			rgba[0] = r;
-			rgba[1] = g;
-			rgba[2] = b;
-			rgba[3] = a;
-		}
-
-		float rgba[4];
-	};
-
 	struct Transform {
 		DirectX::XMMATRIX transform;
 	};
@@ -51,7 +37,7 @@ namespace CTMRenderer::CTMDirectX::Graphics
 		Microsoft::WRL::ComPtr<IDWriteFactory> pDWriteFactory;
 		Microsoft::WRL::ComPtr<IDWriteTextFormat> pTextFormat;
 		Microsoft::WRL::ComPtr<ID2D1SolidColorBrush> pSCBrush;
-		D2D1_RECT_F layoutRect;
+		D2D1_RECT_F layoutRect = {};
 		std::wstring_view text;
 	};
 
@@ -59,19 +45,16 @@ namespace CTMRenderer::CTMDirectX::Graphics
 	{
 	public:
 		DXGraphics(const DXRendererSettings& settingsRef, const Window::Geometry::WindowArea& windowAreaRef, const Control::Mouse& mouseRef) noexcept;
-		DXGraphics(const DXGraphics&) = delete;
-		DXGraphics(DXGraphics&&) = delete;
-		DXGraphics& operator=(const DXGraphics&) = delete;
-		DXGraphics& operator=(DXGraphics&&) = delete;
+		~DXGraphics() = default;
 	public:
 		void Init(const HWND windowHandle) noexcept;
-		void Init2D() noexcept;
-		void InitText() noexcept;
-		void InitTestScene() noexcept;
 		void StartFrame(double elapsedMillis) noexcept;
 		void Draw() noexcept;
 		void EndFrame() noexcept;
 	private:
+		void Init2D() noexcept;
+		void InitText() noexcept;
+		void InitTestScene() noexcept;
 		void BindRTV() const noexcept;
 	private:
 		static constexpr unsigned char SYNC_INTERVAL = 1u;
@@ -88,6 +71,11 @@ namespace CTMRenderer::CTMDirectX::Graphics
 		HWND m_WindowHandle = nullptr;
 		Rendering2D m_2DRender;
 		TextRender m_TextRender;
-		Color m_ClearColor;
+		DXNormColor m_ClearColor;
+	private:
+		DXGraphics(const DXGraphics&) = delete;
+		DXGraphics(DXGraphics&&) = delete;
+		DXGraphics& operator=(const DXGraphics&) = delete;
+		DXGraphics& operator=(DXGraphics&&) = delete;
 	};
 }

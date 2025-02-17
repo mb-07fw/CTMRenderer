@@ -22,14 +22,15 @@ namespace CTMRenderer::CTMDirectX::Graphics
 	public:
 		inline [[nodiscard]] HRESULT Create(const std::filesystem::path& shaderPath, Microsoft::WRL::ComPtr<ID3DBlob>& pReadBlob) noexcept
 		{
-			RUNTIME_ASSERT(!m_Created, "A shader shouldn't be re-created.\n");
+			RUNTIME_ASSERT(!m_IsCreated, "A shader shouldn't be re-created.\n");
 			RUNTIME_ASSERT(std::filesystem::exists(shaderPath), "Path doesn't exist : " << shaderPath << '\n');
 			RUNTIME_ASSERT(shaderPath.extension() == ".cso", "Shader file must be in shader bytecode format of .cso : " << shaderPath.extension() << '\n');
 
 			std::wstring wPath = shaderPath.wstring();
 			D3DReadFileToBlob(wPath.c_str(), &pReadBlob);
 
-			m_Created = true;
+			m_IsCreated = true;
+
 			return mP_DeviceRef->CreatePixelShader(pReadBlob->GetBufferPointer(), pReadBlob->GetBufferSize(), nullptr, mP_PixelShader.GetAddressOf());
 		}
 
@@ -37,8 +38,10 @@ namespace CTMRenderer::CTMDirectX::Graphics
 		{
 			mP_DeviceContext->PSSetShader(mP_PixelShader.Get(), nullptr, 0u);
 		}
+	public:
+		inline [[nodiscard]] bool IsCreated() const noexcept { return m_IsCreated; }
 	private:
-		bool m_Created = false;
+		bool m_IsCreated = false;
 		Microsoft::WRL::ComPtr<ID3D11Device1>& mP_DeviceRef;
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext1>& mP_DeviceContext;
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> mP_PixelShader;

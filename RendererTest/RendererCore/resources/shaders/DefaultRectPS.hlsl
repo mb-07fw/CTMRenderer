@@ -1,4 +1,4 @@
-float4 main(float4 color : Color) : SV_TARGET
+float4 main(float4 color : PX_COLOR) : SV_TARGET
 {
     return color;
 }

@@ -68,11 +68,13 @@
     <ClInclude Include="include\Control\Mouse.hpp" />
     <ClInclude Include="include\Renderer\DirectX\Graphics\DXBuffer.hpp" />
     <ClInclude Include="include\Renderer\DirectX\Graphics\DXShader.hpp" />
-    <ClInclude Include="include\Renderer\DirectX\Graphics\DXQuad.hpp" />
+    <ClInclude Include="include\Renderer\DirectX\Graphics\DXAABB.hpp" />
     <ClInclude Include="include\Renderer\DirectX\Graphics\DXGraphicsUtility.hpp" />
     <ClInclude Include="include\Renderer\DirectX\Graphics\DXShape.hpp" />
     <ClInclude Include="include\Renderer\IRenderer.hpp" />
     <ClInclude Include="include\Renderer\DirectX\DXRendererSettings.hpp" />
+    <ClInclude Include="include\Renderer\DirectX\Graphics\DXInputLayout.hpp" />
+    <ClInclude Include="include\Renderer\DirectX\Graphics\DXColor.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\CorePCH.cpp">
@@ -92,6 +94,7 @@
     <ClCompile Include="src\Event\EventDispatcher.cpp" />
     <ClCompile Include="src\Event\EventSystem.cpp" />
     <ClCompile Include="src\Renderer\CTMRenderer.cpp" />
+    <ClCompile Include="src\Renderer\DirectX\Graphics\DXAABB.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\DefaultCubePS.hlsl">
