@@ -15,8 +15,10 @@ namespace CTMRenderer::CTMDirectX::Graphics
 	class DXPixelShader
 	{
 	public:
-		inline DXPixelShader(Microsoft::WRL::ComPtr<ID3D11Device1>& pDeviceRef, Microsoft::WRL::ComPtr<ID3D11DeviceContext1>& pDeviceContextRef)
-			: mP_DeviceRef(pDeviceRef), mP_DeviceContext(pDeviceContextRef), mP_PixelShader() {}
+		inline DXPixelShader(Microsoft::WRL::ComPtr<ID3D11Device1> pDevice, Microsoft::WRL::ComPtr<ID3D11DeviceContext1> pDeviceContext)
+			: mP_Device(pDevice), mP_DeviceContext(pDeviceContext) 
+		{
+		}
 
 		~DXPixelShader() = default;
 	public:
@@ -31,7 +33,7 @@ namespace CTMRenderer::CTMDirectX::Graphics
 
 			m_IsCreated = true;
 
-			return mP_DeviceRef->CreatePixelShader(pReadBlob->GetBufferPointer(), pReadBlob->GetBufferSize(), nullptr, mP_PixelShader.GetAddressOf());
+			return mP_Device->CreatePixelShader(pReadBlob->GetBufferPointer(), pReadBlob->GetBufferSize(), nullptr, mP_PixelShader.GetAddressOf());
 		}
 
 		inline void Bind() noexcept
@@ -42,16 +44,17 @@ namespace CTMRenderer::CTMDirectX::Graphics
 		inline [[nodiscard]] bool IsCreated() const noexcept { return m_IsCreated; }
 	private:
 		bool m_IsCreated = false;
-		Microsoft::WRL::ComPtr<ID3D11Device1>& mP_DeviceRef;
-		Microsoft::WRL::ComPtr<ID3D11DeviceContext1>& mP_DeviceContext;
+		Microsoft::WRL::ComPtr<ID3D11Device1> mP_Device;
+		Microsoft::WRL::ComPtr<ID3D11DeviceContext1> mP_DeviceContext;
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> mP_PixelShader;
 	};
 
 	class DXVertexShader
 	{
 	public:
-		inline DXVertexShader(Microsoft::WRL::ComPtr<ID3D11Device1>& pDeviceRef, Microsoft::WRL::ComPtr<ID3D11DeviceContext1>& pDeviceContextRef)
-			: mP_DeviceRef(pDeviceRef), mP_DeviceContext(pDeviceContextRef), mP_VertexShader() {
+		inline DXVertexShader(Microsoft::WRL::ComPtr<ID3D11Device1> pDevice, Microsoft::WRL::ComPtr<ID3D11DeviceContext1> pDeviceContext)
+			: mP_Device(pDevice), mP_DeviceContext(pDeviceContext)
+		{
 		}
 
 		~DXVertexShader() = default;
@@ -66,7 +69,7 @@ namespace CTMRenderer::CTMDirectX::Graphics
 			D3DReadFileToBlob(wPath.c_str(), &pReadBlob);
 
 			m_Created = true;
-			return mP_DeviceRef->CreateVertexShader(pReadBlob->GetBufferPointer(), pReadBlob->GetBufferSize(), nullptr, mP_VertexShader.GetAddressOf());
+			return mP_Device->CreateVertexShader(pReadBlob->GetBufferPointer(), pReadBlob->GetBufferSize(), nullptr, mP_VertexShader.GetAddressOf());
 		}
 
 		inline void Bind() noexcept
@@ -75,8 +78,8 @@ namespace CTMRenderer::CTMDirectX::Graphics
 		}
 	private:
 		bool m_Created = false;
-		Microsoft::WRL::ComPtr<ID3D11Device1>& mP_DeviceRef;
-		Microsoft::WRL::ComPtr<ID3D11DeviceContext1>& mP_DeviceContext;
+		Microsoft::WRL::ComPtr<ID3D11Device1> mP_Device;
+		Microsoft::WRL::ComPtr<ID3D11DeviceContext1> mP_DeviceContext;
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> mP_VertexShader;
 	};
 }

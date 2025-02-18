@@ -13,41 +13,248 @@
 
 namespace CTMRenderer::CTMDirectX::Graphics::Bindable
 {
+	// Note : Not all valid combinations are specified, as I'm not insane enough to write them all.
+	template <D3D11_USAGE Usage, D3D11_BIND_FLAG BindFlags, D3D11_CPU_ACCESS_FLAG CPUFlags>
+	struct IsValidBufferConfig : std::false_type {};
+
+	//
+	// Default Usage
+	//
+	template<>
+	struct IsValidBufferConfig<D3D11_USAGE_DEFAULT, D3D11_BIND_VERTEX_BUFFER, (D3D11_CPU_ACCESS_FLAG)(0)>
+		: std::true_type {};
+
+	template<>
+	struct IsValidBufferConfig<D3D11_USAGE_DEFAULT, D3D11_BIND_INDEX_BUFFER, (D3D11_CPU_ACCESS_FLAG)(0)>
+		: std::true_type {
+	};
+
+	template<>
+	struct IsValidBufferConfig<D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, (D3D11_CPU_ACCESS_FLAG)(0)>
+		: std::true_type {
+	};
+
+
+	//
+	// Immutable Usage
+	//
+	template<>
+	struct IsValidBufferConfig<D3D11_USAGE_IMMUTABLE, D3D11_BIND_VERTEX_BUFFER, (D3D11_CPU_ACCESS_FLAG)(0)>
+		: std::true_type {
+	};
+
+	template<>
+	struct IsValidBufferConfig<D3D11_USAGE_IMMUTABLE, D3D11_BIND_INDEX_BUFFER, (D3D11_CPU_ACCESS_FLAG)(0)>
+		: std::true_type {
+	};
+
+	template<>
+	struct IsValidBufferConfig<D3D11_USAGE_IMMUTABLE, D3D11_BIND_SHADER_RESOURCE, (D3D11_CPU_ACCESS_FLAG)(0)>
+		: std::true_type {
+	};
+
+
+	//
+	// Dynamic Usage
+	//
+	template<>
+	struct IsValidBufferConfig<D3D11_USAGE_DYNAMIC, D3D11_BIND_VERTEX_BUFFER, D3D11_CPU_ACCESS_WRITE>
+		: std::true_type {
+	};
+
+	template<>
+	struct IsValidBufferConfig<D3D11_USAGE_DYNAMIC, D3D11_BIND_INDEX_BUFFER, D3D11_CPU_ACCESS_WRITE>
+		: std::true_type {
+	};
+
+	template<>
+	struct IsValidBufferConfig<D3D11_USAGE_DYNAMIC, D3D11_BIND_CONSTANT_BUFFER, D3D11_CPU_ACCESS_WRITE>
+		: std::true_type {
+	};
+
+	template<>
+	struct IsValidBufferConfig<D3D11_USAGE_DYNAMIC, D3D11_BIND_SHADER_RESOURCE, D3D11_CPU_ACCESS_WRITE>
+		: std::true_type {
+	};
+
+
+
+	//
+	// Staging Usage
+	//
+	template<>
+	struct IsValidBufferConfig<D3D11_USAGE_STAGING, (D3D11_BIND_FLAG)(0), D3D11_CPU_ACCESS_WRITE>
+		: std::true_type {
+	};
+
+	template<>
+	struct IsValidBufferConfig<D3D11_USAGE_STAGING, (D3D11_BIND_FLAG)(0), D3D11_CPU_ACCESS_READ>
+		: std::true_type {
+	};
+
+	template<>
+	struct IsValidBufferConfig<D3D11_USAGE_STAGING, (D3D11_BIND_FLAG)(0), (D3D11_CPU_ACCESS_FLAG)(D3D11_CPU_ACCESS_WRITE | D3D11_CPU_ACCESS_READ)>
+		: std::true_type {
+	};
+
+
+
+
+
+	template <typename T, D3D11_USAGE Usage, D3D11_BIND_FLAG BindFlags, D3D11_CPU_ACCESS_FLAG CPUFlags = (D3D11_CPU_ACCESS_FLAG)(0)>
+		requires (IsValidBufferConfig<Usage, BindFlags, CPUFlags>::value)
+	class DXBuffer
+	{
+		template<typename Ty>
+		using ComPtr = Microsoft::WRL::ComPtr<Ty>;
+
+		static_assert(
+			Usage == D3D11_USAGE_DEFAULT ||
+			Usage == D3D11_USAGE_DYNAMIC ||
+			Usage == D3D11_USAGE_IMMUTABLE ||
+			Usage == D3D11_USAGE_STAGING,
+			"Provided D3D11_USAGE is invalid."
+		);
+		static_assert(
+			BindFlags == D3D11_BIND_VERTEX_BUFFER ||
+			BindFlags == D3D11_BIND_INDEX_BUFFER ||
+			BindFlags == D3D11_BIND_CONSTANT_BUFFER ||
+			BindFlags == D3D11_BIND_SHADER_RESOURCE,
+			"Provided D3D11_BIND_FLAG flag is invalid."
+		);
+	public:
+		inline DXBuffer(ComPtr<ID3D11Device1> pDevice, ComPtr<ID3D11DeviceContext1> pDeviceContext)
+			: mP_Device(pDevice), mP_DeviceContext(pDeviceContext)
+		{
+		}
+
+		~DXBuffer() = default;
+	public:
+		inline constexpr [[nodiscard]] UINT Stride() const noexcept { return S_STRIDE; }
+		inline [[nodiscard]] const ComPtr<ID3D11Buffer>& ComBuffer() const noexcept { return mP_Buffer; }
+		inline [[nodiscard]] bool IsCreated() const noexcept { return m_IsCreated; }
+	protected:
+		constexpr static UINT S_STRIDE = sizeof(T);
+		ComPtr<ID3D11Buffer> mP_Buffer;
+		ComPtr<ID3D11Device1> mP_Device;
+		ComPtr<ID3D11DeviceContext1> mP_DeviceContext;
+		bool m_IsCreated = false;
+	};
+
 	/*  Explanation:
 	 *
-	 *    Instead of restricting the size of the buffer at compile time (like DXStrictBuffer),
-	 *    the size is instead set at runtime, allowing storage capacity to be determined at runtime.
+	 *    Instead of restricting the capacity of the buffer at compile time (like DXStrictBuffer),
+	 *    the capacity is instead set at runtime, which is very useful when the amount of data varies.
+	 * 
+	 *    DXRuntimeBuffer utilizes D3D11_USAGE_DYNAMIC, as it is meant to be modified through data,
+	 *    or buffer size.
+	 * 
+	 *    DXRuntimeBuffer has the CPUFlags of D3D11_CPU_ACCESS_WRITE and D3D11_CPU_ACCESS_READ by default, unless specified otherwise.
 	 * 
 	 *  NOTE:
 	 * 
-	 *    !! The immutability factor of DXBuffer's does NOT change with this implementation. !!
+	 *    For DXStrictBuffer, the capacity of the buffer is fixed after instantiation.
 	 * 
-	 *    For both DXRuntimeBuffer, and DXStrictBuffer, the size of the buffers are fixed after instantiation.
-	 *    However, DXStrictBuffer takes it's size as a template parameter, which allows stack allocation of elements via std::array.
-	 *    On the contrary, since DXRuntimeBuffer's buffer size is determined at runtime, heap allocation is inevitable.
+	 *    This differs from DXRuntimeBuffer, which allows recreation with a differing buffer capacity.
+	 * 
+	 *    However, since DXStrictBuffer takes it's capacity as a template parameter, stack allocation of elements via std::array is allowed, improving performance.
+	 * 
+	 *    On the contrary, since DXRuntimeBuffer's buffer capacity is determined at runtime, heap allocation is inevitable, 
+	 *    which may hurt performance in edge cases, such as frequent buffer resizing.
+	 * 
+	 *	Usage:
+	 * 
+	 *	  DXRuntimeBuffer should be used where the amount of data varies.
+	 * 
+	 *    DXStrictBuffer should be used where the amount of the data is known at compile time, for better data optimization.
 	 */
-	class DXRuntimeBuffer
-	{
-
-	};
-
-	template <typename T, UINT Elems, D3D11_USAGE Usage, D3D11_BIND_FLAG BindFlags, D3D11_CPU_ACCESS_FLAG CPUFlags = (D3D11_CPU_ACCESS_FLAG)(0)>
-	class DXStrictBuffer
+	template <typename T, D3D11_BIND_FLAG BindFlags, D3D11_CPU_ACCESS_FLAG CPUFlags = (D3D11_CPU_ACCESS_FLAG)(D3D11_CPU_ACCESS_WRITE | D3D11_CPU_ACCESS_READ)>
+	class DXRuntimeBuffer : public DXBuffer<T, D3D11_USAGE_DYNAMIC, BindFlags, CPUFlags>
 	{
 		template<typename Ty>
 		using ComPtr = Microsoft::WRL::ComPtr<Ty>;
 	public:
-		inline DXStrictBuffer(ComPtr<ID3D11Device1>& pDeviceRef, ComPtr<ID3D11DeviceContext1>& pDeviceContextRef) noexcept
-			: m_Stride(sizeof(T)), m_Bytes(Elems* m_Stride), mP_DeviceRef(pDeviceRef),
-			  mP_DeviceContextRef(pDeviceContextRef) {}
+		inline DXRuntimeBuffer(size_t initialElems, ComPtr<ID3D11Device1> pDevice, ComPtr<ID3D11DeviceContext1> pDeviceContext)
+			: DXBuffer<T, Usage, BindFlags, CPUFlags>(pDevice, pDeviceContext),
+			  m_Data(initialElems), m_CurrentElems((UINT)initialElems)
+		{
+		}
 
-		inline DXStrictBuffer(const std::array<T, Elems>& data, ComPtr<ID3D11Device1>& pDeviceRef, ComPtr<ID3D11DeviceContext1>& pDeviceContextRef) noexcept
-			: m_Data(data), m_Stride(sizeof(T)), m_Bytes(Elems * m_Stride), mP_DeviceRef(pDeviceRef),
-			  mP_DeviceContextRef(pDeviceContextRef) {}
+		~DXRuntimeBuffer() = default;
+	public:
+		inline HRESULT Expand(UINT additionalElems) noexcept
+		{
+			m_CurrentElems += additionalElems;
+			m_CurrentByteWidth = m_CurrentElems * this->S_STRIDE;
+	
+			std::vector<T> tempData = std::move(m_Data);
 
-		inline DXStrictBuffer(const std::initializer_list<T>& dataList, ComPtr<ID3D11Device1>& pDeviceRef, ComPtr<ID3D11DeviceContext1>& pDeviceContextRef) noexcept
-			: m_Stride(sizeof(T)), m_Bytes(Elems * m_Stride), mP_DeviceRef(pDeviceRef),
-			  mP_DeviceContextRef(pDeviceContextRef)
+			m_Data.reserve(m_CurrentElems);
+			m_Data.assign(tempData.begin(), tempData.end());
+
+			return Create();
+		}
+
+		// Creates the buffer with the current size.
+		// If the buffer needs to expand, Call Expand instead.
+		inline HRESULT Create() noexcept
+		{
+			RUNTIME_ASSERT(!this->m_IsCreated, "A DXRuntimeBuffer should not be .\n");
+
+			D3D11_BUFFER_DESC vBufferDesc = {};
+			vBufferDesc.ByteWidth = m_CurrentByteWidth;
+			vBufferDesc.Usage = Usage;
+			vBufferDesc.BindFlags = BindFlags;
+			vBufferDesc.CPUAccessFlags = CPUFlags;
+			vBufferDesc.MiscFlags = 0;
+
+			D3D11_SUBRESOURCE_DATA vBufferSubData = {};
+			vBufferSubData.pSysMem = m_Data.data();
+
+			this->m_IsCreated = true;
+			return this->mP_Device->CreateBuffer(&vBufferDesc, &vBufferSubData, this->mP_Buffer.GetAddressOf());
+		}
+	private:
+		std::vector<T> m_Data;
+		UINT m_CurrentElems;
+		UINT m_CurrentByteWidth;
+	};
+
+	template <typename T>
+	class DXRuntimeVertexBuffer : public DXRuntimeBuffer<T, D3D11_BIND_VERTEX_BUFFER>
+	{
+	public:
+		inline DXRuntimeVertexBuffer(size_t initialElems, ComPtr<ID3D11Device1> pDevice, ComPtr<ID3D11DeviceContext1> pDeviceContext)
+			: DXRuntimeBuffer<T, D3D11_BIND_VERTEX_BUFFER>(initialElems, pDevice, pDeviceContext)
+		{
+		}
+
+		~DXRuntimeVertexBuffer() = default;
+	public:
+		inline void Bind(UINT startSlot = 0u) noexcept
+		{
+			UINT stride = this->S_STRIDE;
+
+			this->mP_DeviceContext->IASetVertexBuffers(startSlot, 1, this->mP_Buffer.GetAddressOf(), &stride, &m_Offset);
+		}
+	private:
+		UINT m_Offset = 0;
+	};
+
+	template <typename T, UINT Elems, D3D11_USAGE Usage, D3D11_BIND_FLAG BindFlags, D3D11_CPU_ACCESS_FLAG CPUFlags = (D3D11_CPU_ACCESS_FLAG)(0)>
+	class DXStrictBuffer : public DXBuffer<T, Usage, BindFlags, CPUFlags>
+	{
+		template<typename Ty>
+		using ComPtr = Microsoft::WRL::ComPtr<Ty>;
+	public:
+		inline DXStrictBuffer(ComPtr<ID3D11Device1> pDevice, ComPtr<ID3D11DeviceContext1> pDeviceContext) noexcept
+			: DXBuffer<T, Usage, BindFlags, CPUFlags>(pDevice, pDeviceContext) {}
+
+		inline DXStrictBuffer(const std::array<T, Elems>& data, ComPtr<ID3D11Device1> pDevice, ComPtr<ID3D11DeviceContext1>& pDeviceContext) noexcept
+			: DXBuffer<T, Usage, BindFlags, CPUFlags>(pDevice, pDeviceContext), m_Data(data) {}
+
+		inline DXStrictBuffer(const std::initializer_list<T>& dataList, ComPtr<ID3D11Device1> pDevice, ComPtr<ID3D11DeviceContext1> pDeviceContext) noexcept
+			: DXBuffer<T, Usage, BindFlags, CPUFlags>(pDevice, pDeviceContext)
 		{
 			RUNTIME_ASSERT(
 				Elems == dataList.size(),
@@ -61,9 +268,6 @@ namespace CTMRenderer::CTMDirectX::Graphics::Bindable
 			RUNTIME_ASSERT(Elems == dataList.size(), "Buffer size and list size don't match.\n");
 			std::copy(dataList.begin(), dataList.end(), m_Data.data());
 
-			m_Stride = sizeof(T);
-			m_Bytes = Elems * m_Stride;
-
 			return *this;
 		}
 
@@ -71,10 +275,10 @@ namespace CTMRenderer::CTMDirectX::Graphics::Bindable
 	public:
 		inline [[nodiscard]] HRESULT Create() noexcept
 		{
-			RUNTIME_ASSERT(!m_IsCreated, "A buffer should not be re-created.\n");
+			RUNTIME_ASSERT(!this->m_IsCreated, "A DXStrictBuffer should not be recreated.\n");
 
 			D3D11_BUFFER_DESC vBufferDesc = {};
-			vBufferDesc.ByteWidth = (unsigned int)m_Bytes;
+			vBufferDesc.ByteWidth = S_BYTES;
 			vBufferDesc.Usage = Usage;
 			vBufferDesc.BindFlags = BindFlags;
 			vBufferDesc.CPUAccessFlags = CPUFlags;
@@ -83,46 +287,36 @@ namespace CTMRenderer::CTMDirectX::Graphics::Bindable
 			D3D11_SUBRESOURCE_DATA vBufferSubData = {};
 			vBufferSubData.pSysMem = Data();
 
-			m_IsCreated = true;
-			return mP_DeviceRef->CreateBuffer(&vBufferDesc, &vBufferSubData, mP_Buffer.GetAddressOf());
+			this->m_IsCreated = true;
+			return this->mP_Device->CreateBuffer(&vBufferDesc, &vBufferSubData, this->mP_Buffer.GetAddressOf());
 		}
 	public:
-		inline constexpr [[nodiscard]] const T* Data() const noexcept { return m_Data.data(); }
-		inline constexpr [[nodiscard]] UINT Elements() const noexcept { return Elems; }
-		inline constexpr [[nodiscard]] UINT Stride() const noexcept { return m_Stride; }
-		inline constexpr [[nodiscard]] UINT Bytes() { return m_Bytes; }
-		inline [[nodiscard]] const ComPtr<ID3D11Buffer>& ComBuffer() const noexcept { return mP_Buffer; }
-		inline [[nodiscard]] bool IsCreated() const noexcept { return m_IsCreated; }
+		inline constexpr [[nodiscard]] UINT Bytes() { return S_BYTES; }
+		inline [[nodiscard]] const T* Data() const noexcept { return m_Data.data(); }
 	protected:
+		constexpr static UINT S_BYTES = DXBuffer<T, Usage, BindFlags, CPUFlags>::S_STRIDE * Elems;
 		std::array<T, Elems> m_Data;
-		UINT m_Stride;
-		UINT m_Bytes;
-		UINT m_Offset = 0;
-		ComPtr<ID3D11Buffer> mP_Buffer;
-		ComPtr<ID3D11Device1>& mP_DeviceRef;
-		ComPtr<ID3D11DeviceContext1>& mP_DeviceContextRef;
-		bool m_IsCreated = false;
 	};
 
-	template <typename T, UINT Elems, D3D11_USAGE = D3D11_USAGE_IMMUTABLE>
-	class DXStrictVertexBuffer : public DXStrictBuffer<T, Elems, D3D11_USAGE_IMMUTABLE, D3D11_BIND_VERTEX_BUFFER>
+	template <typename T, UINT Elems, D3D11_USAGE Usage = D3D11_USAGE_IMMUTABLE>
+	class DXStrictVertexBuffer : public DXStrictBuffer<T, Elems, Usage, D3D11_BIND_VERTEX_BUFFER>
 	{
 		template <typename Ty>
 		using ComPtr = Microsoft::WRL::ComPtr<Ty>;
 	public:
-		inline DXStrictVertexBuffer(ComPtr<ID3D11Device1>& pDeviceRef, ComPtr<ID3D11DeviceContext1>& pDeviceContextRef) noexcept
-			: DXStrictBuffer<T, Elems, D3D11_USAGE_IMMUTABLE, D3D11_BIND_VERTEX_BUFFER>(pDeviceRef, pDeviceContextRef) {}
+		inline DXStrictVertexBuffer(ComPtr<ID3D11Device1> pDeviceRef, ComPtr<ID3D11DeviceContext1> pDeviceContextRef) noexcept
+			: DXStrictBuffer<T, Elems, Usage, D3D11_BIND_VERTEX_BUFFER>(pDeviceRef, pDeviceContextRef) {}
 
-		inline DXStrictVertexBuffer(const std::array<T, Elems>& data, ComPtr<ID3D11Device1>& pDeviceRef, ComPtr<ID3D11DeviceContext1>& pDeviceContextRef) noexcept
-			: DXStrictBuffer<T, Elems, D3D11_USAGE_IMMUTABLE, D3D11_BIND_VERTEX_BUFFER>(data, pDeviceRef, pDeviceContextRef) {}
+		inline DXStrictVertexBuffer(const std::array<T, Elems>& data, ComPtr<ID3D11Device1> pDevice, ComPtr<ID3D11DeviceContext1> pDeviceContext) noexcept
+			: DXStrictBuffer<T, Elems, Usage, D3D11_BIND_VERTEX_BUFFER>(data, pDevice, pDeviceContext) {}
 
-		inline DXStrictVertexBuffer(const std::initializer_list<T>& dataList, ComPtr<ID3D11Device1>& pDeviceRef, ComPtr<ID3D11DeviceContext1>& pDeviceContextRef) noexcept
-			: DXStrictBuffer<T, Elems, D3D11_USAGE_IMMUTABLE, D3D11_BIND_VERTEX_BUFFER>(dataList, pDeviceRef, pDeviceContextRef) {}
+		inline DXStrictVertexBuffer(const std::initializer_list<T>& dataList, ComPtr<ID3D11Device1> pDevice, ComPtr<ID3D11DeviceContext1> pDeviceContext) noexcept
+			: DXStrictBuffer<T, Elems, Usage, D3D11_BIND_VERTEX_BUFFER>(dataList, pDevice, pDeviceContext) {}
 
 		inline DXStrictVertexBuffer& operator=(const std::initializer_list<T>& dataList) noexcept
 		{
 			// Call the base class operator=.
-			static_cast<DXStrictBuffer<T, Elems, D3D11_USAGE_IMMUTABLE, D3D11_BIND_VERTEX_BUFFER>&>(*this).operator=(dataList);
+			static_cast<DXStrictBuffer<T, Elems, Usage, D3D11_BIND_VERTEX_BUFFER>&>(*this).operator=(dataList);
 			return *this;
 		}
 
@@ -130,8 +324,12 @@ namespace CTMRenderer::CTMDirectX::Graphics::Bindable
 	public:
 		inline void Bind(UINT startSlot = 0u) noexcept
 		{
-			this->mP_DeviceContextRef->IASetVertexBuffers(startSlot, 1, this->mP_Buffer.GetAddressOf(), &this->m_Stride, &this->m_Offset);
+			UINT stride = this->S_STRIDE;
+
+			this->mP_DeviceContext->IASetVertexBuffers(startSlot, 1, this->mP_Buffer.GetAddressOf(), &stride, &m_Offset);
 		}
+	private:
+		UINT m_Offset = 0;
 	};
 
 	template <typename T, UINT Elems, DXGI_FORMAT DXGIFormat>
@@ -140,14 +338,14 @@ namespace CTMRenderer::CTMDirectX::Graphics::Bindable
 		template <typename Ty>
 		using ComPtr = Microsoft::WRL::ComPtr<Ty>;
 	public:
-		inline DXStrictIndexBuffer(ComPtr<ID3D11Device1>& pDeviceRef, ComPtr<ID3D11DeviceContext1>& pDeviceContextRef) noexcept
-			: DXStrictBuffer<T, Elems, D3D11_USAGE_IMMUTABLE, D3D11_BIND_INDEX_BUFFER>(pDeviceRef, pDeviceContextRef) {}
+		inline DXStrictIndexBuffer(ComPtr<ID3D11Device1> pDevice, ComPtr<ID3D11DeviceContext1> pDeviceContext) noexcept
+			: DXStrictBuffer<T, Elems, D3D11_USAGE_IMMUTABLE, D3D11_BIND_INDEX_BUFFER>(pDevice, pDeviceContext) {}
 
-		inline DXStrictIndexBuffer(const std::array<T, Elems>& data, ComPtr<ID3D11Device1>& pDeviceRef, ComPtr<ID3D11DeviceContext1>& pDeviceContextRef) noexcept
-			: DXStrictBuffer<T, Elems, D3D11_USAGE_IMMUTABLE, D3D11_BIND_INDEX_BUFFER>(data, pDeviceRef, pDeviceContextRef) {}
+		inline DXStrictIndexBuffer(const std::array<T, Elems>& data, ComPtr<ID3D11Device1> pDevice, ComPtr<ID3D11DeviceContext1> pDeviceContext) noexcept
+			: DXStrictBuffer<T, Elems, D3D11_USAGE_IMMUTABLE, D3D11_BIND_INDEX_BUFFER>(data, pDevice, pDeviceContext) {}
 
-		inline DXStrictIndexBuffer(const std::initializer_list<T>& dataList, ComPtr<ID3D11Device1>& pDeviceRef, ComPtr<ID3D11DeviceContext1>& pDeviceContextRef) noexcept
-			: DXStrictBuffer<T, Elems, D3D11_USAGE_IMMUTABLE, D3D11_BIND_INDEX_BUFFER>(dataList, pDeviceRef, pDeviceContextRef) {}
+		inline DXStrictIndexBuffer(const std::initializer_list<T>& dataList, ComPtr<ID3D11Device1> pDevice, ComPtr<ID3D11DeviceContext1> pDeviceContext) noexcept
+			: DXStrictBuffer<T, Elems, D3D11_USAGE_IMMUTABLE, D3D11_BIND_INDEX_BUFFER>(dataList, pDevice, pDeviceContext) {}
 
 		inline DXStrictIndexBuffer& operator=(const std::initializer_list<T>& dataList) noexcept
 		{
@@ -160,7 +358,7 @@ namespace CTMRenderer::CTMDirectX::Graphics::Bindable
 	public:
 		inline void Bind(UINT startSlot = 0u) noexcept
 		{
-			this->mP_DeviceContextRef->IASetIndexBuffer(this->mP_Buffer.Get(), DXGIFormat, 0);
+			this->mP_DeviceContext->IASetIndexBuffer(this->mP_Buffer.Get(), DXGIFormat, 0);
 		}
 	};
 
@@ -170,14 +368,14 @@ namespace CTMRenderer::CTMDirectX::Graphics::Bindable
 		template <typename Ty>
 		using ComPtr = Microsoft::WRL::ComPtr<Ty>;
 	public:
-		inline DXStrictConstantBuffer(ComPtr<ID3D11Device1>& pDeviceRef, ComPtr<ID3D11DeviceContext1>& pDeviceContextRef) noexcept
-			: DXStrictBuffer<T, Elems, D3D11_USAGE_DYNAMIC, D3D11_BIND_CONSTANT_BUFFER, D3D11_CPU_ACCESS_WRITE>(pDeviceRef, pDeviceContextRef) {}
+		inline DXStrictConstantBuffer(ComPtr<ID3D11Device1> pDevice, ComPtr<ID3D11DeviceContext1> pDeviceContext) noexcept
+			: DXStrictBuffer<T, Elems, D3D11_USAGE_DYNAMIC, D3D11_BIND_CONSTANT_BUFFER, D3D11_CPU_ACCESS_WRITE>(pDevice, pDeviceContext) {}
 
-		inline DXStrictConstantBuffer(const std::array<T, Elems>& data, ComPtr<ID3D11Device1>& pDeviceRef, ComPtr<ID3D11DeviceContext1>& pDeviceContextRef) noexcept
-			: DXStrictBuffer<T, Elems, D3D11_USAGE_DYNAMIC, D3D11_BIND_CONSTANT_BUFFER, D3D11_CPU_ACCESS_WRITE>(data, pDeviceRef, pDeviceContextRef) {}
+		inline DXStrictConstantBuffer(const std::array<T, Elems>& data, ComPtr<ID3D11Device1> pDevice, ComPtr<ID3D11DeviceContext1> pDeviceContext) noexcept
+			: DXStrictBuffer<T, Elems, D3D11_USAGE_DYNAMIC, D3D11_BIND_CONSTANT_BUFFER, D3D11_CPU_ACCESS_WRITE>(data, pDevice, pDeviceContext) {}
 
-		inline DXStrictConstantBuffer(const std::initializer_list<T>& dataList, ComPtr<ID3D11Device1>& pDeviceRef, ComPtr<ID3D11DeviceContext1>& pDeviceContextRef) noexcept
-			: DXStrictBuffer<T, Elems, D3D11_USAGE_DYNAMIC, D3D11_BIND_CONSTANT_BUFFER, D3D11_CPU_ACCESS_WRITE>(dataList, pDeviceRef, pDeviceContextRef) {}
+		inline DXStrictConstantBuffer(const std::initializer_list<T>& dataList, ComPtr<ID3D11Device1> pDevice, ComPtr<ID3D11DeviceContext1> pDeviceContext) noexcept
+			: DXStrictBuffer<T, Elems, D3D11_USAGE_DYNAMIC, D3D11_BIND_CONSTANT_BUFFER, D3D11_CPU_ACCESS_WRITE>(dataList, pDevice, pDeviceContext) {}
 
 		inline DXStrictConstantBuffer& operator=(const std::initializer_list<T>& dataList) noexcept
 		{
@@ -190,7 +388,7 @@ namespace CTMRenderer::CTMDirectX::Graphics::Bindable
 	public:
 		inline void Bind(UINT startSlot = 0u) noexcept
 		{
-			this->mP_DeviceContextRef->VSSetConstantBuffers(startSlot, 1, this->mP_Buffer.GetAddressOf());
+			this->mP_DeviceContext->VSSetConstantBuffers(startSlot, 1, this->mP_Buffer.GetAddressOf());
 		}
 	};
 }

@@ -15,7 +15,7 @@ namespace CTMRenderer::CTMDirectX::Graphics::Bindable
 			float height,
 			float minDepth,
 			float maxDepth,
-			Microsoft::WRL::ComPtr<ID3D11DeviceContext>& pContextRef) noexcept
+			Microsoft::WRL::ComPtr<ID3D11DeviceContext1>& pContextRef) noexcept
 			: mP_ContextRef(pContextRef)
 		{
 			m_Viewport.TopLeftX = topLeftX;
@@ -31,7 +31,7 @@ namespace CTMRenderer::CTMDirectX::Graphics::Bindable
 			mP_ContextRef->RSSetViewports(1, &m_Viewport);
 		}
 	private:
-		Microsoft::WRL::ComPtr<ID3D11DeviceContext>& mP_ContextRef;
+		Microsoft::WRL::ComPtr<ID3D11DeviceContext1>& mP_ContextRef;
 		D3D11_VIEWPORT m_Viewport = {};
 	};
 }

@@ -246,34 +246,13 @@ namespace CTMRenderer::CTMDirectX::Graphics
 		float offsetXTwo = targetRectTwo.AABB.left - sourceRect.AABB.left;
 		float offsetYTwo = targetRectTwo.AABB.top - sourceRect.AABB.top;
 
-		//const DXAABB& aabb = sourceRect.AABB;
-		//DirectX::XMFLOAT2 tLPoint(aabb.left, aabb.top);
-		//DirectX::XMFLOAT2 tRPoint(aabb.right, aabb.top);
-		//DirectX::XMFLOAT2 bLPoint(aabb.left, aabb.bottom);
-		//DirectX::XMFLOAT2 bRPoint(aabb.right, aabb.bottom);
-
-		//tLPoint.x = tLPoint.x * scalarX + offsetX; // Equivalent to DirectX::XMMatrixScaling(scalarX, scalarY, 1.0f) * DirectX::XMMatrixTranslation(offsetX, offsetY, 0.0f)
-		//tLPoint.y = tLPoint.y * scalarY + offsetY; // 
-
-		//tRPoint.x = tRPoint.x * scalarX + offsetX; // Equivalent to DirectX::XMMatrixScaling(scalarX, scalarY, 1.0f) * DirectX::XMMatrixTranslation(offsetX, offsetY, 0.0f)
-		//tRPoint.y = tRPoint.y * scalarY + offsetY; // 
-
-		//bLPoint.x = bLPoint.x * scalarX + offsetX; // Equivalent to DirectX::XMMatrixScaling(scalarX, scalarY, 1.0f) * DirectX::XMMatrixTranslation(offsetX, offsetY, 0.0f)
-		//bLPoint.y = bLPoint.y * scalarY + offsetY; // 
-
-		//bRPoint.x = bRPoint.x * scalarX + offsetX; // Equivalent to DirectX::XMMatrixScaling(scalarX, scalarY, 1.0f) * DirectX::XMMatrixTranslation(offsetX, offsetY, 0.0f)
-		//bRPoint.y = bRPoint.y * scalarY + offsetY; // 
-
-		//DEBUG_PRINT("Top-left point : (" << tLPoint.x << ", " << tLPoint.y << ").\n");
-		//DEBUG_PRINT("Top-right point : (" << tRPoint.x << ", " << tRPoint.y << ").\n");
-		//DEBUG_PRINT("Bottom-left point : (" << bLPoint.x << ", " << bLPoint.y << ").\n");
-		//DEBUG_PRINT("Bottom-right point : (" << bRPoint.x << ", " << bRPoint.y << ").\n");
-
 		struct InstanceData {
 			DirectX::XMFLOAT2 scalarXY = {}; // X and Y scale factors.
 			DirectX::XMFLOAT2 offsetXY = {}; // X and Y scale factors.
 			DXColor color = {};
 		};
+
+		
 
 		Bindable::DXStrictVertexBuffer<InstanceData, 2> vInstanceBuffer(
 			{
@@ -324,17 +303,16 @@ namespace CTMRenderer::CTMDirectX::Graphics
 		RUNTIME_ASSERT(inputLayout.Create() == S_OK, "Failed to create input layout.\n");
 		inputLayout.Bind();
 
-		
-
-		D3D11_VIEWPORT viewport = {};
-		viewport.TopLeftX = 0;
-		viewport.TopLeftY = 0;
-		viewport.Width = (FLOAT)m_WindowAreaRef.width;
-		viewport.Height = (FLOAT)m_WindowAreaRef.height;
-		viewport.MinDepth = 0;
-		viewport.MaxDepth = 1;
-
-		mP_DeviceContext->RSSetViewports(1, &viewport);
+		Bindable::DXViewport viewport(
+			0.0f, // Top-left x.
+			0.0f, // Top-left y.
+			(float)m_WindowAreaRef.width, // Viewport width.
+			(float)m_WindowAreaRef.height, // Viewport height.
+			0.0f, // Min depth.
+			1.0f, // Max depth.
+			mP_DeviceContext
+		);
+		viewport.Bind();
 
 		mP_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
