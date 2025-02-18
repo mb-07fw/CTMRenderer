@@ -1,4 +1,4 @@
-workspace "RendererTest"
+workspace "CTMRenderer"
 	architecture "x64"
 	configurations { "Debug", "Release" }
 	language "C++"
@@ -23,23 +23,23 @@ workspace "RendererTest"
 		optimize "On"
 	filter{} -- clear filters
 
-	project "RendererApp"
-		location "RendererTest/RendererApp"
-		kind "ConsoleApp" -- Set the subsystem as a console application.
+	project "CTMRendererApp"
+		locationdir = "CTMRenderer/CTMRendererApp/"
 
-		locationdir = "RendererTest/RendererApp/"
+		location (locationdir)
+		kind "ConsoleApp" -- Set the subsystem as a console application.
 
 		files { locationdir .. "src/**.cpp", locationdir .. "include/**.hpp" }
 		includedirs { locationdir .. "include/" }
 
-		links { "RendererCore.lib" }
-		libdirs { "bin/out/" .. outputdir .. "/RendererCore/" }
+		links { "CTMRendererCore.lib" }
+		libdirs { "bin/out/" .. outputdir .. "/CTMRendererCore/" }
 
-		dependson { "RendererCore" }
-		includedirs { "RendererTest/RendererCore/include" }
+		dependson { "CTMRendererCore" }
+		includedirs { "CTMRenderer/CTMRendererCore/include" }
 
-	project "RendererCore"
-		locationdir = "RendererTest/RendererCore/"
+	project "CTMRendererCore"
+		locationdir = "CTMRenderer/CTMRendererCore/"
 		shaderdir = locationdir .. "resources/shaders/"
 		
 		location (locationdir)
@@ -68,5 +68,5 @@ workspace "RendererTest"
 		-- These are currently included via #pragma comment's. in RendererCore.hpp.
 		-- links { "d3d11.lib", "d3dcompiler.lib", "D2d1.lib", "dwrite.lib" }
 
-		pchheader "Core/CorePCH.hpp"	-- Define how the header is included.
+		pchheader "Core/CorePCH.hpp" -- Define how the header is included.
 		pchsource (locationdir .. "src/Core/CorePCH.cpp") -- Define the path of the pch source file.
