@@ -252,17 +252,22 @@ namespace CTMRenderer::CTMDirectX::Graphics
 			DXColor color = {};
 		};
 
+		Bindable::DXRuntimeVertexBuffer<InstanceData> vInstanceBuffer(2, mP_Device, mP_DeviceContext);
 		
-
-		Bindable::DXStrictVertexBuffer<InstanceData, 2> vInstanceBuffer(
-			{
-				{ { scalarXOne, scalarYOne }, { offsetXOne, offsetYOne }, targetRectOne.color },
-				{ { scalarXTwo, scalarYTwo}, { offsetXTwo, offsetYTwo }, targetRectTwo.color }
-			},
-			mP_Device, mP_DeviceContext
-		);
+		vInstanceBuffer.EmplaceNext(DirectX::XMFLOAT2(scalarXOne, scalarYOne), DirectX::XMFLOAT2(offsetXOne, offsetYOne), targetRectOne.color);
+		vInstanceBuffer.EmplaceNext(DirectX::XMFLOAT2(scalarXTwo, scalarYTwo), DirectX::XMFLOAT2(offsetXTwo, offsetYTwo), targetRectTwo.color);
 		RUNTIME_ASSERT(vInstanceBuffer.Create() == S_OK, "Failed to create instance buffer.\n");
 		vInstanceBuffer.Bind(1);
+
+		//Bindable::DXStrictVertexBuffer<InstanceData, 2> vInstanceBuffer(
+		//	{
+		//		{ { scalarXOne, scalarYOne }, { offsetXOne, offsetYOne }, targetRectOne.color },
+		//		{ { scalarXTwo, scalarYTwo}, { offsetXTwo, offsetYTwo }, targetRectTwo.color }
+		//	},
+		//	mP_Device, mP_DeviceContext
+		//);
+		//RUNTIME_ASSERT(vInstanceBuffer.Create() == S_OK, "Failed to create instance buffer.\n");
+		//vInstanceBuffer.Bind(1);
 
 		Bindable::DXStrictIndexBuffer<short, 6, DXGI_FORMAT_R16_UINT> iBuffer(
 			{
@@ -338,7 +343,7 @@ namespace CTMRenderer::CTMDirectX::Graphics
 		//			      also clears any rendering done with the D3D RTV. Save yourself some tears.
 		//m_2DRender.pRTV->Clear(); 
 
-		m_2DRender.pRTV->SetTransform(D2D1::IdentityMatrix());
+		//m_2DRender.pRTV->SetTransform(D2D1::IdentityMatrix());
 
 		m_2DRender.pRTV->DrawText(
 			m_TextRender.text.data(),
