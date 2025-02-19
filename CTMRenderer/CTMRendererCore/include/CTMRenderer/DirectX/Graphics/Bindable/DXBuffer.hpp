@@ -176,7 +176,7 @@ namespace CTMRenderer::CTMDirectX::Graphics::Bindable
 	public:
 		inline DXRuntimeBuffer(size_t initialSize, ComPtr<ID3D11Device1> pDevice, ComPtr<ID3D11DeviceContext1> pDeviceContext)
 			: DXBuffer<T, D3D11_USAGE_DYNAMIC, BindFlags, CPUFlags>(pDevice, pDeviceContext),
-			  m_CurrentByteWidth(initialSize * this->S_STRIDE)
+			  m_CurrentByteWidth((UINT)initialSize * this->S_STRIDE)
 		{
 			m_Data.reserve(initialSize);
 		}
@@ -243,29 +243,7 @@ namespace CTMRenderer::CTMDirectX::Graphics::Bindable
 		UINT m_CurrentByteWidth;
 	};
 
-	template <typename T>
-	class DXRuntimeVertexBuffer : public DXRuntimeBuffer<T, D3D11_BIND_VERTEX_BUFFER>
-	{
-		template <typename T>
-		using ComPtr = Microsoft::WRL::ComPtr<T>;
-	public:
-		inline DXRuntimeVertexBuffer(size_t initialSize, ComPtr<ID3D11Device1> pDevice, ComPtr<ID3D11DeviceContext1> pDeviceContext)
-			: DXRuntimeBuffer<T, D3D11_BIND_VERTEX_BUFFER>(initialSize, pDevice, pDeviceContext)
-		{
-		}
 
-		~DXRuntimeVertexBuffer() = default;
-	public:
-		inline void Bind(UINT startSlot = 0u) noexcept
-		{
-			// Store stride in a temporary variable since S_STRIDE is a static constexpr, meaning it's address cannot be referenced.
-			UINT stride = this->S_STRIDE;
-
-			this->mP_DeviceContext->IASetVertexBuffers(startSlot, 1, this->mP_Buffer.GetAddressOf(), &stride, &m_Offset);
-		}
-	private:
-		UINT m_Offset = 0;
-	};
 
 	template <typename T, UINT Elems, D3D11_USAGE Usage, D3D11_BIND_FLAG BindFlags, D3D11_CPU_ACCESS_FLAG CPUFlags = (D3D11_CPU_ACCESS_FLAG)(0)>
 	class DXStrictBuffer : public DXBuffer<T, Usage, BindFlags, CPUFlags>
@@ -284,8 +262,9 @@ namespace CTMRenderer::CTMDirectX::Graphics::Bindable
 		{
 			RUNTIME_ASSERT(
 				Elems == dataList.size(),
-				"Buffer size and list size don't match. | " << "Buffer size : " << Elems <<  " | " << "List size : " << dataList.size() << '\n'
+				"Buffer size and list size don't match. | " << "Buffer size : " << Elems << " | " << "List size : " << dataList.size() << '\n'
 			);
+
 			std::copy(dataList.begin(), dataList.end(), m_Data.data());
 		}
 
@@ -320,9 +299,37 @@ namespace CTMRenderer::CTMDirectX::Graphics::Bindable
 		inline constexpr [[nodiscard]] UINT Bytes() { return S_BYTES; }
 		inline [[nodiscard]] const T* Data() const noexcept { return m_Data.data(); }
 	protected:
-		constexpr static UINT S_BYTES = DXBuffer<T, Usage, BindFlags, CPUFlags>::S_STRIDE * Elems;
+		constexpr static UINT S_BYTES = DXBuffer<T, Usage, BindFlags, CPUFlags>::S_STRIDE* Elems;
 		std::array<T, Elems> m_Data;
 	};
+
+
+
+	template <typename T>
+	class DXRuntimeVertexBuffer : public DXRuntimeBuffer<T, D3D11_BIND_VERTEX_BUFFER>
+	{
+		template <typename T>
+		using ComPtr = Microsoft::WRL::ComPtr<T>;
+	public:
+		inline DXRuntimeVertexBuffer(size_t initialSize, ComPtr<ID3D11Device1> pDevice, ComPtr<ID3D11DeviceContext1> pDeviceContext)
+			: DXRuntimeBuffer<T, D3D11_BIND_VERTEX_BUFFER>(initialSize, pDevice, pDeviceContext)
+		{
+		}
+
+		~DXRuntimeVertexBuffer() = default;
+	public:
+		inline void Bind(UINT startSlot = 0u) noexcept
+		{
+			// Store stride in a temporary variable since S_STRIDE is a static constexpr, meaning it's address cannot be referenced.
+			UINT stride = this->S_STRIDE;
+
+			this->mP_DeviceContext->IASetVertexBuffers(startSlot, 1, this->mP_Buffer.GetAddressOf(), &stride, &m_Offset);
+		}
+	private:
+		UINT m_Offset = 0;
+	};
+
+
 
 	template <typename T, UINT Elems, D3D11_USAGE Usage = D3D11_USAGE_IMMUTABLE>
 	class DXStrictVertexBuffer : public DXStrictBuffer<T, Elems, Usage, D3D11_BIND_VERTEX_BUFFER>
@@ -417,4 +424,5 @@ namespace CTMRenderer::CTMDirectX::Graphics::Bindable
 			this->mP_DeviceContext->VSSetConstantBuffers(startSlot, 1, this->mP_Buffer.GetAddressOf());
 		}
 	};
-}
+
+	}

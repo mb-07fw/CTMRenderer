@@ -6,15 +6,31 @@
 
 namespace CTMRenderer::CTMDirectX::Graphics::Geometry
 {
-	struct DXRect
+	enum class ShapeType
 	{
-		inline DXRect(float left, float top, float right, float bottom, const DXColor& color) noexcept
-			: AABB(left, top, right, bottom), color(color)
-		{
-		}
+		RECT,
+		CIRClE
+	};
 
+	class IShape
+	{
+	public:
+		IShape(ShapeType type) noexcept;
+		virtual ~IShape() = default;
+	public:
+		virtual [[nodiscard]] ShapeType Type() const noexcept = 0;
+	private:
+		const ShapeType m_Type;
+	};
+
+	class DXRect : public IShape
+	{
+	public:
+		DXRect(float left, float top, float right, float bottom, const DXColor& color) noexcept;
 		~DXRect() = default;
-
+	public:
+		[[nodiscard]] DXAABB& Aabb() noexcept;
+	private:
 		DXAABB AABB;
 		DXColor color;
 	};

@@ -70,7 +70,7 @@ namespace CTMRenderer::CTMDirectX::Graphics
 
 	struct DXNormColor
 	{
-		inline DXNormColor(float r = 0, float g = 0, float b = 0, float a = 0)
+		inline DXNormColor(float r = 0, float g = 0, float b = 0, float a = 1)
 		{
 			rgba[0] = r;
 			rgba[1] = g;

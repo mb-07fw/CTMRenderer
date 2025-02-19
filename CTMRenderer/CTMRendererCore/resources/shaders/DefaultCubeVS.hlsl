@@ -5,7 +5,7 @@ cbuffer TranslationBuffer : register(b0)
 
 struct VSOutput
 {
-    float4 color : Color; // Note to self : Keep color first or things will go wrong.
+    float4 color : Color; // Note to self : Keep color first. Trust me.
     float4 pos : SV_Position;
 };
 

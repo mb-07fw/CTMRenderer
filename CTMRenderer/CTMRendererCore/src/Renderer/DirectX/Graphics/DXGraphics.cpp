@@ -13,7 +13,7 @@ namespace CTMRenderer::CTMDirectX::Graphics
 {
 	DXGraphics::DXGraphics(const DXRendererSettings& settingsRef, const Window::Geometry::WindowArea& windowAreaRef, const Control::Mouse& mouseRef) noexcept
 		: m_SettingsRef(settingsRef), m_WindowAreaRef(windowAreaRef), m_MouseRef(mouseRef),
-		  m_2DRender(), m_TextRender(), m_ClearColor()
+		  m_2DRender(), m_TextRender(), m_ClearColor(0, 0, .1f, 1.0f)
 	{
 	}
 
@@ -160,7 +160,7 @@ namespace CTMRenderer::CTMDirectX::Graphics
 		RUNTIME_ASSERT(hResult == S_OK, Utility::TranslateHResult(hResult));
 
 		hResult = m_2DRender.pRTV->CreateSolidColorBrush(
-			D2D1::ColorF(D2D1::ColorF::BlueViolet),
+			D2D1::ColorF(D2D1::ColorF::Cyan),
 			m_TextRender.pSCBrush.GetAddressOf()
 		);
 		RUNTIME_ASSERT(hResult == S_OK, Utility::TranslateHResult(hResult));
@@ -252,22 +252,22 @@ namespace CTMRenderer::CTMDirectX::Graphics
 			DXColor color = {};
 		};
 
-		Bindable::DXRuntimeVertexBuffer<InstanceData> vInstanceBuffer(2, mP_Device, mP_DeviceContext);
+		/*Bindable::DXRuntimeVertexBuffer<InstanceData> vInstanceBuffer(2, mP_Device, mP_DeviceContext);
 		
 		vInstanceBuffer.EmplaceNext(DirectX::XMFLOAT2(scalarXOne, scalarYOne), DirectX::XMFLOAT2(offsetXOne, offsetYOne), targetRectOne.color);
 		vInstanceBuffer.EmplaceNext(DirectX::XMFLOAT2(scalarXTwo, scalarYTwo), DirectX::XMFLOAT2(offsetXTwo, offsetYTwo), targetRectTwo.color);
 		RUNTIME_ASSERT(vInstanceBuffer.Create() == S_OK, "Failed to create instance buffer.\n");
-		vInstanceBuffer.Bind(1);
+		vInstanceBuffer.Bind(1);*/
 
-		//Bindable::DXStrictVertexBuffer<InstanceData, 2> vInstanceBuffer(
-		//	{
-		//		{ { scalarXOne, scalarYOne }, { offsetXOne, offsetYOne }, targetRectOne.color },
-		//		{ { scalarXTwo, scalarYTwo}, { offsetXTwo, offsetYTwo }, targetRectTwo.color }
-		//	},
-		//	mP_Device, mP_DeviceContext
-		//);
-		//RUNTIME_ASSERT(vInstanceBuffer.Create() == S_OK, "Failed to create instance buffer.\n");
-		//vInstanceBuffer.Bind(1);
+		Bindable::DXStrictVertexBuffer<InstanceData, 2> vInstanceBuffer(
+			{
+				{ { scalarXOne, scalarYOne }, { offsetXOne, offsetYOne }, targetRectOne.color },
+				{ { scalarXTwo, scalarYTwo}, { offsetXTwo, offsetYTwo }, targetRectTwo.color }
+			},
+			mP_Device, mP_DeviceContext
+		);
+		RUNTIME_ASSERT(vInstanceBuffer.Create() == S_OK, "Failed to create instance buffer.\n");
+		vInstanceBuffer.Bind(1);
 
 		Bindable::DXStrictIndexBuffer<short, 6, DXGI_FORMAT_R16_UINT> iBuffer(
 			{

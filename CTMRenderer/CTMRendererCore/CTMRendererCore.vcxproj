@@ -38,6 +38,7 @@
     <ClInclude Include="include\Event\EventListener.hpp" />
     <ClInclude Include="include\Event\EventPool.hpp" />
     <ClInclude Include="include\Event\EventSystem.hpp" />
+    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXLayerSystem.hpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\DefaultCubePS.hlsl">
@@ -68,7 +69,9 @@
     <ClCompile Include="src\Renderer\DirectX\DXRenderer.cpp" />
     <ClCompile Include="src\Renderer\DirectX\Graphics\DXGraphics.cpp" />
     <ClCompile Include="src\Renderer\DirectX\Graphics\DXInfoQueue.cpp" />
+    <ClCompile Include="src\Renderer\DirectX\Graphics\DXLayerSystem.cpp" />
     <ClCompile Include="src\Renderer\DirectX\Graphics\Geometry\DXAABB.cpp" />
+    <ClCompile Include="src\Renderer\DirectX\Graphics\Geometry\DXShape.cpp" />
     <ClCompile Include="src\Renderer\DirectX\Window\DXWindow.cpp" />
     <ClCompile Include="src\Renderer\Timer.cpp" />
   </ItemGroup>

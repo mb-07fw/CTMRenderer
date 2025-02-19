@@ -1,3 +1,5 @@
+#include "util.hlsl"
+
 cbuffer ScreenSpace : register(b0)
 {
     float2 WidthHeight;
@@ -21,14 +23,6 @@ struct InstanceInput
     float4 Color : INSTANCE_COLOR;
 };
 
-float2 ScreenToClipSpace(float2 Pos)
-{
-    return float2(
-        (2 * Pos.x) / WidthHeight.x - 1,
-        1 - (2 * Pos.y / WidthHeight.y)
-    );
-}
-
 VSOutput main(VertexInput vInput, InstanceInput iInput)
 {
     VSOutput output;
@@ -38,7 +32,7 @@ VSOutput main(VertexInput vInput, InstanceInput iInput)
     vInput.Pos += iInput.OffsetPos;
     
     // Convert provided coordinates to screen space.
-    output.Pos = float4(ScreenToClipSpace(vInput.Pos), 0.0f, 1.0f);
+    output.Pos = float4(ScreenToClipSpace(vInput.Pos, WidthHeight), 0.0f, 1.0f);
     
     output.Color = iInput.Color;
     return output;
