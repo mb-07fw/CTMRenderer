@@ -26,12 +26,14 @@ namespace CTMRenderer::CTMDirectX::Graphics::Geometry
 	class DXRect : public IShape
 	{
 	public:
-		DXRect(float left, float top, float right, float bottom, const DXColor& color) noexcept;
+		DXRect(float left, float top, float right, float bottom, DXColor color) noexcept;
 		~DXRect() = default;
 	public:
-		[[nodiscard]] DXAABB& Aabb() noexcept;
+		virtual inline [[nodiscard]] ShapeType Type() const noexcept override { return ShapeType::RECT; }
+		inline [[nodiscard]] DXAABB& AABB() noexcept { return m_AABB; }
+		inline [[nodiscard]] DXColor Color() noexcept { return m_Color; }
 	private:
-		DXAABB AABB;
-		DXColor color;
+		DXAABB m_AABB;
+		DXColor m_Color;
 	};
 }

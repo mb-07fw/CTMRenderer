@@ -206,18 +206,20 @@ namespace CTMRenderer::CTMDirectX::Graphics
 			DXColor(DXColorType::BLUE)
 		);
 
-		DEBUG_PRINT("Rect Left : " << sourceRect.AABB.left << '\n');
-		DEBUG_PRINT("Rect Top : " << sourceRect.AABB.top << '\n');
-		DEBUG_PRINT("Rect Right : " << sourceRect.AABB.right << '\n');
-		DEBUG_PRINT("Rect Bottom : " << sourceRect.AABB.bottom << '\n');
+		Geometry::DXAABB& sourceAABB = sourceRect.AABB();
+
+		DEBUG_PRINT("Rect Left : " << sourceAABB.left << '\n');
+		DEBUG_PRINT("Rect Top : " << sourceAABB.top << '\n');
+		DEBUG_PRINT("Rect Right : " << sourceAABB.right << '\n');
+		DEBUG_PRINT("Rect Bottom : " << sourceAABB.bottom << '\n');
 
 		// Define basic quad geometry from base quad / rect.
-		Bindable::DXStrictVertexBuffer<Vertex, 4> vGeometryBuffer(
+		Bindable::DXStrictVertexBuffer<Vertex, 4, D3D11_USAGE_DYNAMIC> vGeometryBuffer(
 			{
-				{ { sourceRect.AABB.left,  sourceRect.AABB.top }   },
-				{ { sourceRect.AABB.right, sourceRect.AABB.top }   },
-				{ { sourceRect.AABB.right, sourceRect.AABB.bottom } },
-				{ { sourceRect.AABB.left,  sourceRect.AABB.bottom } }
+				{ { sourceAABB.left,  sourceAABB.top }   },
+				{ { sourceAABB.right, sourceAABB.top }   },
+				{ { sourceAABB.right, sourceAABB.bottom } },
+				{ { sourceAABB.left,  sourceAABB.bottom } }
 			},
 			mP_Device, mP_DeviceContext
 		);
@@ -234,17 +236,20 @@ namespace CTMRenderer::CTMDirectX::Graphics
 			DXColor(DXColorType::GREEN)
 		);
 
-		float scalarXOne = targetRectOne.AABB.width / sourceRect.AABB.width;
-		float scalarYOne = targetRectOne.AABB.height / sourceRect.AABB.height;
+		Geometry::DXAABB& aabbOne = targetRectOne.AABB();
+		Geometry::DXAABB& aabbTwo = targetRectTwo.AABB();
 
-		float scalarXTwo = targetRectTwo.AABB.width / sourceRect.AABB.width;
-		float scalarYTwo = targetRectTwo.AABB.height / sourceRect.AABB.height;
+		float scalarXOne = aabbOne.width / sourceAABB.width;
+		float scalarYOne = aabbOne.height / sourceAABB.height;
 
-		float offsetXOne = targetRectOne.AABB.left - sourceRect.AABB.left;
-		float offsetYOne = targetRectOne.AABB.top - sourceRect.AABB.top;
+		float scalarXTwo = aabbTwo.width / sourceAABB.width;
+		float scalarYTwo = aabbTwo.height / sourceAABB.height;
 
-		float offsetXTwo = targetRectTwo.AABB.left - sourceRect.AABB.left;
-		float offsetYTwo = targetRectTwo.AABB.top - sourceRect.AABB.top;
+		float offsetXOne = aabbOne.left - sourceAABB.left;
+		float offsetYOne = aabbOne.top - sourceAABB.top;
+
+		float offsetXTwo = aabbTwo.left - sourceAABB.left;
+		float offsetYTwo = aabbTwo.top - sourceAABB.top;
 
 		struct InstanceData {
 			DirectX::XMFLOAT2 scalarXY = {}; // X and Y scale factors.
@@ -252,22 +257,22 @@ namespace CTMRenderer::CTMDirectX::Graphics
 			DXColor color = {};
 		};
 
-		/*Bindable::DXRuntimeVertexBuffer<InstanceData> vInstanceBuffer(2, mP_Device, mP_DeviceContext);
+		Bindable::DXRuntimeVertexBuffer<InstanceData> vInstanceBuffer(2, mP_Device, mP_DeviceContext);
 		
-		vInstanceBuffer.EmplaceNext(DirectX::XMFLOAT2(scalarXOne, scalarYOne), DirectX::XMFLOAT2(offsetXOne, offsetYOne), targetRectOne.color);
-		vInstanceBuffer.EmplaceNext(DirectX::XMFLOAT2(scalarXTwo, scalarYTwo), DirectX::XMFLOAT2(offsetXTwo, offsetYTwo), targetRectTwo.color);
+		vInstanceBuffer.EmplaceNext(DirectX::XMFLOAT2(scalarXOne, scalarYOne), DirectX::XMFLOAT2(offsetXOne, offsetYOne), targetRectOne.Color());
+		vInstanceBuffer.EmplaceNext(DirectX::XMFLOAT2(scalarXTwo, scalarYTwo), DirectX::XMFLOAT2(offsetXTwo, offsetYTwo), targetRectTwo.Color());
 		RUNTIME_ASSERT(vInstanceBuffer.Create() == S_OK, "Failed to create instance buffer.\n");
-		vInstanceBuffer.Bind(1);*/
+		vInstanceBuffer.Bind(1);
 
-		Bindable::DXStrictVertexBuffer<InstanceData, 2> vInstanceBuffer(
+		/*Bindable::DXStrictVertexBuffer<InstanceData, 2> vInstanceBuffer(
 			{
-				{ { scalarXOne, scalarYOne }, { offsetXOne, offsetYOne }, targetRectOne.color },
-				{ { scalarXTwo, scalarYTwo}, { offsetXTwo, offsetYTwo }, targetRectTwo.color }
+				{ { scalarXOne, scalarYOne }, { offsetXOne, offsetYOne }, targetRectOne.Color() },
+				{ { scalarXTwo, scalarYTwo}, { offsetXTwo, offsetYTwo }, targetRectTwo.Color() }
 			},
 			mP_Device, mP_DeviceContext
 		);
 		RUNTIME_ASSERT(vInstanceBuffer.Create() == S_OK, "Failed to create instance buffer.\n");
-		vInstanceBuffer.Bind(1);
+		vInstanceBuffer.Bind(1);*/
 
 		Bindable::DXStrictIndexBuffer<short, 6, DXGI_FORMAT_R16_UINT> iBuffer(
 			{
