@@ -16,13 +16,13 @@ namespace CTMRenderer::CTMDirectX::Graphics
 	{
 	public:
 		inline DXPixelShader(Microsoft::WRL::ComPtr<ID3D11Device1> pDevice, Microsoft::WRL::ComPtr<ID3D11DeviceContext1> pDeviceContext)
-			: mP_Device(pDevice), mP_DeviceContext(pDeviceContext) 
+			: mP_Device(std::move(pDevice)), mP_DeviceContext(std::move(pDeviceContext))
 		{
 		}
 
 		~DXPixelShader() = default;
 	public:
-		inline [[nodiscard]] HRESULT Create(const std::filesystem::path& shaderPath, Microsoft::WRL::ComPtr<ID3DBlob>& pReadBlob) noexcept
+		inline [[nodiscard]] HRESULT Create(const std::filesystem::path& shaderPath, Microsoft::WRL::ComPtr<ID3DBlob> pReadBlob) noexcept
 		{
 			RUNTIME_ASSERT(!m_IsCreated, "A shader shouldn't be re-created.\n");
 			RUNTIME_ASSERT(std::filesystem::exists(shaderPath), "Path doesn't exist : " << shaderPath << '\n');

@@ -183,113 +183,54 @@ namespace CTMRenderer::CTMDirectX::Graphics
 		DEBUG_PRINT("Screen CenterX : " << NDCToScreenX(0, (float)m_WindowAreaRef.width) << '\n');
 		DEBUG_PRINT("Screen CenterY : " << NDCToScreenY(0, (float)m_WindowAreaRef.height) << '\n');
 
-		struct ScreenSpace {
-			DirectX::XMFLOAT2 WidthHeight = {};
-			DirectX::XMFLOAT2 Padding = {};
-		};
-
-		/*Bindable::DXStrictConstantBuffer<ScreenSpace, 1> cScreenBuffer(
-			{
-				{ { (float)m_WindowAreaRef.width, (float)m_WindowAreaRef.height } }
-			},
-			mP_Device, mP_DeviceContext
-		);
-		RUNTIME_ASSERT(cScreenBuffer.Create() == S_OK, "Failed to create constant buffer.\n");
-		cScreenBuffer.Bind();*/
-
 		struct Vertex {
 			DirectX::XMFLOAT2 pos;
 		};
 
-		Geometry::DXRect sourceRect(
-			0, 0, (float)m_WindowAreaRef.width, (float)m_WindowAreaRef.height,
-			DXColor(DXColorType::BLUE)
-		);
+		struct CBuffer {
+			float scale;
+			float padding[3] = { 0, 0, 0 };
+		};
 
-		Geometry::DXAABB& sourceAABB = sourceRect.AABB();
-
-		DEBUG_PRINT("Rect Left : " << sourceAABB.left << '\n');
-		DEBUG_PRINT("Rect Top : " << sourceAABB.top << '\n');
-		DEBUG_PRINT("Rect Right : " << sourceAABB.right << '\n');
-		DEBUG_PRINT("Rect Bottom : " << sourceAABB.bottom << '\n');
-
-		// Define basic quad geometry from base quad / rect.
-		//Bindable::DXStrictVertexBuffer<Vertex, 4, D3D11_USAGE_DYNAMIC> vGeometryBuffer(
-		//	{
-		//		{ { sourceAABB.left,  sourceAABB.top }   },
-		//		{ { sourceAABB.right, sourceAABB.top }   },
-		//		{ { sourceAABB.right, sourceAABB.bottom } },
-		//		{ { sourceAABB.left,  sourceAABB.bottom } }
-		//	},
-		//	mP_Device, mP_DeviceContext
-		//);
-		//RUNTIME_ASSERT(vGeometryBuffer.Create() == S_OK, "Failed to create buffer.\n");
-		//vGeometryBuffer.Bind(); // Pass in base quad as per vertex data.
-
-		//Geometry::DXRect targetRectOne(
-		//	100, 100, 300, 300,
-		//	DXColor(DXColorType::RED)
-		//);
-
-		//Geometry::DXRect targetRectTwo(
-		//	450, 250, 700, 500,
-		//	DXColor(DXColorType::GREEN)
-		//);
-
-		//Geometry::DXAABB& aabbOne = targetRectOne.AABB();
-		//Geometry::DXAABB& aabbTwo = targetRectTwo.AABB();
-
-		//float scalarXOne = aabbOne.width / sourceAABB.width;
-		//float scalarYOne = aabbOne.height / sourceAABB.height;
-
-		//float scalarXTwo = aabbTwo.width / sourceAABB.width;
-		//float scalarYTwo = aabbTwo.height / sourceAABB.height;
-
-		//float offsetXOne = aabbOne.left - sourceAABB.left;
-		//float offsetYOne = aabbOne.top - sourceAABB.top;
-
-		//float offsetXTwo = aabbTwo.left - sourceAABB.left;
-		//float offsetYTwo = aabbTwo.top - sourceAABB.top;
-
-		//struct InstanceData {
-		//	DirectX::XMFLOAT2 scalarXY = {}; // X and Y scale factors.
-		//	DirectX::XMFLOAT2 offsetXY = {}; // X and Y scale factors.
-		//	DXColor color = {};
-		//};
-
-		//Bindable::DXRuntimeVertexBuffer<InstanceData> vInstanceBuffer(2, mP_Device, mP_DeviceContext);
-		//
-		//vInstanceBuffer.EmplaceNext(DirectX::XMFLOAT2(scalarXOne, scalarYOne), DirectX::XMFLOAT2(offsetXOne, offsetYOne), targetRectOne.Color());
-		//vInstanceBuffer.EmplaceNext(DirectX::XMFLOAT2(scalarXTwo, scalarYTwo), DirectX::XMFLOAT2(offsetXTwo, offsetYTwo), targetRectTwo.Color());
-		//RUNTIME_ASSERT(vInstanceBuffer.Create() == S_OK, "Failed to create instance buffer.\n");
-		//vInstanceBuffer.Bind(1);
-
-		/*Bindable::DXStrictVertexBuffer<InstanceData, 2> vInstanceBuffer(
+		Bindable::DXStrictConstantBuffer<1, CBuffer, D3D11_USAGE_DEFAULT> cBuffer(
 			{
-				{ { scalarXOne, scalarYOne }, { offsetXOne, offsetYOne }, targetRectOne.Color() },
-				{ { scalarXTwo, scalarYTwo}, { offsetXTwo, offsetYTwo }, targetRectTwo.Color() }
+				{ 0.75f, 0, 0, 0 }
 			},
 			mP_Device, mP_DeviceContext
 		);
-		RUNTIME_ASSERT(vInstanceBuffer.Create() == S_OK, "Failed to create instance buffer.\n");
-		vInstanceBuffer.Bind(1);*/
+		RUNTIME_ASSERT(cBuffer.Create() == S_OK, "Failed to create constant buffer.\n");
+		cBuffer.Bind();
 
-		//Bindable::DXStrictIndexBuffer<short, 6, DXGI_FORMAT_R16_UINT> iBuffer(
-		//	{
-		//		0, 1, 2, // First Triangle
-		//		2, 3, 0  // Second Triangle
-		//	},
-		//	mP_Device, mP_DeviceContext
-		//);
-		//RUNTIME_ASSERT(iBuffer.Create() == S_OK, "Failed to create index buffer.\n");
-		//iBuffer.Bind();
+		Bindable::DXStrictVertexBuffer<4, Vertex, D3D11_USAGE_DEFAULT> vBuffer(
+			{
+				{ DirectX::XMFLOAT2(-0.5f,  0.5f) },
+				{ DirectX::XMFLOAT2( 0.5f, -0.5f) },
+				{ DirectX::XMFLOAT2(-0.5f, -0.5f) },
+				{ DirectX::XMFLOAT2( 0.5f,  0.5f) },
+			},
+			mP_Device, mP_DeviceContext
+		);
+
+		RUNTIME_ASSERT(vBuffer.Create() == S_OK, "Failed to create vertex buffer.\n");
+		vBuffer.Bind();
+
+		Bindable::DXStrictIndexBuffer<DXGI_FORMAT_R16_UINT, 6, short, D3D11_USAGE_DEFAULT> iBuffer(
+			{
+				0, 1, 2,
+				0, 3, 1
+			},
+			mP_Device, mP_DeviceContext
+		);
+
+		RUNTIME_ASSERT(iBuffer.Create() == S_OK, "Failed to create index buffer.\n");
+		iBuffer.Bind();
 
 		// Target Path (for now) : C:\dev\projects\cpp\Direct3D\RendererTest\bin\out\Debug-windows-x86_64\RendererCore\ 
 		const std::filesystem::path shaderPath = Utility::GetBinDirectory().string() + Utility::GetOutDirectory().string();
 		const std::string shaderPathStr = shaderPath.string();
 
-		const std::filesystem::path pixelShaderPath = shaderPathStr + "DefaultRectPS.cso";
-		const std::filesystem::path vertexShaderPath = shaderPathStr + "DefaultRectVS.cso";
+		const std::filesystem::path pixelShaderPath = shaderPathStr + "DefaultPS.cso";
+		const std::filesystem::path vertexShaderPath = shaderPathStr + "DefaultVS.cso";
 		
 		Microsoft::WRL::ComPtr<ID3DBlob> pBlob;
 		DXPixelShader pixelShader(mP_Device, mP_DeviceContext);
@@ -300,13 +241,10 @@ namespace CTMRenderer::CTMDirectX::Graphics
 		RUNTIME_ASSERT(vertexShader.Create(vertexShaderPath, pBlob) == S_OK, "Failed to create vertex shader.\n");
 		vertexShader.Bind();
 
-		DXInputLayout<4> inputLayout(
+		// TODO: Make DXInputLayout copy device and device context instead of using by reference.
+		DXInputLayout<1> inputLayout(
 			{
-				{ "POSITION", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, 0u, D3D11_INPUT_PER_VERTEX_DATA, 0u },
-
-				{ "INSTANCE_SCALAR", 0u, DXGI_FORMAT_R32G32_FLOAT, 1u, 0u, D3D11_INPUT_PER_INSTANCE_DATA, 1u },
-				{ "INSTANCE_OFFSET", 0u, DXGI_FORMAT_R32G32_FLOAT, 1u, sizeof(DirectX::XMFLOAT2), D3D11_INPUT_PER_INSTANCE_DATA, 1u },
-				{ "INSTANCE_COLOR", 0u, DXGI_FORMAT_R8G8B8A8_UNORM, 1u, sizeof(DirectX::XMFLOAT2) * 2, D3D11_INPUT_PER_INSTANCE_DATA, 1u }
+				{ "POSITION", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, 0u, D3D11_INPUT_PER_VERTEX_DATA, 0u }
 			},
 			pBlob, mP_Device, mP_DeviceContext
 		);
@@ -340,19 +278,18 @@ namespace CTMRenderer::CTMDirectX::Graphics
 
 	void DXGraphics::Draw() noexcept
 	{
-		/*mP_DeviceContext->DrawIndexedInstanced(6, 2, 0, 0, 0);
-		RUNTIME_ASSERT(m_InfoQueue.IsQueueEmpty() == true, m_InfoQueue.GetMessages());*/
+		mP_DeviceContext->DrawIndexed(6, 0, 0);
 
 		m_2DRender.pRTV->BeginDraw();
 		// Note to self : Clearing the D2D RTV when it references the same texture as the D3D RTV 
-		//			      also clears any rendering done with the D3D RTV. Save yourself some tears.
+		//			      also clears any rendering done with the D3D RTV. Who would've thought?
 		//m_2DRender.pRTV->Clear(); 
 
 		//m_2DRender.pRTV->SetTransform(D2D1::IdentityMatrix());
 
 		m_2DRender.pRTV->DrawText(
 			m_TextRender.text.data(),
-			(UINT32)m_TextRender.text.size(),
+			(UINT)m_TextRender.text.size(),
 			m_TextRender.pTextFormat.Get(),
 			m_TextRender.layoutRect,
 			m_TextRender.pSCBrush.Get()
@@ -360,6 +297,8 @@ namespace CTMRenderer::CTMDirectX::Graphics
 
 		HRESULT hResult = m_2DRender.pRTV->EndDraw();
 		RUNTIME_ASSERT(hResult == S_OK, Utility::TranslateHResult(hResult));
+		/*mP_DeviceContext->DrawIndexedInstanced(6, 2, 0, 0, 0);
+		RUNTIME_ASSERT(m_InfoQueue.IsQueueEmpty() == true, m_InfoQueue.GetMessages());*/
 	}
 
 	void DXGraphics::EndFrame() noexcept

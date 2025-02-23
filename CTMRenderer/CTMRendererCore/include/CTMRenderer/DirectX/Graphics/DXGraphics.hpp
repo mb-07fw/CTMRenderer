@@ -17,7 +17,6 @@
 #include "CTMRenderer/DirectX/Graphics/DXInfoQueue.hpp"
 #include "CTMRenderer/DirectX/Graphics/DXColor.hpp"
 
-
 namespace CTMRenderer::CTMDirectX::Graphics
 {
 	struct Transform {
