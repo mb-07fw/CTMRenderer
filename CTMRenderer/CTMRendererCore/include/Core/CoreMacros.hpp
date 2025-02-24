@@ -8,7 +8,9 @@
 #define DO_WRAP(x)              do { x } while(0)
 #define IF_DEBUG(x)				x
 #define DEBUG_PRINT(msg)		std::cout << "[DEBUG_PRINT] " << msg 
-#define DEBUG_PRINT_ERROR(msg)	std::cout << "[DEBUG_PRINT_ERROR] " << msg
+#define DEBUG_PRINTW(msg)		std::wcout << L"[DEBUG_PRINTW] " << msg
+#define DEBUG_PRINT_ERROR(msg)	std::cerr << "[DEBUG_PRINT_ERROR] " << msg
+#define DEBUG_PRINT_ERRORW(msg)	std::wcerr << L"[DEBUG_PRINT_ERRORW] " << msg
 #define DEBUG_ERROR(msg, code)	DO_WRAP( \
 									DEBUG_PRINT_ERROR(msg); \
 									__debugbreak();\

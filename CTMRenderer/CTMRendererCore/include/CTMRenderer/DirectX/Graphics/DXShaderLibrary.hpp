@@ -5,6 +5,11 @@
 
 namespace CTMRenderer::CTMDirectX::Graphics
 {
+	enum class ImplementedShaderType
+	{
+
+	};
+
 	class DXShaderLibrary
 	{
 	public:
@@ -14,6 +19,8 @@ namespace CTMRenderer::CTMDirectX::Graphics
 	private:
 		void LoadShaders() noexcept;
 	private:
-		std::vector<std::filesystem::path> m_Shaders;
+		const std::filesystem::path m_ShaderPath;
+		std::vector<std::wstring> m_VertexShaders;
+		std::vector<std::wstring> m_PixelShaders;
 	};
 }

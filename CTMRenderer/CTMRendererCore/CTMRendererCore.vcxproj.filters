@@ -1,0 +1,215 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{89AF369E-F58E-B539-FEA6-40106A051C9B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\CTMRenderer">
+      <UniqueIdentifier>{73FA1A65-DF5B-F872-68C9-3E25D4292F32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\CTMRenderer\DirectX">
+      <UniqueIdentifier>{35A01F89-A1AD-4D6F-2A94-495A96A01926}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\CTMRenderer\DirectX\Control">
+      <UniqueIdentifier>{E5B50BAD-516F-7657-DACE-903146872CC7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\CTMRenderer\DirectX\Graphics">
+      <UniqueIdentifier>{1574D7C7-015B-99BF-AAAB-FFDC96711226}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\CTMRenderer\DirectX\Graphics\Bindable">
+      <UniqueIdentifier>{954FAC8E-01C0-AE07-CADE-2890360EE708}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\CTMRenderer\DirectX\Graphics\Geometry">
+      <UniqueIdentifier>{100907FB-7C79-0974-4598-83FCB1C74175}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\CTMRenderer\DirectX\Window">
+      <UniqueIdentifier>{7CBF7833-68FB-7B9D-D10D-9494BD6824B8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Core">
+      <UniqueIdentifier>{81F1C769-6D54-570E-16DA-8FC4021C2391}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Event">
+      <UniqueIdentifier>{9AF3EDA2-06B4-69D9-CFEE-B2563B6EAEB5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resources">
+      <UniqueIdentifier>{202B5BA7-8C95-0F1E-D5D3-C0C3417DED72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resources\shaders">
+      <UniqueIdentifier>{19081037-851E-0ECD-CE95-99EE3AEBDE54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Core">
+      <UniqueIdentifier>{A5D31CCF-91A0-77DA-BAB9-6582A6E5AC68}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Event">
+      <UniqueIdentifier>{3E1ADFB2-AA84-9329-F3C2-44CF5F6C717E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Renderer">
+      <UniqueIdentifier>{73D1DFBF-5F34-6F64-08BA-A71AF4FB3AE7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Renderer\DirectX">
+      <UniqueIdentifier>{3577CBEA-2106-55B4-CA24-69AFB692655A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Renderer\DirectX\Graphics">
+      <UniqueIdentifier>{152BC519-8143-AC43-4AF0-3BDDB6C740DD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Renderer\DirectX\Graphics\Geometry">
+      <UniqueIdentifier>{10A05255-FCF1-2945-E510-6755D101432E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Renderer\DirectX\Window">
+      <UniqueIdentifier>{7CB68CF0-E8C3-BAD6-71AA-B6C1DDB6868D}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\CTMRenderer\CTMRenderer.hpp">
+      <Filter>include\CTMRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CTMRenderer\DirectX\Control\Mouse.hpp">
+      <Filter>include\CTMRenderer\DirectX\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CTMRenderer\DirectX\DXRenderer.hpp">
+      <Filter>include\CTMRenderer\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CTMRenderer\DirectX\DXRendererSettings.hpp">
+      <Filter>include\CTMRenderer\DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\Bindable\DXBuffer.hpp">
+      <Filter>include\CTMRenderer\DirectX\Graphics\Bindable</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\Bindable\DXInputLayout.hpp">
+      <Filter>include\CTMRenderer\DirectX\Graphics\Bindable</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\Bindable\DXShader.hpp">
+      <Filter>include\CTMRenderer\DirectX\Graphics\Bindable</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\Bindable\DXViewport.hpp">
+      <Filter>include\CTMRenderer\DirectX\Graphics\Bindable</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXColor.hpp">
+      <Filter>include\CTMRenderer\DirectX\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXGraphics.hpp">
+      <Filter>include\CTMRenderer\DirectX\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXGraphicsUtility.hpp">
+      <Filter>include\CTMRenderer\DirectX\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXInfoQueue.hpp">
+      <Filter>include\CTMRenderer\DirectX\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXLayerSystem.hpp">
+      <Filter>include\CTMRenderer\DirectX\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXShaderLibrary.hpp">
+      <Filter>include\CTMRenderer\DirectX\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\Geometry\DXAABB.hpp">
+      <Filter>include\CTMRenderer\DirectX\Graphics\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\Geometry\DXShape.hpp">
+      <Filter>include\CTMRenderer\DirectX\Graphics\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CTMRenderer\DirectX\Window\DXWindow.hpp">
+      <Filter>include\CTMRenderer\DirectX\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CTMRenderer\DirectX\Window\DXWindowGeometry.hpp">
+      <Filter>include\CTMRenderer\DirectX\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CTMRenderer\IRenderer.hpp">
+      <Filter>include\CTMRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CTMRenderer\Timer.hpp">
+      <Filter>include\CTMRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\CoreMacros.hpp">
+      <Filter>include\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\CorePCH.hpp">
+      <Filter>include\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\CoreUtility.hpp">
+      <Filter>include\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\WindowsDefines.hpp">
+      <Filter>include\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Event\Event.hpp">
+      <Filter>include\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Event\EventDispatcher.hpp">
+      <Filter>include\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Event\EventListener.hpp">
+      <Filter>include\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Event\EventPool.hpp">
+      <Filter>include\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Event\EventSystem.hpp">
+      <Filter>include\Event</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Core\CorePCH.cpp">
+      <Filter>src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Event\EventDispatcher.cpp">
+      <Filter>src\Event</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Event\EventSystem.cpp">
+      <Filter>src\Event</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\CTMRenderer.cpp">
+      <Filter>src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX\DXRenderer.cpp">
+      <Filter>src\Renderer\DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX\Graphics\DXGraphics.cpp">
+      <Filter>src\Renderer\DirectX\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX\Graphics\DXInfoQueue.cpp">
+      <Filter>src\Renderer\DirectX\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX\Graphics\DXLayerSystem.cpp">
+      <Filter>src\Renderer\DirectX\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX\Graphics\DXShaderLibrary.cpp">
+      <Filter>src\Renderer\DirectX\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX\Graphics\Geometry\DXAABB.cpp">
+      <Filter>src\Renderer\DirectX\Graphics\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX\Graphics\Geometry\DXShape.cpp">
+      <Filter>src\Renderer\DirectX\Graphics\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX\Window\DXWindow.cpp">
+      <Filter>src\Renderer\DirectX\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Timer.cpp">
+      <Filter>src\Renderer</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="resources\shaders\DefaultCubePS.hlsl">
+      <Filter>resources\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\DefaultCubeVS.hlsl">
+      <Filter>resources\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\DefaultPS.hlsl">
+      <Filter>resources\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\DefaultRectPS.hlsl">
+      <Filter>resources\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\DefaultRectVS.hlsl">
+      <Filter>resources\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\DefaultVS.hlsl">
+      <Filter>resources\shaders</Filter>
+    </FxCompile>
+  </ItemGroup>
+</Project>

@@ -10,81 +10,6 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="include\Core\CoreMacros.hpp" />
-    <ClInclude Include="include\Core\CorePCH.hpp" />
-    <ClInclude Include="include\Core\CoreUtility.hpp" />
-    <ClInclude Include="include\Core\WindowsDefines.hpp" />
-    <ClInclude Include="include\CTMRenderer\CTMRenderer.hpp" />
-    <ClInclude Include="include\CTMRenderer\DirectX\Control\Mouse.hpp" />
-    <ClInclude Include="include\CTMRenderer\DirectX\DXRenderer.hpp" />
-    <ClInclude Include="include\CTMRenderer\DirectX\DXRendererSettings.hpp" />
-    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\Bindable\DXBuffer.hpp" />
-    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\Bindable\DXInputLayout.hpp" />
-    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\Bindable\DXShader.hpp" />
-    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\Bindable\DXViewport.hpp" />
-    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXColor.hpp" />
-    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXGraphics.hpp" />
-    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXGraphicsUtility.hpp" />
-    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXInfoQueue.hpp" />
-    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXShaderLibrary.hpp" />
-    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\Geometry\DXAABB.hpp" />
-    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\Geometry\DXShape.hpp" />
-    <ClInclude Include="include\CTMRenderer\DirectX\Window\DXWindow.hpp" />
-    <ClInclude Include="include\CTMRenderer\DirectX\Window\DXWindowGeometry.hpp" />
-    <ClInclude Include="include\CTMRenderer\IRenderer.hpp" />
-    <ClInclude Include="include\CTMRenderer\Timer.hpp" />
-    <ClInclude Include="include\Event\Event.hpp" />
-    <ClInclude Include="include\Event\EventDispatcher.hpp" />
-    <ClInclude Include="include\Event\EventListener.hpp" />
-    <ClInclude Include="include\Event\EventPool.hpp" />
-    <ClInclude Include="include\Event\EventSystem.hpp" />
-    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXLayerSystem.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="resources\shaders\DefaultCubePS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\DefaultCubeVS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\DefaultPS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\DefaultRectPS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\DefaultRectVS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\DefaultVS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-    </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\Core\CorePCH.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="src\Event\EventDispatcher.cpp" />
-    <ClCompile Include="src\Event\EventSystem.cpp" />
-    <ClCompile Include="src\Renderer\CTMRenderer.cpp" />
-    <ClCompile Include="src\Renderer\DirectX\DXRenderer.cpp" />
-    <ClCompile Include="src\Renderer\DirectX\Graphics\DXGraphics.cpp" />
-    <ClCompile Include="src\Renderer\DirectX\Graphics\DXInfoQueue.cpp" />
-    <ClCompile Include="src\Renderer\DirectX\Graphics\DXLayerSystem.cpp" />
-    <ClCompile Include="src\Renderer\DirectX\Graphics\DXShaderLibrary.cpp" />
-    <ClCompile Include="src\Renderer\DirectX\Graphics\Geometry\DXAABB.cpp" />
-    <ClCompile Include="src\Renderer\DirectX\Graphics\Geometry\DXShape.cpp" />
-    <ClCompile Include="src\Renderer\DirectX\Window\DXWindow.cpp" />
-    <ClCompile Include="src\Renderer\Timer.cpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{293D649F-95C8-D163-9ED9-54580AE42D64}</ProjectGuid>
     <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
@@ -164,6 +89,81 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="include\CTMRenderer\CTMRenderer.hpp" />
+    <ClInclude Include="include\CTMRenderer\DirectX\Control\Mouse.hpp" />
+    <ClInclude Include="include\CTMRenderer\DirectX\DXRenderer.hpp" />
+    <ClInclude Include="include\CTMRenderer\DirectX\DXRendererSettings.hpp" />
+    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\Bindable\DXBuffer.hpp" />
+    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\Bindable\DXInputLayout.hpp" />
+    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\Bindable\DXShader.hpp" />
+    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\Bindable\DXViewport.hpp" />
+    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXColor.hpp" />
+    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXGraphics.hpp" />
+    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXGraphicsUtility.hpp" />
+    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXInfoQueue.hpp" />
+    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXLayerSystem.hpp" />
+    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXShaderLibrary.hpp" />
+    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\Geometry\DXAABB.hpp" />
+    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\Geometry\DXShape.hpp" />
+    <ClInclude Include="include\CTMRenderer\DirectX\Window\DXWindow.hpp" />
+    <ClInclude Include="include\CTMRenderer\DirectX\Window\DXWindowGeometry.hpp" />
+    <ClInclude Include="include\CTMRenderer\IRenderer.hpp" />
+    <ClInclude Include="include\CTMRenderer\Timer.hpp" />
+    <ClInclude Include="include\Core\CoreMacros.hpp" />
+    <ClInclude Include="include\Core\CorePCH.hpp" />
+    <ClInclude Include="include\Core\CoreUtility.hpp" />
+    <ClInclude Include="include\Core\WindowsDefines.hpp" />
+    <ClInclude Include="include\Event\Event.hpp" />
+    <ClInclude Include="include\Event\EventDispatcher.hpp" />
+    <ClInclude Include="include\Event\EventListener.hpp" />
+    <ClInclude Include="include\Event\EventPool.hpp" />
+    <ClInclude Include="include\Event\EventSystem.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Core\CorePCH.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\Event\EventDispatcher.cpp" />
+    <ClCompile Include="src\Event\EventSystem.cpp" />
+    <ClCompile Include="src\Renderer\CTMRenderer.cpp" />
+    <ClCompile Include="src\Renderer\DirectX\DXRenderer.cpp" />
+    <ClCompile Include="src\Renderer\DirectX\Graphics\DXGraphics.cpp" />
+    <ClCompile Include="src\Renderer\DirectX\Graphics\DXInfoQueue.cpp" />
+    <ClCompile Include="src\Renderer\DirectX\Graphics\DXLayerSystem.cpp" />
+    <ClCompile Include="src\Renderer\DirectX\Graphics\DXShaderLibrary.cpp" />
+    <ClCompile Include="src\Renderer\DirectX\Graphics\Geometry\DXAABB.cpp" />
+    <ClCompile Include="src\Renderer\DirectX\Graphics\Geometry\DXShape.cpp" />
+    <ClCompile Include="src\Renderer\DirectX\Window\DXWindow.cpp" />
+    <ClCompile Include="src\Renderer\Timer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="resources\shaders\DefaultCubePS.hlsl">
+      <ShaderType>Pixel</ShaderType>
+      <ShaderModel>4.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\DefaultCubeVS.hlsl">
+      <ShaderType>Vertex</ShaderType>
+      <ShaderModel>4.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\DefaultPS.hlsl">
+      <ShaderType>Pixel</ShaderType>
+      <ShaderModel>4.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\DefaultRectPS.hlsl">
+      <ShaderType>Pixel</ShaderType>
+      <ShaderModel>4.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\DefaultRectVS.hlsl">
+      <ShaderType>Vertex</ShaderType>
+      <ShaderModel>4.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\DefaultVS.hlsl">
+      <ShaderType>Vertex</ShaderType>
+      <ShaderModel>4.0</ShaderModel>
+    </FxCompile>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

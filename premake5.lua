@@ -7,12 +7,12 @@ workspace "CTMRenderer"
 	local outputdir = ("%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}")
 	local target_dir = "bin/out/" .. outputdir ..  "/%{prj.name}"
 
-	targetdir (target_dir)
-	objdir ("bin/intermediates/" .. outputdir .. "/%{prj.name}")
-
 	defines {
 		'OUTPUT_DIR="out/' .. outputdir .. '/%{prj.name}/"'
 	}
+
+	targetdir (target_dir)
+	objdir ("bin/intermediates/" .. outputdir .. "/%{prj.name}")
 
 	filter "configurations:Debug"
 			defines { "DEBUG_MODE" }
@@ -27,7 +27,7 @@ workspace "CTMRenderer"
 		locationdir = "CTMRenderer/CTMRendererApp/"
 
 		location (locationdir)
-		kind "ConsoleApp" -- Set the subsystem as a console application.
+		kind "ConsoleApp" -- Set the subsystem as a console application for debug printing.
 
 		files { locationdir .. "src/**.cpp", locationdir .. "include/**.hpp" }
 		includedirs { locationdir .. "include/" }
@@ -36,11 +36,24 @@ workspace "CTMRenderer"
 		libdirs { "bin/out/" .. outputdir .. "/CTMRendererCore/" }
 
 		dependson { "CTMRendererCore" }
-		includedirs { "CTMRenderer/CTMRendererCore/include" }
+		includedirs { "CTMRenderer/CTMRendererCore/include/" }
 
 	project "CTMRendererCore"
 		locationdir = "CTMRenderer/CTMRendererCore/"
 		shaderdir = locationdir .. "resources/shaders/"
+
+		-- Count the number of matching HLSL files
+		--local shaderFiles = os.matchfiles(shaderdir .. "/**S.hlsl")
+		--local shaderCount = #shaderFiles
+
+		--print("Total found shaders : ", shaderCount)
+
+		--defines {
+			--'TOTAL_SHADERS=' .. shaderCount
+		--}
+
+		pchheader "Core/CorePCH.hpp" -- Define how the header is included.
+		pchsource (locationdir .. "CorePCH.cpp") -- Define the path of the pch source file.
 		
 		location (locationdir)
 		kind "StaticLib" -- Compile as a static library.
@@ -48,7 +61,7 @@ workspace "CTMRenderer"
 		files { 
 			locationdir .. "src/**.cpp", 
 			locationdir .. "include/**.hpp",
-			shaderdir .. "/**.hlsl"
+			shaderdir .. "/**S.hlsl"
 		}
 
 		filter { "files:**VS.hlsl" }
@@ -67,6 +80,3 @@ workspace "CTMRenderer"
 
 		-- These are currently included via #pragma comment's. in RendererCore.hpp.
 		-- links { "d3d11.lib", "d3dcompiler.lib", "D2d1.lib", "dwrite.lib" }
-
-		pchheader "Core/CorePCH.hpp" -- Define how the header is included.
-		pchsource (locationdir .. "src/Core/CorePCH.cpp") -- Define the path of the pch source file.
