@@ -27,6 +27,7 @@
     <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXGraphics.hpp" />
     <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXGraphicsUtility.hpp" />
     <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXInfoQueue.hpp" />
+    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXShaderLibrary.hpp" />
     <ClInclude Include="include\CTMRenderer\DirectX\Graphics\Geometry\DXAABB.hpp" />
     <ClInclude Include="include\CTMRenderer\DirectX\Graphics\Geometry\DXShape.hpp" />
     <ClInclude Include="include\CTMRenderer\DirectX\Window\DXWindow.hpp" />
@@ -78,6 +79,7 @@
     <ClCompile Include="src\Renderer\DirectX\Graphics\DXGraphics.cpp" />
     <ClCompile Include="src\Renderer\DirectX\Graphics\DXInfoQueue.cpp" />
     <ClCompile Include="src\Renderer\DirectX\Graphics\DXLayerSystem.cpp" />
+    <ClCompile Include="src\Renderer\DirectX\Graphics\DXShaderLibrary.cpp" />
     <ClCompile Include="src\Renderer\DirectX\Graphics\Geometry\DXAABB.cpp" />
     <ClCompile Include="src\Renderer\DirectX\Graphics\Geometry\DXShape.cpp" />
     <ClCompile Include="src\Renderer\DirectX\Window\DXWindow.cpp" />

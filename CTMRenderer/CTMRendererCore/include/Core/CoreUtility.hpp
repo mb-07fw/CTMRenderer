@@ -59,7 +59,7 @@ namespace CTMRenderer::Utility
 
     inline std::filesystem::path GetOutDirectory()
     {
-        return std::filesystem::path(OUTPUT_DIR);
+        return std::filesystem::path(GetBinDirectory().string() + std::filesystem::path(OUTPUT_DIR).string());
     }
 
     inline constexpr double MinDB(double value, double min)

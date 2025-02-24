@@ -13,7 +13,7 @@ namespace CTMRenderer::CTMDirectX::Graphics
 {
 	DXGraphics::DXGraphics(const DXRendererSettings& settingsRef, const Window::Geometry::WindowArea& windowAreaRef, const Control::Mouse& mouseRef) noexcept
 		: m_SettingsRef(settingsRef), m_WindowAreaRef(windowAreaRef), m_MouseRef(mouseRef),
-		  m_2DRender(), m_TextRender(), m_ClearColor(0, 0, .1f, 1.0f)
+		  m_2DRender(), m_TextRender(), m_ClearColor(0.0f, 0.0f, .1f, 1.0f)
 	{
 	}
 
@@ -225,8 +225,7 @@ namespace CTMRenderer::CTMDirectX::Graphics
 		RUNTIME_ASSERT(iBuffer.Create() == S_OK, "Failed to create index buffer.\n");
 		iBuffer.Bind();
 
-		// Target Path (for now) : C:\dev\projects\cpp\Direct3D\RendererTest\bin\out\Debug-windows-x86_64\RendererCore\ 
-		const std::filesystem::path shaderPath = Utility::GetBinDirectory().string() + Utility::GetOutDirectory().string();
+		const std::filesystem::path shaderPath = Utility::GetOutDirectory();
 		const std::string shaderPathStr = shaderPath.string();
 
 		const std::filesystem::path pixelShaderPath = shaderPathStr + "DefaultPS.cso";

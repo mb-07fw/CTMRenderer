@@ -15,6 +15,7 @@
 #include "CTMRenderer/DirectX/DXRendererSettings.hpp"
 #include "CTMRenderer/DirectX/Window/DXWindowGeometry.hpp"
 #include "CTMRenderer/DirectX/Graphics/DXInfoQueue.hpp"
+#include "CTMRenderer/DirectX/Graphics/DXShaderLibrary.hpp"
 #include "CTMRenderer/DirectX/Graphics/DXColor.hpp"
 
 namespace CTMRenderer::CTMDirectX::Graphics
@@ -62,6 +63,7 @@ namespace CTMRenderer::CTMDirectX::Graphics
 		const Window::Geometry::WindowArea& m_WindowAreaRef;
 		const Control::Mouse& m_MouseRef;
 		Debug::DXInfoQueue m_InfoQueue;
+		DXShaderLibrary m_ShaderLibrary;
 		Microsoft::WRL::ComPtr<ID3D11Device1> mP_Device;
 		Microsoft::WRL::ComPtr<IDXGISwapChain> mP_SwapChain;
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext1> mP_DeviceContext;

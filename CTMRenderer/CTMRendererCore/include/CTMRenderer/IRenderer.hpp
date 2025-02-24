@@ -32,5 +32,10 @@ namespace CTMRenderer
 		std::atomic_bool m_ShouldRun = false;
 		std::atomic_bool m_EventLoopStarted = false;
 		std::atomic_bool m_RendererStarted = false;
+	private:
+		IRenderer(const IRenderer&) = delete;
+		IRenderer(IRenderer&&) = delete;
+		IRenderer& operator=(const IRenderer&) = delete;
+		IRenderer& operator=(IRenderer&&) = delete;
 	};
 }
