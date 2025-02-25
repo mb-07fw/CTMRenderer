@@ -1,4 +1,4 @@
-#include "util.hlsl"
+//#include "util.hlsl"
 
 float4 main(float2 pos : POSITION) : SV_POSITION
 {

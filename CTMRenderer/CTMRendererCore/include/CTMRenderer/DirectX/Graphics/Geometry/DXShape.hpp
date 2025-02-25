@@ -3,6 +3,7 @@
 #include "Core/CoreMacros.hpp"
 #include "CTMRenderer/DirectX/Graphics/Geometry/DXAABB.hpp"
 #include "CTMRenderer/DirectX/Graphics/DXColor.hpp"
+#include "CTMRenderer/DirectX/Graphics/Bindable/DXShader.hpp"
 
 namespace CTMRenderer::CTMDirectX::Graphics::Geometry
 {
@@ -15,12 +16,16 @@ namespace CTMRenderer::CTMDirectX::Graphics::Geometry
 	class IShape
 	{
 	public:
-		IShape(ShapeType type) noexcept;
+		IShape(ShapeType type, Bindable::ImplementedVSType respectiveVSType, Bindable::ImplementedPSType respectivePSType) noexcept;
 		virtual ~IShape() = default;
 	public:
-		virtual [[nodiscard]] ShapeType Type() const noexcept = 0;
+		[[nodiscard]] ShapeType Type() const noexcept { return m_Type; }
+		[[nodiscard]] Bindable::ImplementedVSType VSType() const noexcept { return m_VSType; }
+		[[nodiscard]] Bindable::ImplementedPSType PSType() const noexcept { return m_PSType; }
 	private:
 		const ShapeType m_Type;
+		const Bindable::ImplementedVSType m_VSType;
+		const Bindable::ImplementedPSType m_PSType;
 	};
 
 	class DXRect : public IShape
@@ -29,7 +34,6 @@ namespace CTMRenderer::CTMDirectX::Graphics::Geometry
 		DXRect(float left, float top, float right, float bottom, DXColor color) noexcept;
 		~DXRect() = default;
 	public:
-		virtual inline [[nodiscard]] ShapeType Type() const noexcept override { return ShapeType::RECT; }
 		inline [[nodiscard]] DXAABB& AABB() noexcept { return m_AABB; }
 		inline [[nodiscard]] DXColor Color() noexcept { return m_Color; }
 	private:

@@ -10,8 +10,44 @@
 
 #include "Core/CoreMacros.hpp"
 
-namespace CTMRenderer::CTMDirectX::Graphics
+namespace CTMRenderer::CTMDirectX::Graphics::Bindable
 {
+	enum class DXShaderType
+	{
+		VERTEX, PIXEL
+	};
+
+	enum class ImplementedShaderType
+	{
+		POS2_DEF
+		//POS2_INSTANCED_COLOR
+	};
+
+	// Currently, this is used in assuming that the shader has the same name for both vertex and pixel shaders.
+	struct DXShaderData
+	{
+	public:
+		inline DXShaderData(ImplementedShaderType shaderType) noexcept
+			: ShaderType(shaderType) {}
+
+		ImplementedShaderType ShaderType;
+	};
+
+	class DXShaderSource
+	{
+	public:
+		DXShaderSource(
+			ImplementedShaderType shaderType,
+			Microsoft::WRL::ComPtr<ID3DBlob> pVSBytecode,
+			Microsoft::WRL::ComPtr<ID3DBlob> pPSBytecode) noexcept;
+	private:
+		const ImplementedShaderType m_ShaderType;
+		const std::wstring m_FileName;
+		Microsoft::WRL::ComPtr<ID3DBlob> mP_VSBytecode;
+		Microsoft::WRL::ComPtr<ID3DBlob> mP_PSBytecode;
+		//std::wstring ShaderName;
+	};
+
 	class DXPixelShader
 	{
 	public:

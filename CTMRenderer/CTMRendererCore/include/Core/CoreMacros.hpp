@@ -16,6 +16,11 @@
 									__debugbreak();\
 									exit(code); \
 								)
+#define DEBUG_ERRORW(msg, code)	DO_WRAP( \
+									DEBUG_PRINT_ERRORW(msg); \
+									__debugbreak();\
+									exit(code); \
+								)
 #define RUNTIME_ASSERT(x, msg)	if (!(x)) \
 								{ \
 									std::cerr << "[RUNTIME_ASSERT] Assert failed. \n"; \
@@ -23,15 +28,26 @@
 									std::cerr << "[RUNTIME_ASSERT] File : " << __FILE__ << '\n'; \
 									std::cerr << "[RUNTIME_ASSERT] Line : " << __LINE__ << '\n'; \
 									DEBUG_ERROR(msg, 1); \
-								} \
-
+								}
+#define RUNTIME_ASSERTW(x, msg) if (!(x)) \
+								{ \
+									std::wcerr << "[RUNTIME_ASSERTW] Assert failed. \n"; \
+									std::wcerr << "[RUNTIME_ASSERTW] Condition : " << #x << '\n'; \
+									std::wcerr << "[RUNTIME_ASSERTW] File : " << __FILE__ << '\n'; \
+									std::wcerr << "[RUNTIME_ASSERTW] Line : " << __LINE__ << '\n'; \
+									DEBUG_ERRORW(msg, 1); \
+								}
 #else
 
 #define DO_WRAP(x)				(void)0
 #define IF_DEBUG(x)				(void)0
 #define DEBUG_PRINT(msg)		(void)0
+#define DEBUG_PRINTW(msg)		(void)0
 #define DEBUG_PRINT_ERROR(msg)  (void)0
+#define DEBUG_PRINT_ERRORW(msg) (void)0
 #define DEBUG_ERROR(msg, code)  (void)0
+#define DEBUG_ERRORW(msg, code) (void)0
 #define RUNTIME_ASSERT(x, msg)  (void)0
+#define RUNTIME_ASSERTW(x, msg) (void)0
 
 #endif

@@ -125,41 +125,42 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\CTMRenderer\DirectX\Graphics\Bindable\DXShader.cpp" />
     <ClCompile Include="src\Event\EventDispatcher.cpp" />
     <ClCompile Include="src\Event\EventSystem.cpp" />
-    <ClCompile Include="src\Renderer\CTMRenderer.cpp" />
-    <ClCompile Include="src\Renderer\DirectX\DXRenderer.cpp" />
-    <ClCompile Include="src\Renderer\DirectX\Graphics\DXGraphics.cpp" />
-    <ClCompile Include="src\Renderer\DirectX\Graphics\DXInfoQueue.cpp" />
-    <ClCompile Include="src\Renderer\DirectX\Graphics\DXLayerSystem.cpp" />
-    <ClCompile Include="src\Renderer\DirectX\Graphics\DXShaderLibrary.cpp" />
-    <ClCompile Include="src\Renderer\DirectX\Graphics\Geometry\DXAABB.cpp" />
-    <ClCompile Include="src\Renderer\DirectX\Graphics\Geometry\DXShape.cpp" />
-    <ClCompile Include="src\Renderer\DirectX\Window\DXWindow.cpp" />
-    <ClCompile Include="src\Renderer\Timer.cpp" />
+    <ClCompile Include="src\CTMRenderer\CTMRenderer.cpp" />
+    <ClCompile Include="src\CTMRenderer\DirectX\DXRenderer.cpp" />
+    <ClCompile Include="src\CTMRenderer\DirectX\Graphics\DXGraphics.cpp" />
+    <ClCompile Include="src\CTMRenderer\DirectX\Graphics\DXInfoQueue.cpp" />
+    <ClCompile Include="src\CTMRenderer\DirectX\Graphics\DXLayerSystem.cpp" />
+    <ClCompile Include="src\CTMRenderer\DirectX\Graphics\DXShaderLibrary.cpp" />
+    <ClCompile Include="src\CTMRenderer\DirectX\Graphics\Geometry\DXAABB.cpp" />
+    <ClCompile Include="src\CTMRenderer\DirectX\Graphics\Geometry\DXShape.cpp" />
+    <ClCompile Include="src\CTMRenderer\DirectX\Window\DXWindow.cpp" />
+    <ClCompile Include="src\CTMRenderer\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="resources\shaders\DefaultCubePS.hlsl">
+    <FxCompile Include="resources\DefaultCubePS.hlsl">
       <ShaderType>Pixel</ShaderType>
       <ShaderModel>4.0</ShaderModel>
     </FxCompile>
-    <FxCompile Include="resources\shaders\DefaultCubeVS.hlsl">
+    <FxCompile Include="resources\DefaultCubeVS.hlsl">
       <ShaderType>Vertex</ShaderType>
       <ShaderModel>4.0</ShaderModel>
     </FxCompile>
-    <FxCompile Include="resources\shaders\DefaultPS.hlsl">
+    <FxCompile Include="resources\shaders\Pos2_DefPS.hlsl">
       <ShaderType>Pixel</ShaderType>
       <ShaderModel>4.0</ShaderModel>
     </FxCompile>
-    <FxCompile Include="resources\shaders\DefaultRectPS.hlsl">
+    <FxCompile Include="resources\DefaultRectPS.hlsl">
       <ShaderType>Pixel</ShaderType>
       <ShaderModel>4.0</ShaderModel>
     </FxCompile>
-    <FxCompile Include="resources\shaders\DefaultRectVS.hlsl">
+    <FxCompile Include="resources\DefaultRectVS.hlsl">
       <ShaderType>Vertex</ShaderType>
       <ShaderModel>4.0</ShaderModel>
     </FxCompile>
-    <FxCompile Include="resources\shaders\DefaultVS.hlsl">
+    <FxCompile Include="resources\shaders\Pos2_DefVS.hlsl">
       <ShaderType>Vertex</ShaderType>
       <ShaderModel>4.0</ShaderModel>
     </FxCompile>

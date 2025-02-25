@@ -161,54 +161,55 @@
     <ClCompile Include="src\Event\EventSystem.cpp">
       <Filter>src\Event</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\CTMRenderer.cpp">
+    <ClCompile Include="src\CTMRenderer\CTMRenderer.cpp">
       <Filter>src\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\DirectX\DXRenderer.cpp">
+    <ClCompile Include="src\CTMRenderer\DirectX\DXRenderer.cpp">
       <Filter>src\Renderer\DirectX</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\DirectX\Graphics\DXGraphics.cpp">
+    <ClCompile Include="src\CTMRenderer\DirectX\Graphics\DXGraphics.cpp">
       <Filter>src\Renderer\DirectX\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\DirectX\Graphics\DXInfoQueue.cpp">
+    <ClCompile Include="src\CTMRenderer\DirectX\Graphics\DXInfoQueue.cpp">
       <Filter>src\Renderer\DirectX\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\DirectX\Graphics\DXLayerSystem.cpp">
+    <ClCompile Include="src\CTMRenderer\DirectX\Graphics\DXLayerSystem.cpp">
       <Filter>src\Renderer\DirectX\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\DirectX\Graphics\DXShaderLibrary.cpp">
+    <ClCompile Include="src\CTMRenderer\DirectX\Graphics\DXShaderLibrary.cpp">
       <Filter>src\Renderer\DirectX\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\DirectX\Graphics\Geometry\DXAABB.cpp">
+    <ClCompile Include="src\CTMRenderer\DirectX\Graphics\Geometry\DXAABB.cpp">
       <Filter>src\Renderer\DirectX\Graphics\Geometry</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\DirectX\Graphics\Geometry\DXShape.cpp">
+    <ClCompile Include="src\CTMRenderer\DirectX\Graphics\Geometry\DXShape.cpp">
       <Filter>src\Renderer\DirectX\Graphics\Geometry</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\DirectX\Window\DXWindow.cpp">
+    <ClCompile Include="src\CTMRenderer\DirectX\Window\DXWindow.cpp">
       <Filter>src\Renderer\DirectX\Window</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\Timer.cpp">
+    <ClCompile Include="src\CTMRenderer\Timer.cpp">
       <Filter>src\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\CTMRenderer\DirectX\Graphics\Bindable\DXShader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="resources\shaders\DefaultCubePS.hlsl">
+    <FxCompile Include="resources\DefaultCubePS.hlsl">
       <Filter>resources\shaders</Filter>
     </FxCompile>
-    <FxCompile Include="resources\shaders\DefaultCubeVS.hlsl">
+    <FxCompile Include="resources\DefaultCubeVS.hlsl">
       <Filter>resources\shaders</Filter>
     </FxCompile>
-    <FxCompile Include="resources\shaders\DefaultPS.hlsl">
+    <FxCompile Include="resources\shaders\Pos2_DefPS.hlsl">
       <Filter>resources\shaders</Filter>
     </FxCompile>
-    <FxCompile Include="resources\shaders\DefaultRectPS.hlsl">
+    <FxCompile Include="resources\DefaultRectPS.hlsl">
       <Filter>resources\shaders</Filter>
     </FxCompile>
-    <FxCompile Include="resources\shaders\DefaultRectVS.hlsl">
+    <FxCompile Include="resources\DefaultRectVS.hlsl">
       <Filter>resources\shaders</Filter>
     </FxCompile>
-    <FxCompile Include="resources\shaders\DefaultVS.hlsl">
+    <FxCompile Include="resources\shaders\Pos2_DefVS.hlsl">
       <Filter>resources\shaders</Filter>
     </FxCompile>
   </ItemGroup>
