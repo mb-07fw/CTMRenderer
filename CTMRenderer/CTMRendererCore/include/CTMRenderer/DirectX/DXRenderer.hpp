@@ -15,6 +15,7 @@ namespace CTMRenderer::CTMDirectX
 	public:
 		virtual void Start() noexcept override;
 		virtual void JoinForShutdown() noexcept override;
+		virtual void SubmitShape(const Shapes::IShape& shape) noexcept override;
 	private:
 		void OnStart(const Event::StartEvent* pEvent) noexcept;
 		void OnEnd(const Event::EndEvent* pEvent) noexcept;

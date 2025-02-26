@@ -14,6 +14,7 @@ namespace CTMRenderer::CTMDirectX::Graphics::Bindable
 {
 	enum class ImplementedShaderType
 	{
+		INVALID = -1,
 		POS2_DEF
 	};
 
@@ -23,29 +24,29 @@ namespace CTMRenderer::CTMDirectX::Graphics::Bindable
 		inline DXShaderData(ImplementedShaderType shaderType, Microsoft::WRL::ComPtr<ID3DBlob> pVSBytecode_, Microsoft::WRL::ComPtr<ID3DBlob> pPSBytecode_)
 			: ShaderType(shaderType), pVSBytecode(std::move(pVSBytecode_)), pPSBytecode(std::move(pPSBytecode_)) {}
 
-		ImplementedShaderType ShaderType;
-		Microsoft::WRL::ComPtr<ID3DBlob> pVSBytecode;
-		Microsoft::WRL::ComPtr<ID3DBlob> pPSBytecode;
+		ImplementedShaderType ShaderType = ImplementedShaderType::INVALID;
+		Microsoft::WRL::ComPtr<ID3DBlob> pVSBytecode; // Set to nullptr by default.
+		Microsoft::WRL::ComPtr<ID3DBlob> pPSBytecode; // 
 	};
 
 	class DXPixelShader
 	{
 	public:
-		inline DXPixelShader(Microsoft::WRL::ComPtr<ID3D11Device1> pDevice, Microsoft::WRL::ComPtr<ID3D11DeviceContext1> pDeviceContext)
+		inline DXPixelShader(const DXShaderData& shaderDataRef, Microsoft::WRL::ComPtr<ID3D11Device1> pDevice, Microsoft::WRL::ComPtr<ID3D11DeviceContext1> pDeviceContext)
 			: mP_Device(std::move(pDevice)), mP_DeviceContext(std::move(pDeviceContext))
 		{
 		}
 
 		~DXPixelShader() = default;
 	public:
-		inline [[nodiscard]] HRESULT Create(const std::filesystem::path& shaderPath, Microsoft::WRL::ComPtr<ID3DBlob> pReadBlob) noexcept
+		inline [[nodiscard]] HRESULT Create(Microsoft::WRL::ComPtr<ID3DBlob> pReadBlob) noexcept
 		{
 			RUNTIME_ASSERT(!m_IsCreated, "A shader shouldn't be re-created.\n");
-			RUNTIME_ASSERT(std::filesystem::exists(shaderPath), "Path doesn't exist : " << shaderPath << '\n');
-			RUNTIME_ASSERT(shaderPath.extension() == ".cso", "Shader file must be in shader bytecode format of .cso : " << shaderPath.extension() << '\n');
+			//RUNTIME_ASSERT(std::filesystem::exists(shaderPath), "Path doesn't exist : " << shaderPath << '\n');
+			//RUNTIME_ASSERT(shaderPath.extension() == ".cso", "Shader file must be in shader bytecode format of .cso : " << shaderPath.extension() << '\n');
 
-			std::wstring wPath = shaderPath.wstring();
-			D3DReadFileToBlob(wPath.c_str(), &pReadBlob);
+			//std::wstring wPath = shaderPath.wstring();
+			//D3DReadFileToBlob(wPath.c_str(), &pReadBlob);
 
 			m_IsCreated = true;
 

@@ -12,4 +12,9 @@ namespace CTMRenderer
 	{
 		m_Renderer->JoinForShutdown();
 	}
+
+	void CTMRenderer::SubmitShape(const Shapes::IShape& shape) noexcept
+	{
+		m_Renderer->SubmitShape(shape);
+	}
 }

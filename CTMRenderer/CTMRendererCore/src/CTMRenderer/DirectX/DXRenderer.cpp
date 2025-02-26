@@ -32,6 +32,20 @@ namespace CTMRenderer::CTMDirectX
 	{
 		m_EventThread.join();
 	}
+
+	void DXRenderer::SubmitShape(const Shapes::IShape& shape) noexcept
+	{
+		using namespace CTMDirectX::Graphics::Geometry;
+
+		RUNTIME_ASSERT(
+			dynamic_cast<const DXShape*>(&shape) != nullptr,
+			"Incompatible shape types.\n"
+		);
+
+		const DXShape* pShape = static_cast<const DXShape*>(&shape);
+
+		DEBUG_PRINT("Submitted shape : " << pShape->TypeToStr() << '\n');
+	}
 	#pragma endregion
 
 	#pragma region Private Functions

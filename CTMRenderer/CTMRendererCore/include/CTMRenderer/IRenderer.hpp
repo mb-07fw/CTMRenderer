@@ -7,6 +7,7 @@
 
 #include "Event/EventSystem.hpp"
 #include "CTMRenderer/Timer.hpp"
+#include "CTMRenderer/Shape.hpp"
 
 namespace CTMRenderer
 {
@@ -23,6 +24,7 @@ namespace CTMRenderer
 	public:
 		virtual void Start() noexcept = 0;
 		virtual void JoinForShutdown() noexcept = 0;
+		virtual void SubmitShape(const Shapes::IShape& shape) noexcept = 0;
 	protected:
 		Event::EventSystem m_EventSystem;
 		Timer::Timer m_Timer;

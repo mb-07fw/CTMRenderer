@@ -3,13 +3,13 @@
 
 namespace CTMRenderer::CTMDirectX::Graphics::Geometry
 {
-	IShape::IShape(ShapeType type) noexcept
-		: m_Type(type)
+	DXShape::DXShape(Shapes::ShapeType type) noexcept
+		: Shapes::IShape(type)
 	{
 	}
 
 	DXRect::DXRect(float left, float top, float right, float bottom, DXColor color) noexcept
-		: IShape(ShapeType::RECT), m_AABB(left, top, right, bottom), m_Color(color)
+		: DXShape(Shapes::ShapeType::RECT), m_AABB(left, top, right, bottom), m_Color(color)
 	{
 	}
 }

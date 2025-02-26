@@ -3,7 +3,6 @@
 #include "Core/CoreUtility.hpp"
 #include "CTMRenderer/DirectX/Graphics/DXGraphics.hpp"
 #include "CTMRenderer/DirectX/Graphics/DXGraphicsUtility.hpp"
-#include "CTMRenderer/DirectX/Graphics/Geometry/DXShape.hpp"
 #include "CTMRenderer/DirectX/Graphics/Bindable/DXBuffer.hpp"
 #include "CTMRenderer/DirectX/Graphics/Bindable/DXShader.hpp"
 #include "CTMRenderer/DirectX/Graphics/Bindable/DXInputLayout.hpp"
@@ -82,6 +81,10 @@ namespace CTMRenderer::CTMDirectX::Graphics
 		Init2D();
 		InitText();
 		InitTestScene();
+		
+		const Bindable::DXShaderData& testData = m_ShaderLibrary.GetData(Bindable::ImplementedShaderType::POS2_DEF);
+
+		DEBUG_PRINT("Test shader : " << m_ShaderLibrary.ShaderTypeToStr(testData.ShaderType) << '\n');
 	}
 
 	void DXGraphics::Init2D() noexcept
@@ -188,7 +191,7 @@ namespace CTMRenderer::CTMDirectX::Graphics
 		};
 
 		struct CBuffer {
-			float scale;
+			float scale = 1.0f;
 			float padding[3] = { 0, 0, 0 };
 		};
 

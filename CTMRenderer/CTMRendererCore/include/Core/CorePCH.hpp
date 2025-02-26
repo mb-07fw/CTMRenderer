@@ -16,7 +16,7 @@
 #include <dxgidebug.h>
 #include <DirectXMath.h>
 
-// Other C++ utilities used throughout RendererCore.
+// Other C++ utilities used throughout CTMRendererCore.
 #include <iostream>
 #include <vector>
 #include <memory>

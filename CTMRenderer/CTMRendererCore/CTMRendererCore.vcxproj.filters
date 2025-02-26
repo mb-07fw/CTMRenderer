@@ -150,6 +150,7 @@
     <ClInclude Include="include\Event\EventSystem.hpp">
       <Filter>include\Event</Filter>
     </ClInclude>
+    <ClInclude Include="include\CTMRenderer\Shape.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\CorePCH.cpp">
@@ -191,6 +192,7 @@
     <ClCompile Include="src\CTMRenderer\Timer.cpp">
       <Filter>src\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\CTMRenderer\Shape.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\DefaultCubePS.hlsl">

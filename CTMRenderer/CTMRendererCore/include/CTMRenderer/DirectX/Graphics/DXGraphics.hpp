@@ -17,6 +17,7 @@
 #include "CTMRenderer/DirectX/Graphics/DXInfoQueue.hpp"
 #include "CTMRenderer/DirectX/Graphics/DXShaderLibrary.hpp"
 #include "CTMRenderer/DirectX/Graphics/DXColor.hpp"
+#include "CTMRenderer/DirectX/Graphics/Geometry/DXShape.hpp"
 
 namespace CTMRenderer::CTMDirectX::Graphics
 {

@@ -1,12 +1,14 @@
 #pragma once
 
+#define DO_WRAP(x)					 do { x } while(0)
+
 #ifdef DEBUG_MODE
 
 #include <string>
 #include <iostream>
 
-#define DO_WRAP(x)              do { x } while(0)
 #define IF_DEBUG(x)				x
+
 #define DEBUG_PRINT(msg)		std::cout << "[DEBUG_PRINT] " << msg 
 #define DEBUG_PRINTW(msg)		std::wcout << L"[DEBUG_PRINTW] " << msg
 #define DEBUG_PRINT_ERROR(msg)	std::cerr << "[DEBUG_PRINT_ERROR] " << msg
@@ -27,7 +29,7 @@
 									std::cerr << "[RUNTIME_ASSERT] Condition : " << #x << '\n'; \
 									std::cerr << "[RUNTIME_ASSERT] File : " << __FILE__ << '\n'; \
 									std::cerr << "[RUNTIME_ASSERT] Line : " << __LINE__ << '\n'; \
-									DEBUG_ERROR(msg, 1); \
+									DEBUG_ERROR(msg, -1); \
 								}
 #define RUNTIME_ASSERTW(x, msg) if (!(x)) \
 								{ \
@@ -35,11 +37,10 @@
 									std::wcerr << "[RUNTIME_ASSERTW] Condition : " << #x << '\n'; \
 									std::wcerr << "[RUNTIME_ASSERTW] File : " << __FILE__ << '\n'; \
 									std::wcerr << "[RUNTIME_ASSERTW] Line : " << __LINE__ << '\n'; \
-									DEBUG_ERRORW(msg, 1); \
+									DEBUG_ERRORW(msg, -1); \
 								}
 #else
 
-#define DO_WRAP(x)				(void)0
 #define IF_DEBUG(x)				(void)0
 #define DEBUG_PRINT(msg)		(void)0
 #define DEBUG_PRINTW(msg)		(void)0

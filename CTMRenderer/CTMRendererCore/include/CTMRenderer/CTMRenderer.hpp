@@ -4,6 +4,7 @@
 
 #include "Core/CoreMacros.hpp"
 #include "CTMRenderer/IRenderer.hpp"
+#include "CTMRenderer/Shape.hpp"
 
 #ifdef CTM_NO_DX
 #else
@@ -35,11 +36,12 @@ namespace CTMRenderer
 				#endif
 			}
 			else
-				RUNTIME_ASSERT(false, "Failed to initialize CTMRenderer due to the provided renderType being unknown.\n");
+				RUNTIME_ASSERT(false, "Failed to initialize CTMRenderer due to the provided RendererType being unknown.\n");
 		}
 
 		void Start() noexcept;
 		void JoinForShutdown() noexcept;
+		void SubmitShape(const Shapes::IShape& shape) noexcept;
 	private:
 		std::unique_ptr<IRenderer> m_Renderer;
 	};
