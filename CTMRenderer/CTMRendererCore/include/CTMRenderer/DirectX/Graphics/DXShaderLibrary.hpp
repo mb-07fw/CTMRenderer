@@ -3,13 +3,10 @@
 #include <vector>
 #include <filesystem>
 
+#include "CTMRenderer/DirectX/Graphics/Bindable/DXShader.hpp"
+
 namespace CTMRenderer::CTMDirectX::Graphics
 {
-	enum class ImplementedShaderType
-	{
-
-	};
-
 	class DXShaderLibrary
 	{
 	public:
@@ -18,9 +15,10 @@ namespace CTMRenderer::CTMDirectX::Graphics
 	public:
 	private:
 		void LoadShaders() noexcept;
+		static [[nodiscard]] Bindable::ImplementedShaderType GetShaderType(const std::wstring& shaderName) noexcept;
 	private:
+		static constexpr wchar_t const* S_VERTEX_FLAG = L"VS";
+		static constexpr wchar_t const* S_PIXEL_FLAG = L"PS";
 		const std::filesystem::path m_ShaderPath;
-		std::vector<std::wstring> m_VertexShaders;
-		std::vector<std::wstring> m_PixelShaders;
 	};
 }

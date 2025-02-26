@@ -225,30 +225,30 @@ namespace CTMRenderer::CTMDirectX::Graphics
 		RUNTIME_ASSERT(iBuffer.Create() == S_OK, "Failed to create index buffer.\n");
 		iBuffer.Bind();
 
-		const std::filesystem::path shaderPath = Utility::GetOutDirectory();
-		const std::string shaderPathStr = shaderPath.string();
+		//const std::filesystem::path shaderPath = Utility::GetOutDirectory();
+		//const std::string shaderPathStr = shaderPath.string();
 
-		const std::filesystem::path pixelShaderPath = shaderPathStr + "DefaultPS.cso";
-		const std::filesystem::path vertexShaderPath = shaderPathStr + "DefaultVS.cso";
-		
-		Microsoft::WRL::ComPtr<ID3DBlob> pBlob;
-		DXPixelShader pixelShader(mP_Device, mP_DeviceContext);
-		RUNTIME_ASSERT(pixelShader.Create(pixelShaderPath, pBlob)  == S_OK, "Failed to create pixel shader.\n");
-		pixelShader.Bind();
+		//const std::filesystem::path pixelShaderPath = shaderPathStr + "DefaultPS.cso";
+		//const std::filesystem::path vertexShaderPath = shaderPathStr + "DefaultVS.cso";
+		//
+		//Microsoft::WRL::ComPtr<ID3DBlob> pBlob;
+		//DXPixelShader pixelShader(mP_Device, mP_DeviceContext);
+		//RUNTIME_ASSERT(pixelShader.Create(pixelShaderPath, pBlob)  == S_OK, "Failed to create pixel shader.\n");
+		//pixelShader.Bind();
 
-		DXVertexShader vertexShader(mP_Device, mP_DeviceContext);
-		RUNTIME_ASSERT(vertexShader.Create(vertexShaderPath, pBlob) == S_OK, "Failed to create vertex shader.\n");
-		vertexShader.Bind();
+		//DXVertexShader vertexShader(mP_Device, mP_DeviceContext);
+		//RUNTIME_ASSERT(vertexShader.Create(vertexShaderPath, pBlob) == S_OK, "Failed to create vertex shader.\n");
+		//vertexShader.Bind();
 
-		// TODO: Make DXInputLayout copy device and device context instead of using by reference.
-		DXInputLayout<1> inputLayout(
-			{
-				{ "POSITION", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, 0u, D3D11_INPUT_PER_VERTEX_DATA, 0u }
-			},
-			pBlob, mP_Device, mP_DeviceContext
-		);
-		RUNTIME_ASSERT(inputLayout.Create() == S_OK, "Failed to create input layout.\n");
-		inputLayout.Bind();
+		//// TODO: Make DXInputLayout copy device and device context instead of using by reference.
+		//DXInputLayout<1> inputLayout(
+		//	{
+		//		{ "POSITION", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, 0u, D3D11_INPUT_PER_VERTEX_DATA, 0u }
+		//	},
+		//	pBlob, mP_Device, mP_DeviceContext
+		//);
+		//RUNTIME_ASSERT(inputLayout.Create() == S_OK, "Failed to create input layout.\n");
+		//inputLayout.Bind();
 
 		Bindable::DXViewport viewport(
 			0.0f, // Top-left x.
@@ -277,7 +277,7 @@ namespace CTMRenderer::CTMDirectX::Graphics
 
 	void DXGraphics::Draw() noexcept
 	{
-		mP_DeviceContext->DrawIndexed(6, 0, 0);
+		//mP_DeviceContext->DrawIndexed(6, 0, 0);
 
 		m_2DRender.pRTV->BeginDraw();
 		// Note to self : Clearing the D2D RTV when it references the same texture as the D3D RTV 

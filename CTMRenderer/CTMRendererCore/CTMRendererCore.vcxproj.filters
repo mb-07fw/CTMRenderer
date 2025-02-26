@@ -199,7 +199,7 @@
     <FxCompile Include="resources\shaders\DefaultCubeVS.hlsl">
       <Filter>resources\shaders</Filter>
     </FxCompile>
-    <FxCompile Include="resources\shaders\DefaultPS.hlsl">
+    <FxCompile Include="resources\shaders\Pos2_DefPS.hlsl">
       <Filter>resources\shaders</Filter>
     </FxCompile>
     <FxCompile Include="resources\shaders\DefaultRectPS.hlsl">
@@ -208,7 +208,7 @@
     <FxCompile Include="resources\shaders\DefaultRectVS.hlsl">
       <Filter>resources\shaders</Filter>
     </FxCompile>
-    <FxCompile Include="resources\shaders\DefaultVS.hlsl">
+    <FxCompile Include="resources\shaders\Pos2_DefVS.hlsl">
       <Filter>resources\shaders</Filter>
     </FxCompile>
   </ItemGroup>

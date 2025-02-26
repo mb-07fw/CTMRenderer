@@ -10,8 +10,24 @@
 
 #include "Core/CoreMacros.hpp"
 
-namespace CTMRenderer::CTMDirectX::Graphics
+namespace CTMRenderer::CTMDirectX::Graphics::Bindable
 {
+	enum class ImplementedShaderType
+	{
+		POS2_DEF
+	};
+
+	struct DXShaderData
+	{
+	public:
+		inline DXShaderData(ImplementedShaderType shaderType, Microsoft::WRL::ComPtr<ID3DBlob> pVSBytecode_, Microsoft::WRL::ComPtr<ID3DBlob> pPSBytecode_)
+			: ShaderType(shaderType), pVSBytecode(std::move(pVSBytecode_)), pPSBytecode(std::move(pPSBytecode_)) {}
+
+		ImplementedShaderType ShaderType;
+		Microsoft::WRL::ComPtr<ID3DBlob> pVSBytecode;
+		Microsoft::WRL::ComPtr<ID3DBlob> pPSBytecode;
+	};
+
 	class DXPixelShader
 	{
 	public:
