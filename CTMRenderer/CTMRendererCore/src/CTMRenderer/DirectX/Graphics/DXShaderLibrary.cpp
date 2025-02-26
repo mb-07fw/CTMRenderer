@@ -55,54 +55,34 @@ namespace CTMRenderer::CTMDirectX::Graphics
 
                 bool foundDuplicate = false;
                 for (const Bindable::DXShaderData& data : shaderData)
-                {
                     if (data.ShaderType == shaderType)
                     {
                         foundDuplicate = true;
                         DEBUG_PRINTW("Skipping already collected shader : " << shaderName << '\n');
                         break;
                     }
-                }
 
                 if (foundDuplicate)
                     continue;
 
+                if (shaderFlag == S_PIXEL_FLAG)
+                    pathWStr[pathWStr.size() - 6] = 'V';
+
                 Microsoft::WRL::ComPtr<ID3DBlob> pVSBlob;
                 Microsoft::WRL::ComPtr<ID3DBlob> pPSBlob;
 
-                Microsoft::WRL::ComPtr<ID3DBlob>& currentBlob = pVSBlob;
-
                 HRESULT hResult = S_OK;
-                if (shaderFlag == S_VERTEX_FLAG)
-                {
-                    hResult = D3DReadFileToBlob(pathWStr.c_str(), pVSBlob.GetAddressOf());
-                    RUNTIME_ASSERTW(hResult == S_OK, "Failed to read in file : " << pathWStr << '\n');
+                hResult = D3DReadFileToBlob(pathWStr.c_str(), pVSBlob.GetAddressOf());
+                RUNTIME_ASSERTW(hResult == S_OK, "Failed to read in file : " << pathWStr << '\n');
 
-                    pathWStr[pathWStr.size() - 6] = 'P';
+                pathWStr[pathWStr.size() - 6] = 'P';
 
-                    hResult = D3DReadFileToBlob(pathWStr.c_str(), pPSBlob.GetAddressOf());
-                    RUNTIME_ASSERTW(hResult == S_OK, "Failed to read in file : " << pathWStr << '\n');
+                hResult = D3DReadFileToBlob(pathWStr.c_str(), pPSBlob.GetAddressOf());
+                RUNTIME_ASSERTW(hResult == S_OK, "Failed to read in file : " << pathWStr << '\n');
 
-                    shaderData.emplace_back(shaderType, pVSBlob, pPSBlob);
+                shaderData.emplace_back(shaderType, pVSBlob, pPSBlob);
 
-                    DEBUG_PRINTW("Emplaced shader : " << shaderName << '\n');
-                }
-                else if (shaderFlag == S_PIXEL_FLAG)
-                {
-                    hResult = D3DReadFileToBlob(pathWStr.c_str(), pPSBlob.GetAddressOf());
-                    RUNTIME_ASSERTW(hResult == S_OK, "Failed to read in file : " << pathWStr << '\n');
-
-                    pathWStr[pathWStr.size() - 6] = 'V';
-
-                    hResult = D3DReadFileToBlob(pathWStr.c_str(), pVSBlob.GetAddressOf());
-                    RUNTIME_ASSERTW(hResult == S_OK, "Failed to read in file : " << pathWStr << '\n');
-
-                    shaderData.emplace_back(shaderType, pVSBlob, pPSBlob);
-
-                    DEBUG_PRINTW("Emplaced shader : " << shaderName << '\n');
-                }
-                else
-                    RUNTIME_ASSERTW(false, "Unhandled shader : " << shaderName << '\n');
+                DEBUG_PRINTW("Emplaced shader : " << shaderName << '\n');
             }
 
             DEBUG_PRINT("Shader data : " << shaderData.size() << '\n');
