@@ -41,6 +41,7 @@ namespace CTMRenderer
 
 		void Start() noexcept;
 		void JoinForShutdown() noexcept;
+		Shapes::IRectangle MakeRect(float left, float top, float right, float bottom, Shapes::Color color) const noexcept;
 		void SubmitShape(const Shapes::IShape& shape) noexcept;
 	private:
 		std::unique_ptr<IRenderer> m_Renderer;

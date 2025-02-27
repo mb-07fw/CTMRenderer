@@ -21,8 +21,6 @@ namespace CTMRenderer::CTMDirectX
 		std::unique_lock<std::mutex> lock(m_RendererMutex);
 		m_RendererCV.wait(lock, [this] { return m_EventLoopStarted.load(std::memory_order_acquire); });
 
-		// TODO: Figure out way to have events be dispatched on the Renderer's thread
-		//		 to prevent creation of the window on the main thread. (Dispatching queue)
 		m_EventSystem.Dispatcher().QueueEvent<Event::StartEvent>(1738u); // ayy
 
 		//DEBUG_PRINT("Initialized renderer.\n");
@@ -33,18 +31,16 @@ namespace CTMRenderer::CTMDirectX
 		m_EventThread.join();
 	}
 
+	Shapes::IRectangle DXRenderer::MakeRect(float left, float top, float right, float bottom, Shapes::Color color) const noexcept
+	{
+		return CTMDirectX::Graphics::Geometry::DXRect(left, top, right, bottom, color);
+	}
+
 	void DXRenderer::SubmitShape(const Shapes::IShape& shape) noexcept
 	{
 		using namespace CTMDirectX::Graphics::Geometry;
 
-		RUNTIME_ASSERT(
-			dynamic_cast<const DXShape*>(&shape) != nullptr,
-			"Incompatible shape types.\n"
-		);
-
-		const DXShape* pShape = static_cast<const DXShape*>(&shape);
-
-		DEBUG_PRINT("Submitted shape : " << pShape->TypeToStr() << '\n');
+		DEBUG_PRINT("Submitted shape : " << shape.TypeToStr() << '\n');
 	}
 	#pragma endregion
 

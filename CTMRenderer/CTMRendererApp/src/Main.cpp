@@ -8,6 +8,8 @@ int main()
 
 	renderer.Start();
 
+	Shapes::IRectangle 
+	
 	//renderer.SubmitShape()
 
 	renderer.JoinForShutdown();

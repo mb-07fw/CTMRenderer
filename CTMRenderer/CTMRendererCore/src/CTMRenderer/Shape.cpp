@@ -18,8 +18,8 @@ namespace CTMRenderer::Shapes
 		}
 	}
 
-	IRectangle::IRectangle(float left, float top, float right, float bottom) noexcept
-		: m_Left(left), m_Top(top), m_Right(right), m_Bottom(bottom)
+	IRectangle::IRectangle(float left, float top, float right, float bottom, Color color) noexcept
+		: IShape(ShapeType::RECT), m_Left(left), m_Top(top), m_Right(right), m_Bottom(bottom), m_Color(color)
 	{
 
 	}

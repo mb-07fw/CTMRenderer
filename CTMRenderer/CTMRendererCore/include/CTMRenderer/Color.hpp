@@ -1,8 +1,8 @@
 #pragma once
 
-namespace CTMRenderer::CTMDirectX::Graphics
+namespace CTMRenderer::Shapes
 {
-	enum class DXColorType
+	enum class ColorType
 	{
 		BLACK,
 		WHITE,
@@ -12,7 +12,7 @@ namespace CTMRenderer::CTMDirectX::Graphics
 	};
 
 	// Represents un-normalized RGBA values.
-	struct DXColor
+	struct Color
 	{
 		static constexpr unsigned char RED_CHANNEL = 0;
 		static constexpr unsigned char GREEN_CHANNEL = 1;
@@ -20,25 +20,25 @@ namespace CTMRenderer::CTMDirectX::Graphics
 		static constexpr unsigned char ALPHA_CHANNEL = 3;
 		static constexpr unsigned char NUM_CHANNELS = 4;
 
-		inline DXColor(DXColorType colorType)
+		inline Color(ColorType colorType)
 		{
 			SetAll(0);
 			rgba[ALPHA_CHANNEL] = 255;
 
 			switch (colorType)
 			{
-			case DXColorType::BLACK:
+			case ColorType::BLACK:
 				return;
-			case DXColorType::WHITE:
+			case ColorType::WHITE:
 				SetAll(255);
 				break;
-			case DXColorType::RED:
+			case ColorType::RED:
 				rgba[RED_CHANNEL] = 255;
 				break;
-			case DXColorType::GREEN:
+			case ColorType::GREEN:
 				rgba[GREEN_CHANNEL] = 255;
 				break;
-			case DXColorType::BLUE:
+			case ColorType::BLUE:
 				rgba[BLUE_CHANNEL] = 255;
 				break;
 			default:
@@ -46,7 +46,7 @@ namespace CTMRenderer::CTMDirectX::Graphics
 			}
 		}
 
-		inline DXColor(unsigned char r = 0, unsigned char g = 0, unsigned char b = 0, unsigned char a = 0)
+		inline Color(unsigned char r = 0, unsigned char g = 0, unsigned char b = 0, unsigned char a = 0)
 		{
 			rgba[0] = r;
 			rgba[1] = g;
@@ -68,9 +68,9 @@ namespace CTMRenderer::CTMDirectX::Graphics
 		unsigned char rgba[4];
 	};
 
-	struct DXNormColor
+	struct NormColor
 	{
-		inline DXNormColor(float r = 0, float g = 0, float b = 0, float a = 1)
+		inline NormColor(float r = 0, float g = 0, float b = 0, float a = 1)
 		{
 			rgba[0] = r;
 			rgba[1] = g;

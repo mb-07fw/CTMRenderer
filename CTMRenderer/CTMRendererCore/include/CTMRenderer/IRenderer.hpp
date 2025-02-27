@@ -24,6 +24,7 @@ namespace CTMRenderer
 	public:
 		virtual void Start() noexcept = 0;
 		virtual void JoinForShutdown() noexcept = 0;
+		virtual Shapes::IRectangle MakeRect(float left, float top, float right, float bottom, Shapes::Color color) const noexcept = 0;
 		virtual void SubmitShape(const Shapes::IShape& shape) noexcept = 0;
 	protected:
 		Event::EventSystem m_EventSystem;

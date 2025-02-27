@@ -2,8 +2,6 @@
 #include "CTMRenderer/DirectX/Graphics/DXShaderLibrary.hpp"
 #include "Core/CoreUtility.hpp"
 
-#include <chrono>
-
 namespace CTMRenderer::CTMDirectX::Graphics
 {
     DXShaderLibrary::DXShaderLibrary() noexcept

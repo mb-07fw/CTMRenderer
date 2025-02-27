@@ -87,7 +87,7 @@
     <ClInclude Include="include\CTMRenderer\DirectX\Graphics\Bindable\DXViewport.hpp">
       <Filter>include\CTMRenderer\DirectX\Graphics\Bindable</Filter>
     </ClInclude>
-    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXColor.hpp">
+    <ClInclude Include="include\CTMRenderer\Color.hpp">
       <Filter>include\CTMRenderer\DirectX\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXGraphics.hpp">

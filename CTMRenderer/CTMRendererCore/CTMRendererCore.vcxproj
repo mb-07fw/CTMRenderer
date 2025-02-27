@@ -98,7 +98,7 @@
     <ClInclude Include="include\CTMRenderer\DirectX\Graphics\Bindable\DXInputLayout.hpp" />
     <ClInclude Include="include\CTMRenderer\DirectX\Graphics\Bindable\DXShader.hpp" />
     <ClInclude Include="include\CTMRenderer\DirectX\Graphics\Bindable\DXViewport.hpp" />
-    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXColor.hpp" />
+    <ClInclude Include="include\CTMRenderer\Color.hpp" />
     <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXGraphics.hpp" />
     <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXGraphicsUtility.hpp" />
     <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXInfoQueue.hpp" />

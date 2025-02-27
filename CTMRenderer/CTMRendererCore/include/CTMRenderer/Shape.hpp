@@ -1,5 +1,7 @@
 #pragma once
 
+#include "CTMRenderer/Color.hpp"
+
 namespace CTMRenderer::Shapes
 {
 	enum class ShapeType
@@ -16,14 +18,15 @@ namespace CTMRenderer::Shapes
 	public:
 		[[nodiscard]] const char* TypeToStr() const noexcept;
 		inline [[nodiscard]] ShapeType Type() const noexcept { return m_Type; }
-	private:
+	protected:
 		const ShapeType m_Type;
+		bool m_IsValidated = false;
 	};
 
-	class IRectangle
+	class IRectangle : public IShape
 	{
 	public:
-		IRectangle(float left, float top, float right, float bottom) noexcept;
+		IRectangle(float left, float top, float right, float bottom, Color color) noexcept;
 		virtual ~IRectangle() = default;
 	public:
 		inline [[nodiscard]] float Left() const noexcept { return m_Left; }
@@ -32,5 +35,6 @@ namespace CTMRenderer::Shapes
 		inline [[nodiscard]] float Bottom() const noexcept { return m_Bottom; }
 	private:
 		float m_Left, m_Top, m_Right, m_Bottom;
+		Color m_Color;
 	};
 }

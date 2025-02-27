@@ -4,6 +4,7 @@
 #include "CTMRenderer/DirectX/DXRendererSettings.hpp"
 #include "CTMRenderer/DirectX/Window/DXWindow.hpp"
 #include "CTMRenderer/DirectX/Graphics/DXGraphics.hpp"
+#include "CTMRenderer/Color.hpp"
 
 namespace CTMRenderer::CTMDirectX
 {
@@ -15,6 +16,7 @@ namespace CTMRenderer::CTMDirectX
 	public:
 		virtual void Start() noexcept override;
 		virtual void JoinForShutdown() noexcept override;
+		virtual Shapes::IRectangle MakeRect(float left, float top, float right, float bottom, Shapes::Color color) const noexcept override;
 		virtual void SubmitShape(const Shapes::IShape& shape) noexcept override;
 	private:
 		void OnStart(const Event::StartEvent* pEvent) noexcept;
