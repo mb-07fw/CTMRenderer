@@ -15,15 +15,14 @@ namespace CTMRenderer::CTMDirectX
 	public:
 		virtual void Init() noexcept override;
 		virtual void JoinForShutdown() noexcept override;
-		virtual void ClearScreen() noexcept override;
 	private:
-		void OnStart(const Event::StartEvent* pEvent) noexcept;
-		void OnEnd(const Event::EndEvent* pEvent) noexcept;
+		void OnStart(const Event::CTMStartEvent* pEvent) noexcept;
+		void OnEnd(const Event::CTMEndEvent* pEvent) noexcept;
 		void EventLoop() noexcept;
-		void HandleEvent(Event::IEvent* pEvent) noexcept;
-		void HandleStateEvent(Event::IEvent* pEvent) noexcept;
-		void HandleMouseEvent(Event::IEvent* pEvent) noexcept;
-		void HandleFrameEvent(Event::IEvent* pEvent) noexcept;
+		void HandleEvent(Event::ICTMEvent* pEvent) noexcept;
+		void HandleStateEvent(Event::ICTMEvent* pEvent) noexcept;
+		void HandleMouseEvent(Event::ICTMEvent* pEvent) noexcept;
+		void HandleFrameEvent(Event::ICTMEvent* pEvent) noexcept;
 	private:
 		DXRendererSettings m_Settings;
 		Window::DXWindow m_Window;

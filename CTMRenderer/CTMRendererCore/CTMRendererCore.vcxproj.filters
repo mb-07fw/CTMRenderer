@@ -129,19 +129,19 @@
     <ClInclude Include="include\Core\WindowsDefines.hpp">
       <Filter>include\Core</Filter>
     </ClInclude>
-    <ClInclude Include="include\CTMRenderer\Event\Event.hpp">
+    <ClInclude Include="include\CTMRenderer\Event\CTMEvent.hpp">
       <Filter>include\Event</Filter>
     </ClInclude>
-    <ClInclude Include="include\CTMRenderer\Event\EventDispatcher.hpp">
+    <ClInclude Include="include\CTMRenderer\Event\CTMEventDispatcher.hpp">
       <Filter>include\Event</Filter>
     </ClInclude>
-    <ClInclude Include="include\CTMRenderer\Event\EventListener.hpp">
+    <ClInclude Include="include\CTMRenderer\Event\CTMEventListener.hpp">
       <Filter>include\Event</Filter>
     </ClInclude>
-    <ClInclude Include="include\CTMRenderer\Event\EventPool.hpp">
+    <ClInclude Include="include\CTMRenderer\Event\CTMEventPool.hpp">
       <Filter>include\Event</Filter>
     </ClInclude>
-    <ClInclude Include="include\CTMRenderer\Event\EventSystem.hpp">
+    <ClInclude Include="include\CTMRenderer\Event\CTMEventSystem.hpp">
       <Filter>include\Event</Filter>
     </ClInclude>
     <ClInclude Include="include\CTMRenderer\CTMShape.hpp" />
@@ -150,10 +150,7 @@
     <ClCompile Include="src\Core\CorePCH.cpp">
       <Filter>src\Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\CTMRenderer\Event\EventDispatcher.cpp">
-      <Filter>src\Event</Filter>
-    </ClCompile>
-    <ClCompile Include="src\CTMRenderer\Event\EventSystem.cpp">
+    <ClCompile Include="src\CTMRenderer\Event\CTMEventDispatcher.cpp">
       <Filter>src\Event</Filter>
     </ClCompile>
     <ClCompile Include="src\CTMRenderer\CTMRenderer.cpp">
@@ -183,8 +180,9 @@
     <ClCompile Include="src\CTMRenderer\CTMShape.cpp" />
     <ClCompile Include="src\CTMRenderer\ICTMRenderer.cpp" />
     <ClCompile Include="src\CTMRenderer\CTMDrawQueue.cpp" />
-    <ClCompile Include="src\CTMRenderer\Event\Event.cpp" />
-    <ClCompile Include="src\CTMRenderer\Event\EventPool.cpp" />
+    <ClCompile Include="src\CTMRenderer\Event\CTMEvent.cpp" />
+    <ClCompile Include="src\CTMRenderer\Event\CTMEventPool.cpp" />
+    <ClCompile Include="src\CTMRenderer\Event\CTMEventListener.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\DefaultCubePS.hlsl">

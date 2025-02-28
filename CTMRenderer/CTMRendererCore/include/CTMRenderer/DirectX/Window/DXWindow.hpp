@@ -5,7 +5,7 @@
 #include "CTMRenderer/DirectX/DXRendererSettings.hpp"
 #include "CTMRenderer/DirectX/Window/DXWindowGeometry.hpp"
 #include "CTMRenderer/DirectX/Control/Mouse.hpp"
-#include "CTMRenderer/Event/EventSystem.hpp"
+#include "CTMRenderer/Event/CTMEventSystem.hpp"
 
 #include <thread>
 #include <atomic>
@@ -17,7 +17,7 @@ namespace CTMRenderer::CTMDirectX::Window
 	class DXWindow
 	{
 	public:
-		DXWindow(const DXRendererSettings& settingsRef, Event::EventDispatcher& eventDispatcherRef, UINT width = 800, UINT height = 600);
+		DXWindow(const DXRendererSettings& settingsRef, Event::CTMEventDispatcher& eventDispatcherRef, UINT width = 800, UINT height = 600);
 		DXWindow(const DXWindow&) = delete;
 		DXWindow(DXWindow&&) = delete;
 		DXWindow& operator=(const DXWindow&&) = delete;
@@ -44,7 +44,7 @@ namespace CTMRenderer::CTMDirectX::Window
 		static constexpr const wchar_t* SP_WINDOW_TITLE = L"Test Window";
 	private:
 		const DXRendererSettings& m_SettingsRef;
-		Event::EventDispatcher& m_EventDispatcherRef;
+		Event::CTMEventDispatcher& m_EventDispatcherRef;
 		Geometry::WindowArea m_ClientArea;
 		Control::Mouse m_Mouse;
 		std::atomic_bool m_IsInitialized = false;

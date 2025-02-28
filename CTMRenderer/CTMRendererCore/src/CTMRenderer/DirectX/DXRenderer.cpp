@@ -21,7 +21,7 @@ namespace CTMRenderer::CTMDirectX
 		std::unique_lock<std::mutex> lock(m_RendererMutex);
 		m_RendererCV.wait(lock, [this] { return m_EventLoopStarted.load(std::memory_order_acquire); });
 
-		m_EventSystem.Dispatcher().QueueEvent<Event::StartEvent>(1738u); // ayy
+		m_EventSystem.Dispatcher().QueueEvent<Event::CTMStartEvent>(1738u); // ayy
 
 		//DEBUG_PRINT("Initialized renderer.\n");
 	}
@@ -30,15 +30,10 @@ namespace CTMRenderer::CTMDirectX
 	{
 		m_EventThread.join();
 	}
-
-	void DXRenderer::ClearScreen() noexcept
-	{
-		m_EventSystem.Dispatcher().QueueEvent<Event::ClearFrameEvent>();
-	}
 	#pragma endregion
 
 	#pragma region Private Functions
-	void DXRenderer::OnStart(const Event::StartEvent* pStartEvent) noexcept
+	void DXRenderer::OnStart(const Event::CTMStartEvent* pStartEvent) noexcept
 	{
 		RUNTIME_ASSERT(pStartEvent != nullptr, "Start event is nullptr. How TF did this happen?\n");
 		RUNTIME_ASSERT(m_RendererStarted.load(std::memory_order_acquire) == false, "Renderer has already started.\n");
@@ -53,7 +48,7 @@ namespace CTMRenderer::CTMDirectX
 		DEBUG_PRINT("Renderer started.\n");
 	}
 
-	void DXRenderer::OnEnd(const Event::EndEvent* pEndEvent) noexcept
+	void DXRenderer::OnEnd(const Event::CTMEndEvent* pEndEvent) noexcept
 	{
 		RUNTIME_ASSERT(pEndEvent != nullptr, "End event is nullptr. How TF did this happen?\n");
 		RUNTIME_ASSERT(m_EventLoopStarted.load(std::memory_order_acquire) == true, "Event loop hasn't started.\n");
@@ -70,11 +65,11 @@ namespace CTMRenderer::CTMDirectX
 	void DXRenderer::EventLoop() noexcept
 	{
 		// The passed onNotifyFunc will be called when an event is dispatched.
-		Event::GenericListener<Event::GenericEventType::CTM_ANY> eventListenerAny(
+		Event::CTMGenericListener<Event::CTMGenericEventType::CTM_ANY> eventListenerAny(
 			std::bind(&DXRenderer::HandleEvent, this, std::placeholders::_1)
 		);
 
-		Event::EventDispatcher& eventDispatcher = m_EventSystem.Dispatcher();
+		Event::CTMEventDispatcher& eventDispatcher = m_EventSystem.Dispatcher();
 		eventDispatcher.Subscribe(&eventListenerAny);
 
 		{
@@ -114,22 +109,22 @@ namespace CTMRenderer::CTMDirectX
 		DEBUG_PRINT("Event loop end.\n");
 	}
 
-	void DXRenderer::HandleEvent(Event::IEvent* pEvent) noexcept
+	void DXRenderer::HandleEvent(Event::ICTMEvent* pEvent) noexcept
 	{
 		RUNTIME_ASSERT(pEvent != nullptr, "Event received is nullptr.\n");
 
 		switch (pEvent->GenericType())
 		{
-		case Event::GenericEventType::CTM_ANY:
+		case Event::CTMGenericEventType::CTM_ANY:
 			RUNTIME_ASSERT(false, "No events should have CTM_ANY as their GenericEventType, as it is a marker type used for event listening.\n");
 			break;
-		case Event::GenericEventType::CTM_STATE_EVENT:
+		case Event::CTMGenericEventType::CTM_STATE_EVENT:
 			HandleStateEvent(pEvent);
 			break;
-		case Event::GenericEventType::CTM_MOUSE_EVENT:
+		case Event::CTMGenericEventType::CTM_MOUSE_EVENT:
 			HandleMouseEvent(pEvent);
 			break;
-		case Event::GenericEventType::CTM_FRAME_EVENT:
+		case Event::CTMGenericEventType::CTM_FRAME_EVENT:
 			HandleFrameEvent(pEvent);
 			break;
 		default:
@@ -137,34 +132,34 @@ namespace CTMRenderer::CTMDirectX
 		}
 	}
 
-	void DXRenderer::HandleStateEvent(Event::IEvent* pEvent) noexcept
+	void DXRenderer::HandleStateEvent(Event::ICTMEvent* pEvent) noexcept
 	{
 		RUNTIME_ASSERT(pEvent != nullptr, "The provided event was nullptr.\n");
-		RUNTIME_ASSERT(pEvent->GenericType() == Event::GenericEventType::CTM_STATE_EVENT, "The provided event's GenericEventType wasn't CTM_STATE_EVENT.\n");
+		RUNTIME_ASSERT(pEvent->GenericType() == Event::CTMGenericEventType::CTM_STATE_EVENT, "The provided event's GenericEventType wasn't CTM_STATE_EVENT.\n");
 
 		switch (pEvent->ConcreteType())
 		{
-		case Event::ConcreteEventType::CTM_STATE_START_EVENT:
-			OnStart(Event::StartEvent::Cast(pEvent));
+		case Event::CTMConcreteEventType::CTM_STATE_START_EVENT:
+			OnStart(Event::CTMStartEvent::Cast(pEvent));
 			break;
-		case Event::ConcreteEventType::CTM_STATE_END_EVENT:
-			OnEnd(Event::EndEvent::Cast(pEvent));
+		case Event::CTMConcreteEventType::CTM_STATE_END_EVENT:
+			OnEnd(Event::CTMEndEvent::Cast(pEvent));
 			break;
 		default:
 			RUNTIME_ASSERT(false, "State event wasn't handled.\n");
 		}
 	}
 
-	void DXRenderer::HandleMouseEvent(Event::IEvent* pEvent) noexcept
+	void DXRenderer::HandleMouseEvent(Event::ICTMEvent* pEvent) noexcept
 	{
 		RUNTIME_ASSERT(pEvent != nullptr, "The provided event was nullptr.\n");
-		RUNTIME_ASSERT(pEvent->GenericType() == Event::GenericEventType::CTM_MOUSE_EVENT, "The provided event's GenericEventType wasn't CTM_MOUSE_EVENT.\n");
+		RUNTIME_ASSERT(pEvent->GenericType() == Event::CTMGenericEventType::CTM_MOUSE_EVENT, "The provided event's GenericEventType wasn't CTM_MOUSE_EVENT.\n");
 
 		switch (pEvent->ConcreteType())
 		{
-		case Event::ConcreteEventType::CTM_MOUSE_MOVE_EVENT:
+		case Event::CTMConcreteEventType::CTM_MOUSE_MOVE_EVENT:
 		{
-			Event::MouseMoveEvent* pMMoveEvent = Event::MouseMoveEvent::Cast(pEvent);
+			Event::CTMMouseMoveEvent* pMMoveEvent = Event::CTMMouseMoveEvent::Cast(pEvent);
 			m_Window.Mouse().SetPos(pMMoveEvent->PosX(), pMMoveEvent->PosY());
 			m_Window.SetTitle(std::wstring(L'(' + std::to_wstring(pMMoveEvent->PosX()) + L", " + std::to_wstring(pMMoveEvent->PosY()) + L')'));
 			break;
@@ -174,22 +169,22 @@ namespace CTMRenderer::CTMDirectX
 		}
 	}
 
-	void DXRenderer::HandleFrameEvent(Event::IEvent* pEvent) noexcept
+	void DXRenderer::HandleFrameEvent(Event::ICTMEvent* pEvent) noexcept
 	{
 		RUNTIME_ASSERT(pEvent != nullptr, "The provided event was nullptr.\n");
-		RUNTIME_ASSERT(pEvent->GenericType() == Event::GenericEventType::CTM_FRAME_EVENT, "The provided event's GenericEventType wasn't CTM_FRAME_EVENT.\n");
+		RUNTIME_ASSERT(pEvent->GenericType() == Event::CTMGenericEventType::CTM_FRAME_EVENT, "The provided event's GenericEventType wasn't CTM_FRAME_EVENT.\n");
 
 		switch (pEvent->ConcreteType())
 		{
-		case Event::ConcreteEventType::CTM_FRAME_CLEAR_FRAME_EVENT:
+		case Event::CTMConcreteEventType::CTM_FRAME_CLEAR_FRAME_EVENT:
 			DEBUG_PRINT("Received an ClearFrameEvent.\n");
 			m_Graphics.Clear();
 			m_Graphics.Present();
 			break;
-		case Event::ConcreteEventType::CTM_FRAME_START_FRAME_EVENT:
+		case Event::CTMConcreteEventType::CTM_FRAME_START_FRAME_EVENT:
 			DEBUG_PRINT("Received an StartFrameEvent.\n");
 			break;
-		case Event::ConcreteEventType::CTM_FRAME_DRAW_FRAME_EVENT:
+		case Event::CTMConcreteEventType::CTM_FRAME_DRAW_FRAME_EVENT:
 			DEBUG_PRINT("Received an DrawFrameEvent.\n");
 			break;
 		}

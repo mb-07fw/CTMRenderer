@@ -1,31 +1,31 @@
 #include "Core/CorePCH.hpp"
-#include "CTMRenderer/Event/EventDispatcher.hpp"
+#include "CTMRenderer/Event/CTMEventDispatcher.hpp"
 
 namespace CTMRenderer::Event
 {
-	EventDispatcher::EventDispatcher() noexcept
+	CTMEventDispatcher::CTMEventDispatcher() noexcept
 	{
 	}
 
-	void EventDispatcher::Subscribe(IGenericListener* pGenericListener) noexcept
+	void CTMEventDispatcher::Subscribe(ICTMGenericListener* pGenericListener) noexcept
 	{
 		RUNTIME_ASSERT(pGenericListener != nullptr, "Recieved generic listener is nullptr.");
 
 		m_GenericListeners[pGenericListener->ListenType()].emplace_back(pGenericListener);
 	}
 	
-	void EventDispatcher::Subscribe(IConcreteListener* pConcreteListener) noexcept
+	void CTMEventDispatcher::Subscribe(ICTMConcreteListener* pConcreteListener) noexcept
 	{
 		RUNTIME_ASSERT(pConcreteListener != nullptr, "Recieved concrete listener is nullptr.");
 
 		m_ConcreteListeners[pConcreteListener->ListenType()].emplace_back(pConcreteListener);
 	}
 
-	void EventDispatcher::Unsubscribe(IGenericListener* pGenericListener) noexcept
+	void CTMEventDispatcher::Unsubscribe(ICTMGenericListener* pGenericListener) noexcept
 	{
 		RUNTIME_ASSERT(pGenericListener != nullptr, "Recieved concrete listener is nullptr.");
 
-		std::vector<IGenericListener*>& genericListeners = m_GenericListeners[pGenericListener->ListenType()];
+		std::vector<ICTMGenericListener*>& genericListeners = m_GenericListeners[pGenericListener->ListenType()];
 
 		// If the pointer of the provided listener matches the stored listener, remove it from storage.
 		for (size_t i = 0; i < genericListeners.size(); ++i)
@@ -33,11 +33,11 @@ namespace CTMRenderer::Event
 				genericListeners.erase(genericListeners.begin() + i);
 	}
 
-	void EventDispatcher::Unsubscribe(IConcreteListener* pConcreteListener) noexcept
+	void CTMEventDispatcher::Unsubscribe(ICTMConcreteListener* pConcreteListener) noexcept
 	{
 		RUNTIME_ASSERT(pConcreteListener != nullptr, "Recieved concrete listener is nullptr.");
 
-		std::vector<IConcreteListener*>& concreteListeners = m_ConcreteListeners[pConcreteListener->ListenType()];
+		std::vector<ICTMConcreteListener*>& concreteListeners = m_ConcreteListeners[pConcreteListener->ListenType()];
 
 		// If the pointer of the provided listener matches the stored listener, remove it from storage.
 		for (size_t i = 0; i < concreteListeners.size(); ++i)
@@ -45,32 +45,35 @@ namespace CTMRenderer::Event
 				concreteListeners.erase(concreteListeners.begin() + i);
 	}
 
-	void EventDispatcher::DispatchQueued() noexcept
+	void CTMEventDispatcher::DispatchQueued() noexcept
 	{
 		// Iterate through each entry in the map.
 		for (auto& [key, value] : m_EventQueues)
 		{
+			if (value.empty())
+				continue;
+
 			// Iterate through each event in the ConcreteEventType's mapped event queue.
-			for (IEvent* pEvent : value)
+			for (ICTMEvent* pEvent : value)
 				switch (pEvent->ConcreteType())
 				{
-				case ConcreteEventType::CTM_STATE_START_EVENT:
-					DispatchEvent(StartEvent::Cast(pEvent));
+				case CTMConcreteEventType::CTM_STATE_START_EVENT:
+					DispatchEvent(CTMStartEvent::Cast(pEvent));
 					break;
-				case ConcreteEventType::CTM_STATE_END_EVENT:
-					DispatchEvent(EndEvent::Cast(pEvent));
+				case CTMConcreteEventType::CTM_STATE_END_EVENT:
+					DispatchEvent(CTMEndEvent::Cast(pEvent));
 					break;
-				case ConcreteEventType::CTM_MOUSE_MOVE_EVENT:
-					DispatchEvent(MouseMoveEvent::Cast(pEvent));
+				case CTMConcreteEventType::CTM_MOUSE_MOVE_EVENT:
+					DispatchEvent(CTMMouseMoveEvent::Cast(pEvent));
 					break;
-				case ConcreteEventType::CTM_FRAME_CLEAR_FRAME_EVENT:
-					DispatchEvent(ClearFrameEvent::Cast(pEvent));
+				case CTMConcreteEventType::CTM_FRAME_CLEAR_FRAME_EVENT:
+					DispatchEvent(CTMClearFrameEvent::Cast(pEvent));
 					break;
-				case ConcreteEventType::CTM_FRAME_START_FRAME_EVENT:
-					DispatchEvent(StartFrameEvent::Cast(pEvent));
+				case CTMConcreteEventType::CTM_FRAME_START_FRAME_EVENT:
+					DispatchEvent(CTMStartFrameEvent::Cast(pEvent));
 					break;
-				case ConcreteEventType::CTM_FRAME_DRAW_FRAME_EVENT:
-					DispatchEvent(DrawFrameEvent::Cast(pEvent));
+				case CTMConcreteEventType::CTM_FRAME_DRAW_FRAME_EVENT:
+					DispatchEvent(CTMDrawFrameEvent::Cast(pEvent));
 					break;
 				}
 

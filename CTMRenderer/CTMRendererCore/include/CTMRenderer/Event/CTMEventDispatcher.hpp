@@ -4,23 +4,23 @@
 #include <deque>
 #include <atomic>
 
-#include "CTMRenderer/Event/EventListener.hpp"
-#include "CTMRenderer/Event/EventPool.hpp"
+#include "CTMRenderer/Event/CTMEventListener.hpp"
+#include "CTMRenderer/Event/CTMEventPool.hpp"
 #include "Core/CoreMacros.hpp"
 
 namespace CTMRenderer::Event
 {
-	class EventDispatcher
+	class CTMEventDispatcher
 	{
 	public:
-		EventDispatcher() noexcept;
-		~EventDispatcher() = default;
+		CTMEventDispatcher() noexcept;
+		~CTMEventDispatcher() = default;
 	public:
-		void Subscribe(IGenericListener* pGenericListener) noexcept;
-		void Subscribe(IConcreteListener* pConcreteListener) noexcept;
+		void Subscribe(ICTMGenericListener* pGenericListener) noexcept;
+		void Subscribe(ICTMConcreteListener* pConcreteListener) noexcept;
 
-		void Unsubscribe(IGenericListener* pGenericListener) noexcept;
-		void Unsubscribe(IConcreteListener* pConcreteListener) noexcept;
+		void Unsubscribe(ICTMGenericListener* pGenericListener) noexcept;
+		void Unsubscribe(ICTMConcreteListener* pConcreteListener) noexcept;
 
 		// Dispatches all queued events to all registered concrete and generic listeners.
 		void DispatchQueued() noexcept;
@@ -58,16 +58,16 @@ namespace CTMRenderer::Event
 			requires IsConcreteEventType<ConcreteEventTy>::Value
 		inline void DispatchToConcrete(ConcreteEventTy* pEvent) const noexcept;
 	private:
-		EventPool m_EventPool;
-		std::unordered_map<ConcreteEventType, std::deque<IEvent*>> m_EventQueues;
+		CTMEventPool m_EventPool;
+		std::unordered_map<CTMConcreteEventType, std::deque<ICTMEvent*>> m_EventQueues;
 		std::atomic_bool m_IsEventQueued = false;
-		std::unordered_map<GenericEventType, std::vector<IGenericListener*>> m_GenericListeners;
-		std::unordered_map<ConcreteEventType, std::vector<IConcreteListener*>> m_ConcreteListeners;
+		std::unordered_map<CTMGenericEventType, std::vector<ICTMGenericListener*>> m_GenericListeners;
+		std::unordered_map<CTMConcreteEventType, std::vector<ICTMConcreteListener*>> m_ConcreteListeners;
 	};
 
 	template <typename ConcreteEventTy, typename... Args>
 		requires IsConcreteEventType<ConcreteEventTy>::Value
-	inline void EventDispatcher::QueueEvent(Args&&... args) noexcept
+	inline void CTMEventDispatcher::QueueEvent(Args&&... args) noexcept
 	{
 		ConcreteEventTy* pEvent = m_EventPool.PoolNew<ConcreteEventTy::EnumConcreteTy, ConcreteEventTy>(std::forward<Args>(args)...);
 		m_EventQueues[ConcreteEventTy::EnumConcreteTy].emplace_back(pEvent);
@@ -77,14 +77,14 @@ namespace CTMRenderer::Event
 
 	template <typename ConcreteEventTy>
 		requires IsConcreteEventType<ConcreteEventTy>::Value
-	inline ConcreteEventTy* EventDispatcher::GetOldestEvent() noexcept
+	inline ConcreteEventTy* CTMEventDispatcher::GetOldestEvent() noexcept
 	{
 		return m_EventPool.GetOldest<ConcreteEventTy::EnumConcreteTy, ConcreteEventTy>();
 	}
 
 	template <typename ConcreteEventTy>
 		requires IsConcreteEventType<ConcreteEventTy>::Value
-	inline void EventDispatcher::DispatchEvent(ConcreteEventTy* pEvent) noexcept
+	inline void CTMEventDispatcher::DispatchEvent(ConcreteEventTy* pEvent) noexcept
 	{
 		DispatchToGeneric(pEvent);
 		DispatchToConcrete(pEvent);
@@ -92,46 +92,46 @@ namespace CTMRenderer::Event
 
 	template <typename ConcreteEventTy>
 		requires IsConcreteEventType<ConcreteEventTy>::Value // Ensure the passed type (ConcreteEventTy) is a concrete event type.
-	inline void EventDispatcher::DispatchToGeneric(ConcreteEventTy* pEvent) const noexcept
+	inline void CTMEventDispatcher::DispatchToGeneric(ConcreteEventTy* pEvent) const noexcept
 	{
 		RUNTIME_ASSERT(pEvent != nullptr, "Recieved event is nullptr.");
 
 		// Get corresponding GenericEventType of the provided type.
-		constexpr GenericEventType EnunGenericType = EnumGenericEventTypeOf<ConcreteEventTy>::Type;
+		constexpr CTMGenericEventType EnunGenericType = EnumGenericEventTypeOf<ConcreteEventTy>::Type;
 		RUNTIME_ASSERT(pEvent->GenericType() == EnunGenericType, "Mismatching GenericEventType's.\n");
 
 		// TODO : Use .find to avoid duplicate loop-ups per GenericEventType. (contains() and at())
 		if (m_GenericListeners.contains(EnunGenericType))
 		{
-			const std::vector<IGenericListener*>& genericListeners = m_GenericListeners.at(EnunGenericType);
-			for (IGenericListener* pGenericListener : genericListeners)
-				static_cast<GenericListener<EnunGenericType>*>(pGenericListener)->Notify(pEvent);
+			const std::vector<ICTMGenericListener*>& genericListeners = m_GenericListeners.at(EnunGenericType);
+			for (ICTMGenericListener* pGenericListener : genericListeners)
+				static_cast<CTMGenericListener<EnunGenericType>*>(pGenericListener)->Notify(pEvent);
 		}
 
 		// TODO : Use .find to avoid duplicate loop-ups per GenericEventType. (contains() and at())
-		if (m_GenericListeners.contains(GenericEventType::CTM_ANY))
+		if (m_GenericListeners.contains(CTMGenericEventType::CTM_ANY))
 		{
-			const std::vector<IGenericListener*>& ctmAnyListeners = m_GenericListeners.at(GenericEventType::CTM_ANY);
-			for (IGenericListener* pAnyListener : ctmAnyListeners)
-				static_cast<GenericListener<GenericEventType::CTM_ANY>*>(pAnyListener)->Notify(pEvent);
+			const std::vector<ICTMGenericListener*>& ctmAnyListeners = m_GenericListeners.at(CTMGenericEventType::CTM_ANY);
+			for (ICTMGenericListener* pAnyListener : ctmAnyListeners)
+				static_cast<CTMGenericListener<CTMGenericEventType::CTM_ANY>*>(pAnyListener)->Notify(pEvent);
 		}
 	}
 
 	template <typename ConcreteEventTy>
 		requires IsConcreteEventType<ConcreteEventTy>::Value
-	inline void EventDispatcher::DispatchToConcrete(ConcreteEventTy* pEvent) const noexcept
+	inline void CTMEventDispatcher::DispatchToConcrete(ConcreteEventTy* pEvent) const noexcept
 	{
 		RUNTIME_ASSERT(pEvent != nullptr, "Recieved concrete event is nullptr.");
 
 		// Get corresponding ConcreteEventType of the provided type.
-		constexpr ConcreteEventType EnumConcreteType = EnumConcreteEventTypeOf<ConcreteEventTy>::Type;
+		constexpr CTMConcreteEventType EnumConcreteType = EnumConcreteEventTypeOf<ConcreteEventTy>::Type;
 		RUNTIME_ASSERT(pEvent->ConcreteType() == EnumConcreteType, "Mismatching ConcreteEventType's.\n");
 
 		if (!m_ConcreteListeners.contains(EnumConcreteType))
 			return;
 
-		const std::vector<IConcreteListener*>& concreteListeners = m_ConcreteListeners.at(EnumConcreteType);
-		for (IConcreteListener* pConcreteListener : concreteListeners)
-			static_cast<ConcreteListener<EnumConcreteType, ConcreteEventTy>*>(pConcreteListener)->Notify(pEvent);
+		const std::vector<ICTMConcreteListener*>& concreteListeners = m_ConcreteListeners.at(EnumConcreteType);
+		for (ICTMConcreteListener* pConcreteListener : concreteListeners)
+			static_cast<CTMConcreteListener<EnumConcreteType, ConcreteEventTy>*>(pConcreteListener)->Notify(pEvent);
 	}
 }

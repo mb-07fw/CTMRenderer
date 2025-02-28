@@ -3,6 +3,11 @@
 
 namespace CTMRenderer
 {
+	void ICTMRenderer::ClearScreen() noexcept
+	{
+		m_EventSystem.Dispatcher().QueueEvent<Event::CTMClearFrameEvent>();
+	}
+
 	void ICTMRenderer::SubmitShape(const Shapes::CTMShape& shapeRef) noexcept
 	{
 		//DEBUG_PRINT("(ICTMRenderer:SubmitShape) Submitted shape : " << shapeRef.TypeToStr() << '\n');

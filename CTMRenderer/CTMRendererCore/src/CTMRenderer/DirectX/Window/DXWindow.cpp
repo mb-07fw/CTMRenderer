@@ -5,7 +5,7 @@
 namespace CTMRenderer::CTMDirectX::Window
 {
     #pragma region Constructors
-    DXWindow::DXWindow(const DXRendererSettings& settingsRef, Event::EventDispatcher& eventDispatcherRef, UINT width, UINT height)
+    DXWindow::DXWindow(const DXRendererSettings& settingsRef, Event::CTMEventDispatcher& eventDispatcherRef, UINT width, UINT height)
         : m_SettingsRef(settingsRef), m_EventDispatcherRef(eventDispatcherRef), m_ClientArea(width, height)
     {
         // Wait until Start is called to initialize the window, due to how CTMRenderer doesn't use RAII,
@@ -34,7 +34,7 @@ namespace CTMRenderer::CTMDirectX::Window
             {
                 DEBUG_PRINT("Broadcasting end event.\n");
                 
-                m_EventDispatcherRef.QueueEvent<Event::EndEvent>(1738u); // ayyy
+                m_EventDispatcherRef.QueueEvent<Event::CTMEndEvent>(1738u); // ayyy
                 return;
             }
 
@@ -156,7 +156,7 @@ namespace CTMRenderer::CTMDirectX::Window
             PostQuitMessage(0);
             return S_OK;
         case WM_MOUSEMOVE:
-            m_EventDispatcherRef.QueueEvent<Event::MouseMoveEvent>(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+            m_EventDispatcherRef.QueueEvent<Event::CTMMouseMoveEvent>(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
             return S_OK;
         default:
             return DefWindowProc(windowHandle, msgCode, wParam, lParam);

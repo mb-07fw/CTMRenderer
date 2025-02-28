@@ -5,7 +5,7 @@
 #include <mutex>  // std::mutex
 #include <condition_variable> // std::condition_variable
 
-#include "Event/EventSystem.hpp"
+#include "CTMRenderer/Event/CTMEventSystem.hpp"
 #include "CTMRenderer/CTMDrawQueue.hpp"
 #include "CTMRenderer/CTMTimer.hpp"
 #include "CTMRenderer/CTMShape.hpp"
@@ -25,13 +25,13 @@ namespace CTMRenderer
 	public:
 		virtual void Init() noexcept = 0;
 		virtual void JoinForShutdown() noexcept = 0;
-		virtual void ClearScreen() noexcept = 0;
+		void ClearScreen() noexcept;
 		void SubmitShape(const Shapes::CTMShape& shapeRef) noexcept;
 
 		/*template <typename ShapeTy, typename... Args>
 		[[nodiscard]] ShapeTy& MakeShape(Args&&... args) noexcept;*/
 	protected:
-		Event::EventSystem m_EventSystem;
+		Event::CTMEventSystem m_EventSystem;
 		CTMDrawQueue m_DrawQueue;
 		Utils::CTMTimer m_Timer;
 		std::thread m_EventThread;

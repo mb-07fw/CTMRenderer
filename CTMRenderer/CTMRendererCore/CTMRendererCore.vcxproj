@@ -113,11 +113,11 @@
     <ClInclude Include="include\Core\CorePCH.hpp" />
     <ClInclude Include="include\Core\CoreUtility.hpp" />
     <ClInclude Include="include\Core\WindowsDefines.hpp" />
-    <ClInclude Include="include\CTMRenderer\Event\Event.hpp" />
-    <ClInclude Include="include\CTMRenderer\Event\EventDispatcher.hpp" />
-    <ClInclude Include="include\CTMRenderer\Event\EventListener.hpp" />
-    <ClInclude Include="include\CTMRenderer\Event\EventPool.hpp" />
-    <ClInclude Include="include\CTMRenderer\Event\EventSystem.hpp" />
+    <ClInclude Include="include\CTMRenderer\Event\CTMEvent.hpp" />
+    <ClInclude Include="include\CTMRenderer\Event\CTMEventDispatcher.hpp" />
+    <ClInclude Include="include\CTMRenderer\Event\CTMEventListener.hpp" />
+    <ClInclude Include="include\CTMRenderer\Event\CTMEventPool.hpp" />
+    <ClInclude Include="include\CTMRenderer\Event\CTMEventSystem.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\CorePCH.cpp">
@@ -126,11 +126,11 @@
     </ClCompile>
     <ClCompile Include="src\CTMRenderer\CTMDrawQueue.cpp" />
     <ClCompile Include="src\CTMRenderer\CTMShape.cpp" />
-    <ClCompile Include="src\CTMRenderer\Event\EventPool.cpp" />
+    <ClCompile Include="src\CTMRenderer\Event\CTMEventListener.cpp" />
+    <ClCompile Include="src\CTMRenderer\Event\CTMEventPool.cpp" />
     <ClCompile Include="src\CTMRenderer\ICTMRenderer.cpp" />
-    <ClCompile Include="src\CTMRenderer\Event\Event.cpp" />
-    <ClCompile Include="src\CTMRenderer\Event\EventDispatcher.cpp" />
-    <ClCompile Include="src\CTMRenderer\Event\EventSystem.cpp" />
+    <ClCompile Include="src\CTMRenderer\Event\CTMEvent.cpp" />
+    <ClCompile Include="src\CTMRenderer\Event\CTMEventDispatcher.cpp" />
     <ClCompile Include="src\CTMRenderer\CTMRenderer.cpp" />
     <ClCompile Include="src\CTMRenderer\DirectX\DXRenderer.cpp" />
     <ClCompile Include="src\CTMRenderer\DirectX\Graphics\DXGraphics.cpp" />

@@ -4,48 +4,48 @@
 #include <vector>
 #include <memory>
 
-#include "CTMRenderer/Event/Event.hpp"
+#include "CTMRenderer/Event/CTMEvent.hpp"
 
 namespace CTMRenderer::Event
 {
-	class EventPool
+	class CTMEventPool
 	{
 	public:
-		EventPool() = default;
-		~EventPool() = default;
+		CTMEventPool() = default;
+		~CTMEventPool() = default;
 	public:
 		// Creates a new event of type ConcreteEventTy and pools it, or returns an already pooled event of the specified EnumConcreteTy.
 		// Returns a pointer to the pooled event.
-		template <ConcreteEventType EnumConcreteTy, typename ConcreteEventTy, typename... Args>
+		template <CTMConcreteEventType EnumConcreteTy, typename ConcreteEventTy, typename... Args>
 			requires IsConcreteEventType<ConcreteEventTy>::Value && IsMatchingConcreteEventType<EnumConcreteTy, ConcreteEventTy>::Value
 		ConcreteEventTy* PoolNew(Args&&... args) noexcept;
 
 		// Returns a non-owning pointer to the oldest event of ConcreteEventTy.
 		// May return nullptr if no events are in the pool.
-		template <ConcreteEventType EnumConcreteTy, typename ConcreteEventTy>
+		template <CTMConcreteEventType EnumConcreteTy, typename ConcreteEventTy>
 			requires IsConcreteEventType<ConcreteEventTy>::Value && IsMatchingConcreteEventType<EnumConcreteTy, ConcreteEventTy>::Value
 		inline ConcreteEventTy* GetOldest() const noexcept;
 
 		// Returns a non-owning pointer to the newest event of EnumConcreteTy.
 		// May return nullptr if no events are in the pool.
-		template <ConcreteEventType EnumConcreteTy, typename ConcreteEventTy>
+		template <CTMConcreteEventType EnumConcreteTy, typename ConcreteEventTy>
 			requires IsConcreteEventType<ConcreteEventTy>::Value&& IsMatchingConcreteEventType<EnumConcreteTy, ConcreteEventTy>::Value
 		inline ConcreteEventTy* GetNewest() const noexcept;
 		
 		// Returns the number of pooled events mapped to the ConcreteEventType.
-		size_t CountOf(ConcreteEventType type) const noexcept;
+		size_t CountOf(CTMConcreteEventType concreteType) const noexcept;
 	private:
-		std::unordered_map<ConcreteEventType, std::vector<std::unique_ptr<IEvent>>> m_Pool;
+		std::unordered_map<CTMConcreteEventType, std::vector<std::unique_ptr<ICTMEvent>>> m_Pool;
 	};
 
 
 
 #pragma region Template Implementations
-	template <ConcreteEventType EnumConcreteTy, typename ConcreteEventTy, typename... Args>
+	template <CTMConcreteEventType EnumConcreteTy, typename ConcreteEventTy, typename... Args>
 		requires IsConcreteEventType<ConcreteEventTy>::Value&& IsMatchingConcreteEventType<EnumConcreteTy, ConcreteEventTy>::Value
-	inline ConcreteEventTy* EventPool::PoolNew(Args&&... args) noexcept
+	inline ConcreteEventTy* CTMEventPool::PoolNew(Args&&... args) noexcept
 	{
-		std::vector<std::unique_ptr<IEvent>>& events = m_Pool[EnumConcreteTy];
+		std::vector<std::unique_ptr<ICTMEvent>>& events = m_Pool[EnumConcreteTy];
 
 		if (events.empty())
 		{
@@ -59,28 +59,28 @@ namespace CTMRenderer::Event
 		return pEvent;
 	}
 	
-	template <ConcreteEventType EnumConcreteTy, typename ConcreteEventTy>
+	template <CTMConcreteEventType EnumConcreteTy, typename ConcreteEventTy>
 		requires IsConcreteEventType<ConcreteEventTy>::Value&& IsMatchingConcreteEventType<EnumConcreteTy, ConcreteEventTy>::Value
-	inline ConcreteEventTy* EventPool::GetOldest() const noexcept
+	inline ConcreteEventTy* CTMEventPool::GetOldest() const noexcept
 	{
 		if (!m_Pool.contains(EnumConcreteTy))
 			return nullptr;
 
-		const std::vector<std::unique_ptr<IEvent>>& events = m_Pool.at(EnumConcreteTy);
+		const std::vector<std::unique_ptr<ICTMEvent>>& events = m_Pool.at(EnumConcreteTy);
 
 		ConcreteEventTy* pEvent = ConcreteEventTy::Cast(events.back().get());
 		RUNTIME_ASSERT(pEvent != nullptr, "Invalid cast.\n");
 		return pEvent;
 	}
 
-	template <ConcreteEventType EnumConcreteTy, typename ConcreteEventTy>
+	template <CTMConcreteEventType EnumConcreteTy, typename ConcreteEventTy>
 		requires IsConcreteEventType<ConcreteEventTy>::Value&& IsMatchingConcreteEventType<EnumConcreteTy, ConcreteEventTy>::Value
-	inline ConcreteEventTy* EventPool::GetNewest() const noexcept
+	inline ConcreteEventTy* CTMEventPool::GetNewest() const noexcept
 	{
 		if (!m_Pool.contains(EnumConcreteTy))
 			return nullptr;
 
-		const std::vector<std::unique_ptr<IEvent>>& events = m_Pool.at(EnumConcreteTy);
+		const std::vector<std::unique_ptr<ICTMEvent>>& events = m_Pool.at(EnumConcreteTy);
 
 		ConcreteEventTy* pEvent = ConcreteEventTy::Cast(events.front().get());
 		RUNTIME_ASSERT(pEvent != nullptr, "Invalid cast.\n");
