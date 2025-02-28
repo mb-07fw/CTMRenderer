@@ -34,7 +34,6 @@ namespace CTMRenderer::CTMDirectX::Window
             {
                 DEBUG_PRINT("Broadcasting end event.\n");
                 
-                m_EventDispatcherRef.QueueEvent<Event::ClearFrameEvent>();
                 m_EventDispatcherRef.QueueEvent<Event::EndEvent>(1738u); // ayyy
                 return;
             }

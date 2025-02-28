@@ -18,8 +18,6 @@ namespace CTMRenderer::CTMDirectX::Graphics::Bindable
 	inline constexpr D3D11_BIND_FLAG BIND_NONE = static_cast<D3D11_BIND_FLAG>(0);
 	inline constexpr D3D11_RESOURCE_MISC_FLAG MISC_NONE = static_cast<D3D11_RESOURCE_MISC_FLAG>(0);
 
-	namespace MS_WRL = Microsoft::WRL;
-
 	template <D3D11_BIND_FLAG BindFlag>
 	inline constexpr bool IsDefaultUsageBindFlag = (
 		//BindFlag != D3D11_BIND_CONSTANT_BUFFER &&
@@ -75,7 +73,7 @@ namespace CTMRenderer::CTMDirectX::Graphics::Bindable
 	class DXBuffer
 	{
 	public:
-		DXBuffer(MS_WRL::ComPtr<ID3D11Device1> pDevice, MS_WRL::ComPtr<ID3D11DeviceContext1> pDeviceContext) noexcept;
+		DXBuffer(Microsoft::WRL::ComPtr<ID3D11Device1> pDevice, Microsoft::WRL::ComPtr<ID3D11DeviceContext1> pDeviceContext) noexcept;
 		~DXBuffer() noexcept = default;
 	public:
 		void Reset() noexcept;
@@ -83,9 +81,9 @@ namespace CTMRenderer::CTMDirectX::Graphics::Bindable
 		[[nodiscard]] HRESULT CreateBuffer(UINT byteWidth, DataTy* pData) noexcept;
 	protected:
 		static constexpr UINT S_STRIDE = sizeof(DataTy);
-		MS_WRL::ComPtr<ID3D11Device1> mP_Device;
-		MS_WRL::ComPtr<ID3D11DeviceContext1> mP_DeviceContext;
-		MS_WRL::ComPtr<ID3D11Buffer> mP_Buffer;
+		Microsoft::WRL::ComPtr<ID3D11Device1> mP_Device;
+		Microsoft::WRL::ComPtr<ID3D11DeviceContext1> mP_DeviceContext;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> mP_Buffer;
 	};
 
 
@@ -121,6 +119,8 @@ namespace CTMRenderer::CTMDirectX::Graphics::Bindable
 		void Bind(UINT offset = 0u) noexcept;
 	};
 
+
+
 	template <typename DataTy, D3D11_USAGE Usage, D3D11_CPU_ACCESS_FLAG CPUFlags = CPU_NONE, D3D11_RESOURCE_MISC_FLAG MiscFlags = MISC_NONE>
 	class DXConstantBuffer : public DXBuffer<DataTy, Usage, D3D11_BIND_CONSTANT_BUFFER, CPUFlags, MiscFlags>
 	{
@@ -141,10 +141,10 @@ namespace CTMRenderer::CTMDirectX::Graphics::Bindable
 	class DXStrictBuffer
 	{
 	public:
-		inline DXStrictBuffer(const std::array<DataTy, Elems>& data, MS_WRL::ComPtr<ID3D11Device1> pDevice, MS_WRL::ComPtr<ID3D11DeviceContext1> pDeviceContext) noexcept
+		inline DXStrictBuffer(const std::array<DataTy, Elems>& data, Microsoft::WRL::ComPtr<ID3D11Device1> pDevice, Microsoft::WRL::ComPtr<ID3D11DeviceContext1> pDeviceContext) noexcept
 			: m_Buffer(std::move(pDevice), std::move(pDeviceContext)), m_Data(data) {}
 
-		DXStrictBuffer(const std::initializer_list<DataTy>& list, MS_WRL::ComPtr<ID3D11Device1> pDevice, MS_WRL::ComPtr<ID3D11DeviceContext1> pDeviceContext) noexcept;
+		DXStrictBuffer(const std::initializer_list<DataTy>& list, Microsoft::WRL::ComPtr<ID3D11Device1> pDevice, Microsoft::WRL::ComPtr<ID3D11DeviceContext1> pDeviceContext) noexcept;
 
 		~DXStrictBuffer() = default;
 	public:
@@ -203,7 +203,9 @@ namespace CTMRenderer::CTMDirectX::Graphics::Bindable
 #pragma region Buffers
 	template <typename DataTy, D3D11_USAGE Usage, D3D11_BIND_FLAG BindFlag, D3D11_CPU_ACCESS_FLAG CPUFlags, D3D11_RESOURCE_MISC_FLAG MiscFlags>
 		requires ValidBufferConfig<Usage, BindFlag, CPUFlags, MiscFlags>
-	inline DXBuffer<DataTy, Usage, BindFlag, CPUFlags, MiscFlags>::DXBuffer(MS_WRL::ComPtr<ID3D11Device1> pDevice, MS_WRL::ComPtr<ID3D11DeviceContext1> pDeviceContext) noexcept
+	inline DXBuffer<DataTy, Usage, BindFlag, CPUFlags, MiscFlags>::DXBuffer(
+		Microsoft::WRL::ComPtr<ID3D11Device1> pDevice, 
+		Microsoft::WRL::ComPtr<ID3D11DeviceContext1> pDeviceContext) noexcept
 	{
 		mP_Device = std::move(pDevice);
 		mP_DeviceContext = std::move(pDeviceContext);
@@ -251,13 +253,15 @@ namespace CTMRenderer::CTMDirectX::Graphics::Bindable
 	}
 #pragma endregion
 
+
+
 #pragma region Buffer Wrappers
 
 	template <typename DXBufferTy, typename DataTy, size_t Elems>
 	inline DXStrictBuffer<DXBufferTy, DataTy, Elems>::DXStrictBuffer(
 		const std::initializer_list<DataTy>& list,
-		MS_WRL::ComPtr<ID3D11Device1> pDevice,
-		MS_WRL::ComPtr<ID3D11DeviceContext1> pDeviceContext
+		Microsoft::WRL::ComPtr<ID3D11Device1> pDevice,
+		Microsoft::WRL::ComPtr<ID3D11DeviceContext1> pDeviceContext
 	) noexcept
 		: m_Buffer(std::move(pDevice), std::move(pDeviceContext))
 	{

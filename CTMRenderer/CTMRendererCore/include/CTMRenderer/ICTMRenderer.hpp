@@ -23,8 +23,9 @@ namespace CTMRenderer
 		ICTMRenderer() = default;
 		virtual ~ICTMRenderer() = default;
 	public:
-		virtual void Start() noexcept = 0;
+		virtual void Init() noexcept = 0;
 		virtual void JoinForShutdown() noexcept = 0;
+		virtual void ClearScreen() noexcept = 0;
 		void SubmitShape(const Shapes::CTMShape& shapeRef) noexcept;
 
 		/*template <typename ShapeTy, typename... Args>

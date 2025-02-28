@@ -11,6 +11,28 @@ namespace CTMRenderer::Shapes
 		BLUE,
 	};
 
+
+
+	struct CTMNormColor
+	{
+		inline CTMNormColor(float r = 0, float g = 0, float b = 0, float a = 1)
+		{
+			rgba[0] = r;
+			rgba[1] = g;
+			rgba[2] = b;
+			rgba[3] = a;
+		}
+
+		inline [[nodiscard]] float r() const noexcept { return rgba[0]; }
+		inline [[nodiscard]] float g() const noexcept { return rgba[1]; }
+		inline [[nodiscard]] float b() const noexcept { return rgba[2]; }
+		inline [[nodiscard]] float a() const noexcept { return rgba[3]; }
+
+		float rgba[4];
+	};
+
+
+
 	// Represents un-normalized RGBA values.
 	struct CTMColor
 	{
@@ -20,7 +42,7 @@ namespace CTMRenderer::Shapes
 		static constexpr unsigned char ALPHA_CHANNEL = 3;
 		static constexpr unsigned char NUM_CHANNELS = 4;
 
-		inline CTMColor(CTMColorType colorType)
+		inline explicit CTMColor(CTMColorType colorType)
 		{
 			SetAll(0);
 			rgba[ALPHA_CHANNEL] = 255;
@@ -60,29 +82,21 @@ namespace CTMRenderer::Shapes
 				rgba[i] = color;
 		}
 
+		inline CTMNormColor AsNormalized() const noexcept
+		{
+			CTMNormColor normalized;
+
+			for (size_t i = 0; i < 4; ++i)
+				normalized.rgba[i] = rgba[i] / 127.5f - 1;
+
+			return normalized;
+		}
+
 		inline [[nodiscard]] unsigned char r() const noexcept { return rgba[0]; }
 		inline [[nodiscard]] unsigned char g() const noexcept { return rgba[1]; }
 		inline [[nodiscard]] unsigned char b() const noexcept { return rgba[2]; }
 		inline [[nodiscard]] unsigned char a() const noexcept { return rgba[3]; }
 
 		unsigned char rgba[4];
-	};
-
-	struct CTMNormColor
-	{
-		inline CTMNormColor(float r = 0, float g = 0, float b = 0, float a = 1)
-		{
-			rgba[0] = r;
-			rgba[1] = g;
-			rgba[2] = b;
-			rgba[3] = a;
-		}
-
-		inline [[nodiscard]] float r() const noexcept { return rgba[0]; }
-		inline [[nodiscard]] float g() const noexcept { return rgba[1]; }
-		inline [[nodiscard]] float b() const noexcept { return rgba[2]; }
-		inline [[nodiscard]] float a() const noexcept { return rgba[3]; }
-
-		float rgba[4];
 	};
 }

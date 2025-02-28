@@ -48,6 +48,9 @@ namespace CTMRenderer::CTMDirectX::Graphics
 		~DXGraphics() = default;
 	public:
 		void Init(const HWND windowHandle) noexcept;
+		void SetClearColor(Shapes::CTMNormColor normColor) noexcept;
+		void Clear() noexcept;
+		void Present() noexcept;
 		void StartFrame(double elapsedMillis) noexcept;
 		void Draw() noexcept;
 		void EndFrame() noexcept;

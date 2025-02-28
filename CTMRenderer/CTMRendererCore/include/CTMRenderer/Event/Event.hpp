@@ -36,11 +36,11 @@ namespace CTMRenderer::Event
 		IEvent(ConcreteEventType concreteType, GenericEventType genericType) noexcept;
 		virtual ~IEvent() = default;
 	public:
-		inline [[nodiscard]] ConcreteEventType ConcreteType() const noexcept { return m_ConcreteType; }
-		inline [[nodiscard]] GenericEventType GenericType() const noexcept { return m_GenericType; }
-
 		[[nodiscard]] std::string_view GenericTypeToStr() const noexcept;
 		[[nodiscard]] std::string_view ConcreteTypeToStr() const noexcept;
+		
+		inline [[nodiscard]] ConcreteEventType ConcreteType() const noexcept { return m_ConcreteType; }
+		inline [[nodiscard]] GenericEventType GenericType() const noexcept { return m_GenericType; }
 	private:
 		ConcreteEventType m_ConcreteType;
 		GenericEventType m_GenericType;

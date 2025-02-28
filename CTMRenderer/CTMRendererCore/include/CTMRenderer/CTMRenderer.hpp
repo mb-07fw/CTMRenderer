@@ -39,8 +39,9 @@ namespace CTMRenderer
 				RUNTIME_ASSERT(false, "Failed to initialize CTMRenderer due to the provided RendererType being unknown.\n");
 		}
 
-		void Start() noexcept;
+		void Init() noexcept;
 		void JoinForShutdown() noexcept;
+		void ClearScreen() noexcept;
 		void SubmitShape(const Shapes::CTMShape& shape) noexcept;
 	private:
 		std::unique_ptr<ICTMRenderer> m_Renderer;

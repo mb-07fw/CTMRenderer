@@ -12,7 +12,7 @@ namespace CTMRenderer::CTMDirectX
 	}
 
 	#pragma region Public API
-	void DXRenderer::Start() noexcept
+	void DXRenderer::Init() noexcept
 	{
 		m_ShouldRun.store(true, std::memory_order_release);
 		m_EventThread = std::thread(&DXRenderer::EventLoop, this);
@@ -29,6 +29,11 @@ namespace CTMRenderer::CTMDirectX
 	void DXRenderer::JoinForShutdown() noexcept
 	{
 		m_EventThread.join();
+	}
+
+	void DXRenderer::ClearScreen() noexcept
+	{
+		m_EventSystem.Dispatcher().QueueEvent<Event::ClearFrameEvent>();
 	}
 	#pragma endregion
 
@@ -113,9 +118,7 @@ namespace CTMRenderer::CTMDirectX
 	{
 		RUNTIME_ASSERT(pEvent != nullptr, "Event received is nullptr.\n");
 
-		Event::GenericEventType genericType = pEvent->GenericType();
-
-		switch (genericType)
+		switch (pEvent->GenericType())
 		{
 		case Event::GenericEventType::CTM_ANY:
 			RUNTIME_ASSERT(false, "No events should have CTM_ANY as their GenericEventType, as it is a marker type used for event listening.\n");
@@ -127,10 +130,7 @@ namespace CTMRenderer::CTMDirectX
 			HandleMouseEvent(pEvent);
 			break;
 		case Event::GenericEventType::CTM_FRAME_EVENT:
-			if (pEvent->ConcreteType() == Event::ConcreteEventType::CTM_FRAME_CLEAR_FRAME_EVENT)
-				DEBUG_PRINT("Received an ClearFrameEvent.\n");
-			else
-				DEBUG_PRINT("Recieved a FrameEvent.\n");
+			HandleFrameEvent(pEvent);
 			break;
 		default:
 			RUNTIME_ASSERT(false, "Received event has an unknown GenericEventType.\n");
@@ -139,7 +139,8 @@ namespace CTMRenderer::CTMDirectX
 
 	void DXRenderer::HandleStateEvent(Event::IEvent* pEvent) noexcept
 	{
-		RUNTIME_ASSERT(pEvent->GenericType() == Event::GenericEventType::CTM_STATE_EVENT, "The provided event wasn't a CTM_STATE_EVENT.\n");
+		RUNTIME_ASSERT(pEvent != nullptr, "The provided event was nullptr.\n");
+		RUNTIME_ASSERT(pEvent->GenericType() == Event::GenericEventType::CTM_STATE_EVENT, "The provided event's GenericEventType wasn't CTM_STATE_EVENT.\n");
 
 		switch (pEvent->ConcreteType())
 		{
@@ -156,7 +157,8 @@ namespace CTMRenderer::CTMDirectX
 
 	void DXRenderer::HandleMouseEvent(Event::IEvent* pEvent) noexcept
 	{
-		RUNTIME_ASSERT(pEvent->GenericType() == Event::GenericEventType::CTM_MOUSE_EVENT, "The provided event wasn't a CTM_STATE_EVENT.\n");
+		RUNTIME_ASSERT(pEvent != nullptr, "The provided event was nullptr.\n");
+		RUNTIME_ASSERT(pEvent->GenericType() == Event::GenericEventType::CTM_MOUSE_EVENT, "The provided event's GenericEventType wasn't CTM_MOUSE_EVENT.\n");
 
 		switch (pEvent->ConcreteType())
 		{
@@ -169,6 +171,27 @@ namespace CTMRenderer::CTMDirectX
 		}
 		default:
 			RUNTIME_ASSERT(false, "Mouse event wasn't handled.\n");
+		}
+	}
+
+	void DXRenderer::HandleFrameEvent(Event::IEvent* pEvent) noexcept
+	{
+		RUNTIME_ASSERT(pEvent != nullptr, "The provided event was nullptr.\n");
+		RUNTIME_ASSERT(pEvent->GenericType() == Event::GenericEventType::CTM_FRAME_EVENT, "The provided event's GenericEventType wasn't CTM_FRAME_EVENT.\n");
+
+		switch (pEvent->ConcreteType())
+		{
+		case Event::ConcreteEventType::CTM_FRAME_CLEAR_FRAME_EVENT:
+			DEBUG_PRINT("Received an ClearFrameEvent.\n");
+			m_Graphics.Clear();
+			m_Graphics.Present();
+			break;
+		case Event::ConcreteEventType::CTM_FRAME_START_FRAME_EVENT:
+			DEBUG_PRINT("Received an StartFrameEvent.\n");
+			break;
+		case Event::ConcreteEventType::CTM_FRAME_DRAW_FRAME_EVENT:
+			DEBUG_PRINT("Received an DrawFrameEvent.\n");
+			break;
 		}
 	}
 	#pragma endregion

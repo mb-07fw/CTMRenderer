@@ -270,12 +270,27 @@ namespace CTMRenderer::CTMDirectX::Graphics
 		DEBUG_PRINT("Aspect ratio reciprocal : " << m_WindowAreaRef.aspectRatioReciprocal << '\n');
 	}
 
+	void DXGraphics::SetClearColor(Shapes::CTMNormColor normColor) noexcept
+	{
+		m_ClearColor = normColor;
+	}
+
+	void DXGraphics::Clear() noexcept
+	{
+		mP_DeviceContext->ClearRenderTargetView(mP_RTV.Get(), m_ClearColor.rgba);
+	}
+
+	void DXGraphics::Present() noexcept
+	{
+		HRESULT hResult = mP_SwapChain->Present(SYNC_INTERVAL, 0u);
+		RUNTIME_ASSERT(m_InfoQueue.IsQueueEmpty() == true, m_InfoQueue.GetMessages());
+		RUNTIME_ASSERT(hResult == S_OK, Utility::TranslateHResult(hResult));
+	}
+
 	void DXGraphics::StartFrame(double elapsedMillis) noexcept
 	{
 		// Rebind the RenderTargetView.
 		BindRTV();
-
-		mP_DeviceContext->ClearRenderTargetView(mP_RTV.Get(), m_ClearColor.rgba);
 	}
 
 	void DXGraphics::Draw() noexcept
