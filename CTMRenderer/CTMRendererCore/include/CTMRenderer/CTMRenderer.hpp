@@ -3,8 +3,8 @@
 #include <memory>
 
 #include "Core/CoreMacros.hpp"
-#include "CTMRenderer/IRenderer.hpp"
-#include "CTMRenderer/Shape.hpp"
+#include "CTMRenderer/ICTMRenderer.hpp"
+#include "CTMRenderer/CTMShape.hpp"
 
 #ifdef CTM_NO_DX
 #else
@@ -23,9 +23,9 @@ namespace CTMRenderer
 	class CTMRenderer
 	{
 	public:
-		CTMRenderer(RendererType rendererType, unsigned int targetFPS = 60) noexcept
+		CTMRenderer(CTMRendererType rendererType, unsigned int targetFPS = 60) noexcept
 		{
-			if (rendererType == RendererType::CTM_DIRECTX)
+			if (rendererType == CTMRendererType::CTM_DIRECTX)
 			{
 				#ifdef CTM_NO_DX
 					RUNTIME_ASSERT(false, "CTMRenderer cannot be created with the DirectX API, as it was explicitly defined to not include it via the macro CTM_NO_DX.\n");
@@ -41,9 +41,8 @@ namespace CTMRenderer
 
 		void Start() noexcept;
 		void JoinForShutdown() noexcept;
-		Shapes::IRectangle MakeRect(float left, float top, float right, float bottom, Shapes::Color color) const noexcept;
-		void SubmitShape(const Shapes::IShape& shape) noexcept;
+		void SubmitShape(const Shapes::CTMShape& shape) noexcept;
 	private:
-		std::unique_ptr<IRenderer> m_Renderer;
+		std::unique_ptr<ICTMRenderer> m_Renderer;
 	};
 }

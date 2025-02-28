@@ -1,14 +1,13 @@
 #pragma once
 
-#include "CTMRenderer/IRenderer.hpp"
+#include "CTMRenderer/ICTMRenderer.hpp"
 #include "CTMRenderer/DirectX/DXRendererSettings.hpp"
 #include "CTMRenderer/DirectX/Window/DXWindow.hpp"
 #include "CTMRenderer/DirectX/Graphics/DXGraphics.hpp"
-#include "CTMRenderer/Color.hpp"
 
 namespace CTMRenderer::CTMDirectX
 {
-	class DXRenderer : public IRenderer
+	class DXRenderer : public ICTMRenderer
 	{
 	public:
 		explicit DXRenderer(const unsigned int targetFPS);
@@ -16,13 +15,10 @@ namespace CTMRenderer::CTMDirectX
 	public:
 		virtual void Start() noexcept override;
 		virtual void JoinForShutdown() noexcept override;
-		virtual Shapes::IRectangle MakeRect(float left, float top, float right, float bottom, Shapes::Color color) const noexcept override;
-		virtual void SubmitShape(const Shapes::IShape& shape) noexcept override;
 	private:
 		void OnStart(const Event::StartEvent* pEvent) noexcept;
 		void OnEnd(const Event::EndEvent* pEvent) noexcept;
 		void EventLoop() noexcept;
-		void DoFrame(double elapsedMillis) noexcept;
 		void HandleEvent(Event::IEvent* pEvent) noexcept;
 		void HandleStateEvent(Event::IEvent* pEvent) noexcept;
 		void HandleMouseEvent(Event::IEvent* pEvent) noexcept;

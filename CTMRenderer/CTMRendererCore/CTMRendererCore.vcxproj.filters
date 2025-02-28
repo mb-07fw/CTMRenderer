@@ -87,7 +87,7 @@
     <ClInclude Include="include\CTMRenderer\DirectX\Graphics\Bindable\DXViewport.hpp">
       <Filter>include\CTMRenderer\DirectX\Graphics\Bindable</Filter>
     </ClInclude>
-    <ClInclude Include="include\CTMRenderer\Color.hpp">
+    <ClInclude Include="include\CTMRenderer\CTMColor.hpp">
       <Filter>include\CTMRenderer\DirectX\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXGraphics.hpp">
@@ -99,17 +99,11 @@
     <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXInfoQueue.hpp">
       <Filter>include\CTMRenderer\DirectX\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXLayerSystem.hpp">
+    <ClInclude Include="include\CTMRenderer\CTMLayerSystem.hpp">
       <Filter>include\CTMRenderer\DirectX\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\CTMRenderer\DirectX\Graphics\DXShaderLibrary.hpp">
       <Filter>include\CTMRenderer\DirectX\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\Geometry\DXAABB.hpp">
-      <Filter>include\CTMRenderer\DirectX\Graphics\Geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="include\CTMRenderer\DirectX\Graphics\Geometry\DXShape.hpp">
-      <Filter>include\CTMRenderer\DirectX\Graphics\Geometry</Filter>
     </ClInclude>
     <ClInclude Include="include\CTMRenderer\DirectX\Window\DXWindow.hpp">
       <Filter>include\CTMRenderer\DirectX\Window</Filter>
@@ -117,10 +111,10 @@
     <ClInclude Include="include\CTMRenderer\DirectX\Window\DXWindowGeometry.hpp">
       <Filter>include\CTMRenderer\DirectX\Window</Filter>
     </ClInclude>
-    <ClInclude Include="include\CTMRenderer\IRenderer.hpp">
+    <ClInclude Include="include\CTMRenderer\ICTMRenderer.hpp">
       <Filter>include\CTMRenderer</Filter>
     </ClInclude>
-    <ClInclude Include="include\CTMRenderer\Timer.hpp">
+    <ClInclude Include="include\CTMRenderer\CTMTimer.hpp">
       <Filter>include\CTMRenderer</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\CoreMacros.hpp">
@@ -135,31 +129,31 @@
     <ClInclude Include="include\Core\WindowsDefines.hpp">
       <Filter>include\Core</Filter>
     </ClInclude>
-    <ClInclude Include="include\Event\Event.hpp">
+    <ClInclude Include="include\CTMRenderer\Event\Event.hpp">
       <Filter>include\Event</Filter>
     </ClInclude>
-    <ClInclude Include="include\Event\EventDispatcher.hpp">
+    <ClInclude Include="include\CTMRenderer\Event\EventDispatcher.hpp">
       <Filter>include\Event</Filter>
     </ClInclude>
-    <ClInclude Include="include\Event\EventListener.hpp">
+    <ClInclude Include="include\CTMRenderer\Event\EventListener.hpp">
       <Filter>include\Event</Filter>
     </ClInclude>
-    <ClInclude Include="include\Event\EventPool.hpp">
+    <ClInclude Include="include\CTMRenderer\Event\EventPool.hpp">
       <Filter>include\Event</Filter>
     </ClInclude>
-    <ClInclude Include="include\Event\EventSystem.hpp">
+    <ClInclude Include="include\CTMRenderer\Event\EventSystem.hpp">
       <Filter>include\Event</Filter>
     </ClInclude>
-    <ClInclude Include="include\CTMRenderer\Shape.hpp" />
+    <ClInclude Include="include\CTMRenderer\CTMShape.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\CorePCH.cpp">
       <Filter>src\Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\Event\EventDispatcher.cpp">
+    <ClCompile Include="src\CTMRenderer\Event\EventDispatcher.cpp">
       <Filter>src\Event</Filter>
     </ClCompile>
-    <ClCompile Include="src\Event\EventSystem.cpp">
+    <ClCompile Include="src\CTMRenderer\Event\EventSystem.cpp">
       <Filter>src\Event</Filter>
     </ClCompile>
     <ClCompile Include="src\CTMRenderer\CTMRenderer.cpp">
@@ -174,25 +168,23 @@
     <ClCompile Include="src\CTMRenderer\DirectX\Graphics\DXInfoQueue.cpp">
       <Filter>src\Renderer\DirectX\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\CTMRenderer\DirectX\Graphics\DXLayerSystem.cpp">
+    <ClCompile Include="src\CTMRenderer\CTMLayerSystem.cpp">
       <Filter>src\Renderer\DirectX\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="src\CTMRenderer\DirectX\Graphics\DXShaderLibrary.cpp">
       <Filter>src\Renderer\DirectX\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\CTMRenderer\DirectX\Graphics\Geometry\DXAABB.cpp">
-      <Filter>src\Renderer\DirectX\Graphics\Geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="src\CTMRenderer\DirectX\Graphics\Geometry\DXShape.cpp">
-      <Filter>src\Renderer\DirectX\Graphics\Geometry</Filter>
-    </ClCompile>
     <ClCompile Include="src\CTMRenderer\DirectX\Window\DXWindow.cpp">
       <Filter>src\Renderer\DirectX\Window</Filter>
     </ClCompile>
-    <ClCompile Include="src\CTMRenderer\Timer.cpp">
+    <ClCompile Include="src\CTMRenderer\CTMTimer.cpp">
       <Filter>src\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="src\CTMRenderer\Shape.cpp" />
+    <ClCompile Include="src\CTMRenderer\CTMShape.cpp" />
+    <ClCompile Include="src\CTMRenderer\ICTMRenderer.cpp" />
+    <ClCompile Include="src\CTMRenderer\CTMDrawQueue.cpp" />
+    <ClCompile Include="src\CTMRenderer\Event\Event.cpp" />
+    <ClCompile Include="src\CTMRenderer\Event\EventPool.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\DefaultCubePS.hlsl">
@@ -213,5 +205,8 @@
     <FxCompile Include="resources\shaders\Pos2_DefVS.hlsl">
       <Filter>resources\shaders</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="include\CTMRenderer\CTMDrawQueue.hpp" />
   </ItemGroup>
 </Project>

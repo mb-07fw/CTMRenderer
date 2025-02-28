@@ -34,6 +34,7 @@ namespace CTMRenderer::CTMDirectX::Window
             {
                 DEBUG_PRINT("Broadcasting end event.\n");
                 
+                m_EventDispatcherRef.QueueEvent<Event::ClearFrameEvent>();
                 m_EventDispatcherRef.QueueEvent<Event::EndEvent>(1738u); // ayyy
                 return;
             }
@@ -151,7 +152,7 @@ namespace CTMRenderer::CTMDirectX::Window
         case WM_KEYDOWN:
             if (wParam != VK_ESCAPE)
                 return S_OK;
-            // Fall through if Esc was pressed.
+            [[fallthrough]];
         case WM_CLOSE:
             PostQuitMessage(0);
             return S_OK;

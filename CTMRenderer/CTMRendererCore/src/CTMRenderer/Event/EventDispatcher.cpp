@@ -1,10 +1,11 @@
 #include "Core/CorePCH.hpp"
-#include "Event/EventDispatcher.hpp"
+#include "CTMRenderer/Event/EventDispatcher.hpp"
 
 namespace CTMRenderer::Event
 {
 	EventDispatcher::EventDispatcher() noexcept
-		: m_EventPool(), m_EventQueues(), m_GenericListeners(), m_ConcreteListeners() {}
+	{
+	}
 
 	void EventDispatcher::Subscribe(IGenericListener* pGenericListener) noexcept
 	{
@@ -51,7 +52,6 @@ namespace CTMRenderer::Event
 		{
 			// Iterate through each event in the ConcreteEventType's mapped event queue.
 			for (IEvent* pEvent : value)
-			{
 				switch (pEvent->ConcreteType())
 				{
 				case ConcreteEventType::CTM_STATE_START_EVENT:
@@ -63,8 +63,16 @@ namespace CTMRenderer::Event
 				case ConcreteEventType::CTM_MOUSE_MOVE_EVENT:
 					DispatchEvent(MouseMoveEvent::Cast(pEvent));
 					break;
+				case ConcreteEventType::CTM_FRAME_CLEAR_FRAME_EVENT:
+					DispatchEvent(ClearFrameEvent::Cast(pEvent));
+					break;
+				case ConcreteEventType::CTM_FRAME_START_FRAME_EVENT:
+					DispatchEvent(StartFrameEvent::Cast(pEvent));
+					break;
+				case ConcreteEventType::CTM_FRAME_DRAW_FRAME_EVENT:
+					DispatchEvent(DrawFrameEvent::Cast(pEvent));
+					break;
 				}
-			}
 
 			// Flush event queue.
 			value.clear();

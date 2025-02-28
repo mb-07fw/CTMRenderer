@@ -16,8 +16,7 @@
 #include "CTMRenderer/DirectX/Window/DXWindowGeometry.hpp"
 #include "CTMRenderer/DirectX/Graphics/DXInfoQueue.hpp"
 #include "CTMRenderer/DirectX/Graphics/DXShaderLibrary.hpp"
-#include "CTMRenderer/Color.hpp"
-#include "CTMRenderer/DirectX/Graphics/Geometry/DXShape.hpp"
+#include "CTMRenderer/CTMColor.hpp"
 
 namespace CTMRenderer::CTMDirectX::Graphics
 {
@@ -73,7 +72,7 @@ namespace CTMRenderer::CTMDirectX::Graphics
 		HWND m_WindowHandle = nullptr;
 		Rendering2D m_2DRender;
 		TextRender m_TextRender;
-		Shapes::NormColor m_ClearColor;
+		Shapes::CTMNormColor m_ClearColor;
 	private:
 		DXGraphics(const DXGraphics&) = delete;
 		DXGraphics(DXGraphics&&) = delete;

@@ -2,7 +2,7 @@
 
 namespace CTMRenderer::Shapes
 {
-	enum class ColorType
+	enum class CTMColorType
 	{
 		BLACK,
 		WHITE,
@@ -12,7 +12,7 @@ namespace CTMRenderer::Shapes
 	};
 
 	// Represents un-normalized RGBA values.
-	struct Color
+	struct CTMColor
 	{
 		static constexpr unsigned char RED_CHANNEL = 0;
 		static constexpr unsigned char GREEN_CHANNEL = 1;
@@ -20,25 +20,25 @@ namespace CTMRenderer::Shapes
 		static constexpr unsigned char ALPHA_CHANNEL = 3;
 		static constexpr unsigned char NUM_CHANNELS = 4;
 
-		inline Color(ColorType colorType)
+		inline CTMColor(CTMColorType colorType)
 		{
 			SetAll(0);
 			rgba[ALPHA_CHANNEL] = 255;
 
 			switch (colorType)
 			{
-			case ColorType::BLACK:
+			case CTMColorType::BLACK:
 				return;
-			case ColorType::WHITE:
+			case CTMColorType::WHITE:
 				SetAll(255);
 				break;
-			case ColorType::RED:
+			case CTMColorType::RED:
 				rgba[RED_CHANNEL] = 255;
 				break;
-			case ColorType::GREEN:
+			case CTMColorType::GREEN:
 				rgba[GREEN_CHANNEL] = 255;
 				break;
-			case ColorType::BLUE:
+			case CTMColorType::BLUE:
 				rgba[BLUE_CHANNEL] = 255;
 				break;
 			default:
@@ -46,7 +46,7 @@ namespace CTMRenderer::Shapes
 			}
 		}
 
-		inline Color(unsigned char r = 0, unsigned char g = 0, unsigned char b = 0, unsigned char a = 0)
+		inline CTMColor(unsigned char r = 0, unsigned char g = 0, unsigned char b = 0, unsigned char a = 0)
 		{
 			rgba[0] = r;
 			rgba[1] = g;
@@ -68,9 +68,9 @@ namespace CTMRenderer::Shapes
 		unsigned char rgba[4];
 	};
 
-	struct NormColor
+	struct CTMNormColor
 	{
-		inline NormColor(float r = 0, float g = 0, float b = 0, float a = 1)
+		inline CTMNormColor(float r = 0, float g = 0, float b = 0, float a = 1)
 		{
 			rgba[0] = r;
 			rgba[1] = g;

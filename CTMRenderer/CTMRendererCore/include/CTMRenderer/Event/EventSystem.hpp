@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Event/EventDispatcher.hpp"
+#include "CTMRenderer/Event/EventDispatcher.hpp"
 
 namespace CTMRenderer::Event
 {
 	class EventSystem
 	{
 	public:
-		EventSystem() noexcept;
+		EventSystem() = default;
 		~EventSystem() = default;
 	public:
 		inline [[nodiscard]] EventDispatcher& Dispatcher() noexcept { return m_Dispatcher; }

@@ -1,33 +1,32 @@
 #pragma once
 
-#include "CTMRenderer/Color.hpp"
+#include "CTMRenderer/CTMColor.hpp"
 
 namespace CTMRenderer::Shapes
 {
-	enum class ShapeType
+	enum class CTMShapeType
 	{
-		RECT,
-		CIRClE
+		CTM_RECT,
+		CTM_CIRClE
 	};
 
-	class IShape
+	class CTMShape
 	{
 	public:
-		IShape(ShapeType type) noexcept;
-		virtual ~IShape() = default;
+		CTMShape(CTMShapeType type) noexcept;
+		~CTMShape() = default;
 	public:
 		[[nodiscard]] const char* TypeToStr() const noexcept;
-		inline [[nodiscard]] ShapeType Type() const noexcept { return m_Type; }
+		inline [[nodiscard]] CTMShapeType Type() const noexcept { return m_Type; }
 	protected:
-		const ShapeType m_Type;
-		bool m_IsValidated = false;
+		const CTMShapeType m_Type;
 	};
 
-	class IRectangle : public IShape
+	class CTMRect : public CTMShape
 	{
 	public:
-		IRectangle(float left, float top, float right, float bottom, Color color) noexcept;
-		virtual ~IRectangle() = default;
+		CTMRect(float left, float top, float right, float bottom, CTMColor color) noexcept;
+		~CTMRect() = default;
 	public:
 		inline [[nodiscard]] float Left() const noexcept { return m_Left; }
 		inline [[nodiscard]] float Top() const noexcept { return m_Top; }
@@ -35,6 +34,6 @@ namespace CTMRenderer::Shapes
 		inline [[nodiscard]] float Bottom() const noexcept { return m_Bottom; }
 	private:
 		float m_Left, m_Top, m_Right, m_Bottom;
-		Color m_Color;
+		CTMColor m_Color;
 	};
 }

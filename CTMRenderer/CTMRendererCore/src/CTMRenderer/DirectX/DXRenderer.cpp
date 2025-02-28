@@ -6,7 +6,7 @@
 namespace CTMRenderer::CTMDirectX
 {
 	DXRenderer::DXRenderer(const unsigned int targetFPS)
-		: IRenderer(), m_Settings(targetFPS), m_Window(m_Settings, m_EventSystem.Dispatcher()),
+		: ICTMRenderer(), m_Settings(targetFPS), m_Window(m_Settings, m_EventSystem.Dispatcher()),
 		  m_Graphics(m_Settings, m_Window.ClientArea(), m_Window.Mouse())
 	{
 	}
@@ -29,18 +29,6 @@ namespace CTMRenderer::CTMDirectX
 	void DXRenderer::JoinForShutdown() noexcept
 	{
 		m_EventThread.join();
-	}
-
-	Shapes::IRectangle DXRenderer::MakeRect(float left, float top, float right, float bottom, Shapes::Color color) const noexcept
-	{
-		return CTMDirectX::Graphics::Geometry::DXRect(left, top, right, bottom, color);
-	}
-
-	void DXRenderer::SubmitShape(const Shapes::IShape& shape) noexcept
-	{
-		using namespace CTMDirectX::Graphics::Geometry;
-
-		DEBUG_PRINT("Submitted shape : " << shape.TypeToStr() << '\n');
 	}
 	#pragma endregion
 
@@ -105,10 +93,7 @@ namespace CTMRenderer::CTMDirectX
 			frameStartTime = m_Timer.ElapsedMillis();
 
 			if (m_RendererStarted.load(std::memory_order_acquire))
-			{
 				m_Window.HandleMessages(result, msg);
-				DoFrame(frameStartTime / 1000);
-			}
 
 			if (eventDispatcher.IsEventQueued())
 				eventDispatcher.DispatchQueued();
@@ -122,13 +107,6 @@ namespace CTMRenderer::CTMDirectX
 		}
 
 		DEBUG_PRINT("Event loop end.\n");
-	}
-
-	void DXRenderer::DoFrame(double elapsedMillis) noexcept
-	{
-		m_Graphics.StartFrame(elapsedMillis);
-		m_Graphics.Draw();
-		m_Graphics.EndFrame();
 	}
 
 	void DXRenderer::HandleEvent(Event::IEvent* pEvent) noexcept
@@ -148,7 +126,14 @@ namespace CTMRenderer::CTMDirectX
 		case Event::GenericEventType::CTM_MOUSE_EVENT:
 			HandleMouseEvent(pEvent);
 			break;
-		default: break;
+		case Event::GenericEventType::CTM_FRAME_EVENT:
+			if (pEvent->ConcreteType() == Event::ConcreteEventType::CTM_FRAME_CLEAR_FRAME_EVENT)
+				DEBUG_PRINT("Received an ClearFrameEvent.\n");
+			else
+				DEBUG_PRINT("Recieved a FrameEvent.\n");
+			break;
+		default:
+			RUNTIME_ASSERT(false, "Received event has an unknown GenericEventType.\n");
 		}
 	}
 

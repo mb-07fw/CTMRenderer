@@ -2,14 +2,14 @@
 
 #include <chrono>
 
-namespace CTMRenderer::Timer
+namespace CTMRenderer::Utils
 {
 	// TODO: Store time points as doubles, so there can be actual stopping and resetting functionality.
-	class Timer
+	class CTMTimer
 	{
 		using TimePoint = std::chrono::high_resolution_clock::time_point;
 	public:
-		Timer() noexcept;
+		CTMTimer() noexcept;
 	public:
 		void Start() noexcept;
 		void Reset() noexcept;

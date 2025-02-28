@@ -1,25 +1,25 @@
 #include "Core/CorePCH.hpp"
-#include "CTMRenderer/Timer.hpp"
+#include "CTMRenderer/CTMTimer.hpp"
 
-namespace CTMRenderer::Timer
+namespace CTMRenderer::Utils
 {
-	Timer::Timer() noexcept
+	CTMTimer::CTMTimer() noexcept
 	{
         Start();
 	}
 
-    void Timer::Start() noexcept
+    void CTMTimer::Start() noexcept
     {
         m_StartTime = std::chrono::high_resolution_clock::now();
 
     }
 
-    void Timer::Reset() noexcept
+    void CTMTimer::Reset() noexcept
     {
         m_StartTime = std::chrono::high_resolution_clock::now();
     }
 
-    double Timer::ElapsedMillis() const noexcept
+    double CTMTimer::ElapsedMillis() const noexcept
     {
         auto now = std::chrono::high_resolution_clock::now();
         return std::chrono::duration<double, std::milli>(now - m_StartTime).count();

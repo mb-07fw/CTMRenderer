@@ -4,13 +4,15 @@
 
 int main()
 {
-	CTMRenderer::CTMRenderer renderer(CTMRenderer::RendererType::CTM_DIRECTX, 60u);
+	using namespace CTMRenderer::Shapes;
+
+	CTMRenderer::CTMRenderer renderer(CTMRenderer::CTMRendererType::CTM_DIRECTX, 60u);
+
+	//CTMRect rect(0, 0, 1, 1, CTMColor(CTMColorType::BLUE));
 
 	renderer.Start();
 
-	Shapes::IRectangle 
-	
-	//renderer.SubmitShape()
+	//renderer.SubmitShape(rect);
 
 	renderer.JoinForShutdown();
 

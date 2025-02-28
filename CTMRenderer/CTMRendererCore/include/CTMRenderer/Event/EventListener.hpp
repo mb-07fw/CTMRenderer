@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include "Event/Event.hpp"
+#include "CTMRenderer/Event/Event.hpp"
 #include "Core/CoreMacros.hpp"
 
 namespace CTMRenderer::Event

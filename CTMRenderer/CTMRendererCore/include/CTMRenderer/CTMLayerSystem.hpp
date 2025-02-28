@@ -1,10 +1,8 @@
 #pragma once
 
-#include "CTMRenderer/DirectX/Graphics/Geometry/DXShape.hpp"
-
 #include <vector>
 
-namespace CTMRenderer::CTMDirectX::Graphics
+namespace CTMRenderer
 {
 	class Layer
 	{
