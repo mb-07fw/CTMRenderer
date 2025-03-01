@@ -35,7 +35,7 @@ namespace CTMRenderer::CTMDirectX
 	#pragma region Private Functions
 	void DXRenderer::OnStart(const Event::CTMStartEvent* pStartEvent) noexcept
 	{
-		RUNTIME_ASSERT(pStartEvent != nullptr, "Start event is nullptr. How TF did this happen?\n");
+		RUNTIME_ASSERT(pStartEvent != nullptr, "Start event is nullptr.\n");
 		RUNTIME_ASSERT(m_RendererStarted.load(std::memory_order_acquire) == false, "Renderer has already started.\n");
 
 		DEBUG_PRINT("Start args : " << pStartEvent->PlaceholderArgs() << '\n');
@@ -50,7 +50,7 @@ namespace CTMRenderer::CTMDirectX
 
 	void DXRenderer::OnEnd(const Event::CTMEndEvent* pEndEvent) noexcept
 	{
-		RUNTIME_ASSERT(pEndEvent != nullptr, "End event is nullptr. How TF did this happen?\n");
+		RUNTIME_ASSERT(pEndEvent != nullptr, "End event is nullptr.\n");
 		RUNTIME_ASSERT(m_EventLoopStarted.load(std::memory_order_acquire) == true, "Event loop hasn't started.\n");
 		RUNTIME_ASSERT(m_RendererStarted.load(std::memory_order_acquire) == true, "Renderer hasn't started.\n");
 		RUNTIME_ASSERT(m_ShouldRun.load(std::memory_order_acquire) == true, "Renderer has already shutdown.\n");
@@ -96,7 +96,9 @@ namespace CTMRenderer::CTMDirectX
 				m_Window.HandleMessages(result, msg);
 
 			if (eventDispatcher.IsEventQueued())
+			{
 				eventDispatcher.DispatchQueued();
+			}
 
 			actualFrameDuration = m_Timer.ElapsedMillis() - frameStartTime;
 			remainingFrameTime = Utility::MinDB(targetFrameDuration - actualFrameDuration, 0);

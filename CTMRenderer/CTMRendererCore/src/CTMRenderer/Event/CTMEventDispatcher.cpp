@@ -62,7 +62,7 @@ namespace CTMRenderer::Event
 					break;
 				case CTMConcreteEventType::CTM_STATE_END_EVENT:
 					DispatchEvent(CTMEndEvent::Cast(pEvent));
-					break;
+					return; // Skip processing other events after the CTMEndEvent was dispatched.
 				case CTMConcreteEventType::CTM_MOUSE_MOVE_EVENT:
 					DispatchEvent(CTMMouseMoveEvent::Cast(pEvent));
 					break;

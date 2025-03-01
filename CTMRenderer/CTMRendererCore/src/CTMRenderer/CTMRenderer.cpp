@@ -15,7 +15,14 @@ namespace CTMRenderer
 
 	void CTMRenderer::ClearScreen() noexcept
 	{
+		RUNTIME_ASSERT(m_Renderer->IsRunning(), "Renderer has already ended.\n");
+
 		m_Renderer->ClearScreen();
+	}
+
+	void CTMRenderer::Shutdown() noexcept
+	{
+		m_Renderer->Shutdown();
 	}
 
 	void CTMRenderer::SubmitShape(const Shapes::CTMShape& shape) noexcept

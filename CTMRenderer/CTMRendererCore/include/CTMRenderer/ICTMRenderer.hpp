@@ -25,8 +25,12 @@ namespace CTMRenderer
 	public:
 		virtual void Init() noexcept = 0;
 		virtual void JoinForShutdown() noexcept = 0;
+
 		void ClearScreen() noexcept;
+		void Shutdown() noexcept;
 		void SubmitShape(const Shapes::CTMShape& shapeRef) noexcept;
+
+		inline [[nodiscard]] bool IsRunning() const noexcept { return m_ShouldRun.load(std::memory_order_acquire); }
 
 		/*template <typename ShapeTy, typename... Args>
 		[[nodiscard]] ShapeTy& MakeShape(Args&&... args) noexcept;*/

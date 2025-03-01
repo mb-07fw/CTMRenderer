@@ -42,6 +42,7 @@ namespace CTMRenderer
 		void Init() noexcept;
 		void JoinForShutdown() noexcept;
 		void ClearScreen() noexcept;
+		void Shutdown() noexcept;
 		void SubmitShape(const Shapes::CTMShape& shape) noexcept;
 	private:
 		std::unique_ptr<ICTMRenderer> m_Renderer;
