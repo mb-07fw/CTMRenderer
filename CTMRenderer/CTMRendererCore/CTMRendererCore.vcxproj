@@ -91,6 +91,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\CTMRenderer\CTMRenderer.hpp" />
+    <ClInclude Include="include\CTMRenderer\CTMShapePool.hpp" />
     <ClInclude Include="include\CTMRenderer\DirectX\Control\Mouse.hpp" />
     <ClInclude Include="include\CTMRenderer\DirectX\DXRenderer.hpp" />
     <ClInclude Include="include\CTMRenderer\DirectX\DXRendererSettings.hpp" />
@@ -126,6 +127,7 @@
     </ClCompile>
     <ClCompile Include="src\CTMRenderer\CTMDrawQueue.cpp" />
     <ClCompile Include="src\CTMRenderer\CTMShape.cpp" />
+    <ClCompile Include="src\CTMRenderer\CTMShapePool.cpp" />
     <ClCompile Include="src\CTMRenderer\Event\CTMEventListener.cpp" />
     <ClCompile Include="src\CTMRenderer\Event\CTMEventPool.cpp" />
     <ClCompile Include="src\CTMRenderer\ICTMRenderer.cpp" />

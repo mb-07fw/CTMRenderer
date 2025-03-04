@@ -24,6 +24,14 @@ namespace CTMRenderer::Shapes
 		  m_Right(right), m_Bottom(bottom),
 		  m_Color(color)
 	{
+	}
 
+	void CTMRect::Set(float left, float top, float right, float bottom, CTMColor color) noexcept
+	{
+		m_Left = left;
+		m_Top = top;
+		m_Right = right;
+		m_Bottom = bottom;
+		m_Color = color;
 	}
 }

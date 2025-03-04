@@ -39,12 +39,33 @@ namespace CTMRenderer
 				RUNTIME_ASSERT(false, "Failed to initialize CTMRenderer due to the provided RendererType being unknown.\n");
 		}
 
-		void Init() noexcept;
-		void JoinForShutdown() noexcept;
-		void ClearScreen() noexcept;
+		void Start() noexcept;
 		void Shutdown() noexcept;
-		void SubmitShape(const Shapes::CTMShape& shape) noexcept;
+		void JoinForShutdown() noexcept;
+
+		void ClearScreen() noexcept;
+
+		template <typename... Args>
+		std::shared_ptr<Shapes::CTMRect> MakeRect(Args&&... args) noexcept;
+		
+		template <typename ShapeTy>
+			requires std::is_base_of_v<Shapes::CTMShape, ShapeTy>
+		void SubmitShape(const ShapeTy& shapeRef) noexcept;
 	private:
 		std::unique_ptr<ICTMRenderer> m_Renderer;
 	};
+
+	template <typename... Args>
+	std::shared_ptr<Shapes::CTMRect> CTMRenderer::MakeRect(Args&&... args) noexcept
+	{
+		return m_Renderer->MakeRect(std::forward<Args>(args)...);
+	}
+
+	template <typename ShapeTy>
+		requires std::is_base_of_v<Shapes::CTMShape, ShapeTy>
+	void CTMRenderer::SubmitShape(const ShapeTy& shapeRef) noexcept
+	{
+		if constexpr (std::is_same_v<ShapeTy, Shapes::CTMRect>)
+			m_Renderer->SubmitShape(shapeRef);
+	}
 }

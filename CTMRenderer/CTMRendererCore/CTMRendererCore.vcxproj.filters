@@ -145,6 +145,7 @@
       <Filter>include\Event</Filter>
     </ClInclude>
     <ClInclude Include="include\CTMRenderer\CTMShape.hpp" />
+    <ClInclude Include="include\CTMRenderer\CTMShapePool.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\CorePCH.cpp">
@@ -183,6 +184,7 @@
     <ClCompile Include="src\CTMRenderer\Event\CTMEvent.cpp" />
     <ClCompile Include="src\CTMRenderer\Event\CTMEventPool.cpp" />
     <ClCompile Include="src\CTMRenderer\Event\CTMEventListener.cpp" />
+    <ClCompile Include="src\CTMRenderer\CTMShapePool.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\DefaultCubePS.hlsl">

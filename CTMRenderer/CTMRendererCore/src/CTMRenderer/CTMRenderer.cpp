@@ -3,9 +3,14 @@
 
 namespace CTMRenderer
 {
-	void CTMRenderer::Init() noexcept
+	void CTMRenderer::Start() noexcept
 	{
-		m_Renderer->Init();
+		m_Renderer->Start();
+	}
+
+	void CTMRenderer::Shutdown() noexcept
+	{
+		m_Renderer->Shutdown();
 	}
 
 	void CTMRenderer::JoinForShutdown() noexcept
@@ -15,18 +20,8 @@ namespace CTMRenderer
 
 	void CTMRenderer::ClearScreen() noexcept
 	{
-		RUNTIME_ASSERT(m_Renderer->IsRunning(), "Renderer has already ended.\n");
+		RUNTIME_ASSERT(m_Renderer->IsRunning(), "Graphics specific operations such as clearing the screen can only be down when CTMRenderer is running.\n");
 
 		m_Renderer->ClearScreen();
-	}
-
-	void CTMRenderer::Shutdown() noexcept
-	{
-		m_Renderer->Shutdown();
-	}
-
-	void CTMRenderer::SubmitShape(const Shapes::CTMShape& shape) noexcept
-	{
-		m_Renderer->SubmitShape(shape);
 	}
 }

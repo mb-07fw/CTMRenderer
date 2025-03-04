@@ -3,8 +3,8 @@
 
 namespace CTMRenderer
 {
-	void CTMDrawQueue::QueueShape(const Shapes::CTMShape& shapeRef) noexcept
+	void CTMDrawQueue::QueueShape(const Shapes::CTMRect& shapeRef) noexcept
 	{
-		m_ShapeQueue.emplace_back(&shapeRef);
+		m_RectQueue.emplace_back(&shapeRef);
 	}
 }

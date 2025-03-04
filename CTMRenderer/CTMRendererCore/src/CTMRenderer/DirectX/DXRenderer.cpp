@@ -11,28 +11,12 @@ namespace CTMRenderer::CTMDirectX
 	{
 	}
 
-	#pragma region Public API
-	void DXRenderer::Init() noexcept
-	{
-		m_ShouldRun.store(true, std::memory_order_release);
-		m_EventThread = std::thread(&DXRenderer::EventLoop, this);
-
-		// Wait for the event loop to start.
-		std::unique_lock<std::mutex> lock(m_RendererMutex);
-		m_RendererCV.wait(lock, [this] { return m_EventLoopStarted.load(std::memory_order_acquire); });
-
-		m_EventSystem.Dispatcher().QueueEvent<Event::CTMStartEvent>(1738u); // ayy
-
-		//DEBUG_PRINT("Initialized renderer.\n");
-	}
-
-	void DXRenderer::JoinForShutdown() noexcept
-	{
-		m_EventThread.join();
-	}
-	#pragma endregion
-
 	#pragma region Private Functions
+	std::thread DXRenderer::StartEventThread() noexcept
+	{
+		return std::thread(&DXRenderer::EventLoop, this);
+	}
+
 	void DXRenderer::OnStart(const Event::CTMStartEvent* pStartEvent) noexcept
 	{
 		RUNTIME_ASSERT(pStartEvent != nullptr, "Start event is nullptr.\n");
@@ -98,7 +82,12 @@ namespace CTMRenderer::CTMDirectX
 			if (eventDispatcher.IsEventQueued())
 			{
 				eventDispatcher.DispatchQueued();
+
+				if (!m_ShouldRun.load(std::memory_order_acquire))
+					return;
 			}
+
+			DrawQueued();
 
 			actualFrameDuration = m_Timer.ElapsedMillis() - frameStartTime;
 			remainingFrameTime = Utility::MinDB(targetFrameDuration - actualFrameDuration, 0);
@@ -109,6 +98,15 @@ namespace CTMRenderer::CTMDirectX
 		}
 
 		DEBUG_PRINT("Event loop end.\n");
+	}
+
+	void DXRenderer::DrawQueued() noexcept
+	{
+		if (!m_DrawQueue.RectQueue().empty())
+		{
+			DEBUG_PRINT("Queued rect found.\n");
+			m_DrawQueue.RectQueue().clear();
+		}
 	}
 
 	void DXRenderer::HandleEvent(Event::ICTMEvent* pEvent) noexcept

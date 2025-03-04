@@ -10,6 +10,8 @@ namespace CTMRenderer::Shapes
 		CTM_CIRClE
 	};
 
+
+
 	class CTMShape
 	{
 	public:
@@ -22,11 +24,15 @@ namespace CTMRenderer::Shapes
 		const CTMShapeType m_Type;
 	};
 
+
+
 	class CTMRect : public CTMShape
 	{
 	public:
 		CTMRect(float left, float top, float right, float bottom, CTMColor color) noexcept;
 		~CTMRect() = default;
+	public:
+		void Set(float left, float top, float right, float bottom, CTMColor color) noexcept;
 	public:
 		inline [[nodiscard]] float Left() const noexcept { return m_Left; }
 		inline [[nodiscard]] float Top() const noexcept { return m_Top; }

@@ -12,13 +12,14 @@ namespace CTMRenderer::CTMDirectX
 	public:
 		explicit DXRenderer(const unsigned int targetFPS);
 		~DXRenderer() = default;
-	public:
-		virtual void Init() noexcept override;
-		virtual void JoinForShutdown() noexcept override;
 	private:
+		virtual std::thread StartEventThread() noexcept override;
 		void OnStart(const Event::CTMStartEvent* pEvent) noexcept;
 		void OnEnd(const Event::CTMEndEvent* pEvent) noexcept;
 		void EventLoop() noexcept;
+
+		void DrawQueued() noexcept;
+
 		void HandleEvent(Event::ICTMEvent* pEvent) noexcept;
 		void HandleStateEvent(Event::ICTMEvent* pEvent) noexcept;
 		void HandleMouseEvent(Event::ICTMEvent* pEvent) noexcept;
