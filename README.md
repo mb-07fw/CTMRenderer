@@ -1,5 +1,10 @@
 # CTMRenderer
 <br>
+
+Note: This repository has been abanded in favor of my other repository CMRenderer. This is here for legacy's sake.
+
+
+
 An initial testing project where I try to learn more about graphics programming structure through the WinAPI and DirectX11.
 
 CTM stands for custom. I know, it's really original.
